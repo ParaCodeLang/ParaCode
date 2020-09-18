@@ -1,0 +1,73 @@
+# This is a very useful piece of software
+
+#IMPORT("ParaCodeTest.para", "TEST.para")
+
+FUNCTION oopify(prefix) -> prefix + "oop"
+FUNCTION pooify(suffix) -> "poo" + suffix
+FUNCTION nullify(nullifier) -> "NULLIFIED"
+
+FUNCTION join(elements, separator)
+	VAR result = ""
+	VAR len = LEN(elements)
+
+	FOR i = 0 TO len THEN
+		VAR result = result + elements/i
+		IF i != len - 1 THEN VAR result = result + separator
+	END
+
+	RETURN result
+END
+
+FUNCTION map(elements, func)
+	VAR new_elements = []
+
+	FOR i = 0 TO LEN(elements) THEN
+		APPEND(new_elements, func(elements/i))
+	END
+
+	RETURN new_elements
+END
+
+FUNCTION loop(numOfTimes, functionToLoop, parameters)
+	FOR i = 0 TO numOfTimes THEN
+		#FOR o = 0 TO LEN(parameters) 
+		#APPEND(parameters, func(elements/i))
+		#parameters = LEN(parameters)
+		functionToLoop(parameters)
+	END
+END
+
+#FUNCTION loop(numOfTimes, functionToLoop, parameter1, parameter2)
+#	FOR i = 0 TO numOfTimes THEN
+#		#FOR o = 0 TO LEN(parameters) 
+#		#APPEND(parameters, func(elements/i))
+#		#parameters = LEN(parameters)
+#		functionToLoop(parameter1, parameter2)
+#	END
+#END
+
+#FUNCTION hello(message, message2)
+#	PRINT(message)
+#	PRINT(message2)
+#END
+
+FUNCTION hello(message)
+	PRINT(message)
+END
+
+VAR messages = ["WHY HELLO THERE!!", "ParaCode RULES!!!"]
+#loop(20, hello, messages)
+#loop(20, hello, "WHY HELLO THERE!!", "ParaCode RULES!!!")
+loop(20, hello, "WHY HELLO THERE!!")
+
+PRINT(1 + 5 - 3 * 9 / 7)
+PRINT(2 - 3 / 6 * 9 + 4 - 1 / 2 * 3)
+PRINT(join(map(["l", "ps", "c", "p", "sc"], nullify), ", "))
+PRINT(join(map(["l", "sp", "c", "p", "sc"], oopify), ", "))
+PRINT(join(map(["l", "ps", "c", "p", "sc"], pooify), ", "))
+
+#FOR i = 0 TO 5 THEN
+	#PRINT(join(map(["l", "sp", "c", "p", "sc"], oopify), ", "))
+	#PRINT(join(map(["l", "ps", "c", "p", "sc"], pooify), ", "))
+	# RUN("ParaCodeTest.para")
+#END
