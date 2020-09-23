@@ -1,3 +1,5 @@
+from replit import db
+
 from inspect import *
 import sys
 
