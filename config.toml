@@ -4,10 +4,10 @@ userColor = "white"
 userStyle = "white"
 consoleColor = "white"
 consoleStyle = "white"
-pointerColor = "red"
-pointerStyle = "red"
-errorColor = "green"
-errorStyle = "green"
+pointerColor = "green"
+pointerStyle = "green"
+errorColor = "red"
+errorStyle = "red"
 
 # Configuration For ParaCode
 [lang]
