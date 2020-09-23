@@ -127,19 +127,60 @@ APPENDFILE("TEST.txt", "hehe
 APPENDFILE("TEST.txt", "hehe
 ")
 
+// HALFDIAMONDSTAR(148)
+VAR rand = RANDOMNUMBER(1, 149, 3)
+PRINT(rand)
+HALFDIAMONDSTAR(rand)
+
+PRINT("REMOVE PUNCTUATION: ")
+VAR removePunctuation = "A, b, c, & d; e = f * g? 8 % 6 ~ k ___ ' () !"
+PRINT(removePunctuation)
+VAR removePunctuation = REMOVEPUNCTUATION(removePunctuation)
+PRINT(removePunctuation)
+
+PRINT("KEEP PUNCTUATION: ")
+VAR keepPunctuation = "A, b, c, & d; e = f * g? 8 % 6 ~ k ___ ' () !"
+PRINT(keepPunctuation)
+VAR keepPunctuation = KEEPPUNCTUATION(keepPunctuation)
+PRINT(keepPunctuation)
+
+PRINT("REMOVE LETTERS: ")
+VAR removeLetters = "A, b, c, & d; e = f * g? 8 % 6 ~ k ___ ' () !"
+PRINT(removeLetters)
+VAR removeLetters = REMOVELETTERS(removeLetters)
+PRINT(removeLetters)
+
+PRINT("REMOVE NUMBERS: ")
+VAR removeNumbers = "A, b, c, & d; e = f * g? 8 % 6 ~ k ___ ' () !"
+PRINT(removeNumbers)
+VAR removeNumbers = REMOVENUMBERS(removeNumbers)
+PRINT(removeNumbers)
+
+PRINT("REMOVE SPACES: ")
+VAR removeSpaces = "A, b, c, & d; e = f * g? 8 % 6 ~ k ___ ' () !"
+PRINT(removeSpaces)
+VAR removeSpaces = REMOVESPACES(removeSpaces)
+PRINT(removeSpaces)
+
+PRINT("REMOVE SPACE-LIKE CHARACTERS: ")
+VAR removeAllSpaces = "A, b, c, & d; e = f * g? 8 % 6 ~ k ___ ' () !"
+PRINT(removeAllSpaces)
+VAR removeAllSpaces = REMOVEALLSPACES(removeAllSpaces)
+PRINT(removeAllSpaces)
+
 // Turtle Support
 // Rainbow Benzene
-VAR turtle = TURTLE()
-VAR colors = ["red", "purple", "blue", "green", "orange", "yellow"]
-TURTLEBGCOLOR("black")
-FOR x = 0 TO 360 THEN
-    VAR o = MODULO(x, 6)
-    TURTLESPEED(10)
-    TURTLEPENCOLOR(INDEXOF(colors, o))
-    //TURTLEWIDTH(x / 100 + 1)
-    TURTLEFORWARD(x)
-    TURTLELEFT(59)
-END
+// VAR turtle = TURTLE()
+// VAR colors = ["red", "purple", "blue", "green", "orange", "yellow"]
+// TURTLEBGCOLOR("black")
+// FOR x = 0 TO 360 THEN
+//     VAR o = MODULO(x, 6)
+//     TURTLESPEED(10)
+//     TURTLEPENCOLOR(INDEXOF(colors, o))
+//     //TURTLEWIDTH(x / 100 + 1)
+//     TURTLEFORWARD(x)
+//     TURTLELEFT(59)
+// END
 
 // TURTLEEXITONCLICK()
 
