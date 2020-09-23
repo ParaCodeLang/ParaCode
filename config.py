@@ -1,14 +1,16 @@
 import os
 
-version = "1.1.6"
+version = "1.2.2"
 author = "DaRubyMiner360"
 language_name = "ParaCode"
+
+debug = False
 
 do_help_command = True  # use the built-in help command?
 
 help_command = "HELP"
 clear_command = ["CLEAR", "CLR"]  # you can have aliases to the command
-version_command = ["VERSION", "-VERSION", "--VERSION", "ParaCode -VERSION", "ParaCode --VERSION", "PARACODE -VERSION", "PARACODE --VERSION"]  # you can have aliases to the command
+version_command = ["VERSION", "-VERSION", "--VERSION", "ParaCode -VERSION", "ParaCode --VERSION", "PARACODE -VERSION", "PARACODE --VERSION"]
 
 def ECHO(msg='',end='\n'):
     print(msg,end=end)
