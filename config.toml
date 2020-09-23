@@ -1,0 +1,14 @@
+# Configuration For The Shell
+[shell]
+userColor = "white"
+userStyle = "white"
+consoleColor = "white"
+consoleStyle = "white"
+pointerColor = "red"
+pointerStyle = "red"
+errorColor = "green"
+errorStyle = "green"
+
+# Configuration For ParaCode
+[lang]
+packagePath = "Packages/"

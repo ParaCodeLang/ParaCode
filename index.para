@@ -1,7 +1,9 @@
-# This is a very useful piece of software
+// This is a very useful piece of software
 
-#IMPORT("ParaCodeTest.para", "TEST.para")
+// Importing
+//IMPORT("ParaCodeTest.para", "TEST.para")
 
+// Functions
 FUNCTION oopify(prefix) -> prefix + "oop"
 FUNCTION pooify(suffix) -> "poo" + suffix
 FUNCTION nullify(nullifier) -> "NULLIFIED"
@@ -30,34 +32,59 @@ END
 
 FUNCTION loop(numOfTimes, functionToLoop, parameters)
 	FOR i = 0 TO numOfTimes THEN
-		#FOR o = 0 TO LEN(parameters) 
+		#FOR o = 0 TO LEN(parameters)
 		#APPEND(parameters, func(elements/i))
 		#parameters = LEN(parameters)
 		functionToLoop(parameters)
 	END
 END
 
-#FUNCTION loop(numOfTimes, functionToLoop, parameter1, parameter2)
-#	FOR i = 0 TO numOfTimes THEN
-#		#FOR o = 0 TO LEN(parameters) 
-#		#APPEND(parameters, func(elements/i))
-#		#parameters = LEN(parameters)
-#		functionToLoop(parameter1, parameter2)
-#	END
-#END
-
-#FUNCTION hello(message, message2)
-#	PRINT(message)
-#	PRINT(message2)
-#END
-
-FUNCTION hello(message)
-	PRINT(message)
+FUNCTION loop2(numOfTimes, parameter1, parameter1)
+	FOR i = 0 TO numOfTimes THEN
+		#FOR o = 0 TO LEN(parameters)
+		#APPEND(parameters, func(elements/i))
+		#parameters = LEN(parameters)
+		APPENDFILE(parameter1, parameter2)
+	END
 END
 
-VAR messages = ["WHY HELLO THERE!!", "ParaCode RULES!!!"]
-#loop(20, hello, messages)
-#loop(20, hello, "WHY HELLO THERE!!", "ParaCode RULES!!!")
+//FUNCTION loop(numOfTimes, functionToLoop, parameter1, parameter2)
+//	FOR i = 0 TO numOfTimes THEN
+//		//FOR o = 0 TO LEN(parameters)
+//		//APPEND(parameters, func(elements/i))
+//		//parameters = LEN(parameters)
+//		functionToLoop(parameter1, parameter2)
+//	END
+//END
+
+//FUNCTION hello(message, message2)
+//	PRINT(message)
+//	PRINT(message2)
+//END
+
+FUNCTION hello(message)
+    // Printing
+	PRINT(message, "RED")
+	PRINT(message, "MAGENTA")
+	PRINT(message, "YELLOW")
+	PRINT(message, 136)
+	PRINT(message, "")
+	PRINT(message, NULL)
+	ECHO(message, "RED")
+	ECHO(message, "MAGENTA")
+	ECHO(message, "YELLOW")
+	PRINT(message)
+	ECHO(message)
+	DEBUGLOG(message)
+	DEBUGWARN(message)
+	DEBUGERR(message)
+	DEBUGFATAL(message)
+END
+
+// VAR messages = ["WHY HELLO THERE!!", "ParaCode RULES!!!"]
+// loop(20, hello, messages)
+// loop(20, hello, "WHY HELLO THERE!!", "ParaCode RULES!!!")
+// LOOP(hello("WHY HELLO THERE!!"), 20)
 loop(20, hello, "WHY HELLO THERE!!")
 
 PRINT(1 + 5 - 3 * 9 / 7)
@@ -66,8 +93,103 @@ PRINT(join(map(["l", "ps", "c", "p", "sc"], nullify), ", "))
 PRINT(join(map(["l", "sp", "c", "p", "sc"], oopify), ", "))
 PRINT(join(map(["l", "ps", "c", "p", "sc"], pooify), ", "))
 
-#FOR i = 0 TO 5 THEN
-	#PRINT(join(map(["l", "sp", "c", "p", "sc"], oopify), ", "))
-	#PRINT(join(map(["l", "ps", "c", "p", "sc"], pooify), ", "))
+// Replacing
+VAR replace = "REPLACE ME!"
+PRINT(replace)
+VAR replace = REPLACE(replace, "REP", "rep")
+PRINT(replace)
+
+// Date/Time
+PRINT(GETDAY())
+PRINT(GETMONTH())
+PRINT(GETYEAR())
+//PRINT(GETDAY() + "/" + GETMONTH() + "/" + GETYEAR())
+
+// File Handling
+//IF FILEEXISTS(TEST.txt") THEN DELETEFILE("TEST.txt")
+//IF NOT FILEEXISTS(TEST.txt") THEN CREATEFILE("TEST.txt")
+//PRINT(FILEEXISTS(TEST.txt"))
+//loop2(20, "TEST.txt", "hehe\n")
+APPENDFILE("TEST.txt", "hehe
+")
+APPENDFILE("TEST.txt", "hehe
+")
+APPENDFILE("TEST.txt", "hehe
+")
+APPENDFILE("TEST.txt", "hehe
+")
+APPENDFILE("TEST.txt", "hehe
+")
+APPENDFILE("TEST.txt", "hehe
+")
+APPENDFILE("TEST.txt", "hehe
+")
+APPENDFILE("TEST.txt", "hehe
+")
+
+// Turtle Support
+// Rainbow Benzene
+VAR turtle = TURTLE()
+VAR colors = ["red", "purple", "blue", "green", "orange", "yellow"]
+TURTLEBGCOLOR("black")
+FOR x = 0 TO 360 THEN
+    VAR o = MODULO(x, 6)
+    TURTLESPEED(10)
+    TURTLEPENCOLOR(INDEXOF(colors, o))
+    //TURTLEWIDTH(x / 100 + 1)
+    TURTLEFORWARD(x)
+    TURTLELEFT(59)
+END
+
+// TURTLEEXITONCLICK()
+
+// Spiral Helix Pattern
+// VAR loadWindow = TURTLESCREEN()
+// TURTLESPEED(10)
+
+// FOR i = 0 TO 100 THEN
+//     TURTLECIRCLE(5*i)
+//     TURTLECIRCLE(-5*i)
+//     TURTLELEFT(i)
+// END
+
+// TURTLEEXITONCLICK()
+
+// VAR wn = TURTLESCREEN()
+// TURTLEBGCOLOR("light green")
+// TURTLETITLE("Turtle")
+// TURTLECOLOR("blue")
+
+// FUNCTION sqrfunc(size)
+//     FOR i = 0 TO 4 THEN
+//         TURTLEFORWARD(size)
+//         TURTLELEFT(90)
+//         VAR size = size+5
+//     END
+// END
+
+// sqrfunc(6)
+// sqrfunc(26)
+// sqrfunc(46)
+// sqrfunc(66)
+// sqrfunc(86)
+// sqrfunc(106)
+// sqrfunc(126)
+// sqrfunc(146)
+
+// Window/App Support
+//VAR window = MAINLOOPAPP()
+//COLOREDLABEL("HELLO, WORLD!", "PURPLE", "RED")
+//COLOREDLABEL("HELLO, WORLD!", "RED", "PURPLE")
+//LABEL("HELLO, WORLD!")
+// The Demo App
+//DEMOAPP("TRUE")
+
+//PARAGAMEINIT()
+//PRINT("ABC")
+
+# FOR i = 0 TO 5 THEN
+	# PRINT(join(map(["l", "sp", "c", "p", "sc"], oopify), ", "))
+	# PRINT(join(map(["l", "ps", "c", "p", "sc"], pooify), ", "))
 	# RUN("ParaCodeTest.para")
-#END
+# END
