@@ -166,6 +166,29 @@ PRINT(removeAllSpaces)
 VAR removeAllSpaces = REMOVEALLSPACES(removeAllSpaces)
 PRINT(removeAllSpaces)
 
+//PRINT("ORIGINAL MESSAGE")
+//VAR originalMessage = "Hello World"
+//PRINT(originalMessage)
+//VAR cryptoKey = CRYPTOGENERATEKEY()
+//PRINT("CRYPTO KEY")
+//PRINT(cryptoKey)
+//PRINT("ENCRYPTED MESSAGE")
+//VAR encryptedMessage = CRYPTOENCRYPT(cryptoKey, originalMessage)
+//PRINT(encryptedMessage)
+//PRINT("DECRYPTED MESSAGE")
+//VAR decryptedMessage = CRYPTODECRYPT(cryptoKey, encryptedMessage)
+//PRINT(decryptedMessage)
+
+PRINT("ORIGINAL VALUE")
+VAR value = "HELLO, WORLD!"
+PRINT(value)
+PRINT("ENCODED VALUE")
+VAR cryptoEncode = CRYPTOENCODE(value)
+PRINT(cryptoEncode)
+PRINT("DECODED VALUE")
+VAR cryptoDecode = CRYPTODECODE(cryptoEncode)
+PRINT(cryptoDecode)
+
 // Turtle Support
 // Rainbow Benzene
 // VAR turtle = TURTLE()
