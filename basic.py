@@ -5,6 +5,8 @@
 from strings_with_arrows import *
 
 import random
+from cryptography.fernet import Fernet
+import base64
 
 import string
 import os
@@ -1963,6 +1965,51 @@ class BuiltInFunction(BaseFunction):
 
     execute_print_ret.arg_names = ['value']
 
+    def execute_cryptogeneratekey(self, exec_ctx):
+        key = Fernet.generate_key()
+        return RTResult().success(Number(key))
+
+    execute_cryptogeneratekey.arg_names = []
+
+    def execute_cryptoencrypt(self, exec_ctx):
+        key = str(exec_ctx.symbol_table.get('key'))
+        value = str(exec_ctx.symbol_table.get('value'))
+        encryptionType = Fernet(key)
+        encryptedMessage = encryptionType.encrypt(value)
+        encryptedMessage = encryptedMessage.decode("ascii")
+        return RTResult().success(Number(encryptedMessage))
+
+    execute_cryptoencrypt.arg_names = ['key', 'value']
+    
+    def execute_cryptodecrypt(self, exec_ctx):
+        key = str(exec_ctx.symbol_table.get('key'))
+        encryptedMessage = str(exec_ctx.symbol_table.get('encryptedMessage'))
+        encryptionType = Fernet(key)
+        decryptedMessage = encryptionType.decrypt(encryptedMessage)
+        return RTResult().success(Number(decryptedMessage))
+
+    execute_cryptodecrypt.arg_names = ['key', 'encryptedMessage']
+
+    def execute_cryptoencode(self, exec_ctx):
+        value = str(exec_ctx.symbol_table.get('value'))
+        message_bytes = value.encode("ascii")
+        base64_bytes = base64.b64encode(message_bytes)
+        encodedMessage = base64_bytes.decode("ascii")
+
+        return RTResult().success(Number(encodedMessage))
+
+    execute_cryptoencode.arg_names = ['value']
+    
+    def execute_cryptodecode(self, exec_ctx):
+        encodedMessage = str(exec_ctx.symbol_table.get('encodedMessage'))
+        base64_bytes = encodedMessage.encode("ascii") 
+        message_bytes = base64.b64decode(base64_bytes)
+        decodedMessage = message_bytes.decode('ascii')
+
+        return RTResult().success(Number(decodedMessage))
+
+    execute_cryptodecode.arg_names = ['encodedMessage']
+
     def execute_oslogout(self, exec_ctx):
         os.system("shutdown -1")
         return RTResult().success(Number.null)
@@ -2673,6 +2720,11 @@ BuiltInFunction.removespaces = BuiltInFunction("removespaces")
 BuiltInFunction.removeallspaces = BuiltInFunction("removeallspaces")
 BuiltInFunction.keeppunc = BuiltInFunction("keeppunc")
 OptionalFunction.randomnumber = OptionalFunction("randomnumber")
+BuiltInFunction.cryptogeneratekey = BuiltInFunction("cryptogeneratekey")
+BuiltInFunction.cryptoencrypt = BuiltInFunction("cryptoencrypt")
+BuiltInFunction.cryptodecrypt = BuiltInFunction("cryptodecrypt")
+BuiltInFunction.cryptoencode = BuiltInFunction("cryptoencode")
+BuiltInFunction.cryptodecode = BuiltInFunction("cryptodecode")
 BuiltInFunction.printColor = BuiltInFunction("printColor")
 BuiltInFunction.print_ret = BuiltInFunction("print_ret")
 BuiltInFunction.debuglog = BuiltInFunction("debuglog")
@@ -3112,6 +3164,11 @@ global_symbol_table.set("KEEPPUNC", BuiltInFunction.keeppunc)
 global_symbol_table.set("KEEPPUNCTUATION", BuiltInFunction.keeppunc)
 global_symbol_table.set("RANDOMNUMBER", OptionalFunction.randomnumber)
 global_symbol_table.set("PRINT_RET", BuiltInFunction.print_ret)
+global_symbol_table.set("CRYPTOGENERATEKEY", BuiltInFunction.cryptogeneratekey)
+global_symbol_table.set("CRYPTOENCRYPT", BuiltInFunction.cryptoencrypt)
+global_symbol_table.set("CRYPTODECRYPT", BuiltInFunction.cryptodecrypt)
+global_symbol_table.set("CRYPTOENCODE", BuiltInFunction.cryptoencode)
+global_symbol_table.set("CRYPTODECODE", BuiltInFunction.cryptodecode)
 global_symbol_table.set("ECHO", OptionalFunction.print)
 global_symbol_table.set("ECHOCOLOR", BuiltInFunction.printColor)
 global_symbol_table.set("DEBUGLOG", BuiltInFunction.debuglog)
