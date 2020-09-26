@@ -1,0 +1,20 @@
+{
+  "packages": [
+    {
+      "registryName": "ExamplePackage",
+      "installedVersion": "1.0.0",
+      "enabled": false,
+      "location": "ExamplePackage/"
+    }
+  ]
+}
+{
+  "packages": [
+    {
+      "registryName": "ExamplePackage2",
+      "installedVersion": "1.0.0",
+      "enabled": true,
+      "location": "ExamplePackage2/"
+    }
+  ]
+}

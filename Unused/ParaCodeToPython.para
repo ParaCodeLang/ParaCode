@@ -1,0 +1,75 @@
+# This is a very useful piece of software
+
+#FUNCTION oopify(prefix) -> prefix + "oop"
+#FUNCTION def(function)
+#	IF function == "FUNCTION" THEN
+#		function = "def"
+#	END
+#	RETURN function
+#END
+#FUNCTION close(")") -> "):"
+#FUNCTION for("FOR") -> "for"
+#FUNCTION end("END") -> ""
+#FUNCTION var("VAR") -> "var"
+#FUNCTION then("THEN") -> ""
+#FUNCTION print("PRINT") -> "print"
+#FUNCTION debuglog("DEBUGLOG") -> "print"
+#FUNCTION debugwarning("DEBUGWARNING") -> "print"
+#FUNCTION debugerror("DEBUGERROR") -> "print"
+#FUNCTION run(parameter, "RUN") -> "import " + parameter
+
+FUNCTION ChangeRun(parameter) -> "import " + parameter
+
+FUNCTION join(elements, separator)
+	VAR result = ""
+	VAR len = LEN(elements)
+
+	FOR i = 0 TO len THEN
+		VAR result = result + elements/i
+		IF i != len - 1 THEN VAR result = result + separator
+	END
+
+	RETURN result
+END
+
+FUNCTION map(elements, func)
+	VAR new_elements = []
+
+	FOR i = 0 TO LEN(elements) THEN
+		APPEND(new_elements, func(elements/i))
+	END
+
+	RETURN new_elements
+END
+
+FUNCTION convert(code)
+	FOR "FUNCTION" IN code THEN
+		VAR theCode = code"def"
+	END
+	#Code.Replace("FUNCTION", "def")
+	#Code.Replace("CLOSE", "")
+	#Code.Replace("FOR", "for")
+	#Code.Replace("END", "")
+	#Code.Replace("VAR", "var")
+	#Code.Replace("PRINT", "print")
+	#Code.Replace("DEBUGLOG", "print")
+	#Code.Replace("DEBUGWARNING", "print")
+	#Code.Replace("DEBUGERROR", "print")
+	#Code.Replace("STRING", "string")
+	#Code.Replace("INT", "int")
+	#Code.Replace("FLOAT", "float")
+	#Code.Replace("RUN", "")
+	#theCode
+END
+
+#PRINT(join(map(["l", "ps", "c", "p", "sc"], nullify), ", "))
+#PRINT(join(map(["l", "sp", "c", "p", "sc"], oopify), ", "))
+#PRINT(join(map(["l", "ps", "c", "p", "sc"], pooify), ", "))
+convert("HELLO
+FUNCTION hello")
+
+#FOR i = 0 TO 5 THEN
+	#PRINT(join(map(["l", "sp", "c", "p", "sc"], oopify), ", "))
+	#PRINT(join(map(["l", "ps", "c", "p", "sc"], pooify), ", "))
+	# RUN("ParaCodeTest.para")
+#END
