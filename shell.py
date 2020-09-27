@@ -1,3 +1,4 @@
+from pynput.keyboard import Key, Controller
 import signal
 
 # from replit import db
@@ -70,6 +71,9 @@ author = config.author
 clear_command = config.clear_command
 version_command = config.version_command
 
+stopped = 0
+currentlyDoingInput = False
+
 sytling = {
     "white": "\033[37m",
     "red": "\033[31m",
@@ -127,16 +131,19 @@ help = '== Help ==\nFor help with a command, type HELP [command]'
 def Run(command):
     colorama.init()
 
-    global debug, packageRegistryName
+    global debug, packageRegistryName, executed, used
     global error
     global errorfx
-    while True:
+    while stopped == 0 or stopped == 2:
         if executed == 0:
             if command is not None and command != "":
                 text = command
             else:
-                text = input(pointer_color + pointer_style + pointer + console_color + console_style + " ")
-
+                text = ""
+                try:
+                    text = input(pointer_color + pointer_style + pointer + console_color + console_style + " ")
+                except:
+                    pass
             if text.strip() == "": continue
             if debug:
                 print(text)
@@ -246,8 +253,8 @@ def Run(command):
                                                              link2["href"], "LICENSE")]
                                             if os.path.exists(
                                                     os.path.realpath(__file__).replace("shell.py", "") + configFile.get(
-                                                            "lang").get(
-                                                            "packagePath") + packageRegistryName + "\\" + fileName):
+                                                        "lang").get(
+                                                        "packagePath") + packageRegistryName + "\\" + fileName):
                                                 with open(os.path.realpath(__file__).replace("shell.py",
                                                                                              "") + configFile.get(
                                                     "lang").get("packagePath") + packageRegistryName + "\\" + fileName,
@@ -561,7 +568,7 @@ def Run(command):
                         run = lastRun
                 else:
                     run = ""
-                if run is not "":
+                if run != "":
                     newText = 'RUN("' + run + '")'
                     result, error = basic.run('<stdin>', newText)
                     if debug:
@@ -619,7 +626,7 @@ def Run(command):
                         run = lastRun
                 else:
                     run = ""
-                if run is not "":
+                if run != "":
                     newText = 'RUN("' + run + '")'
                     result, error = basic.run('<stdin>', newText)
                     if debug:
@@ -642,7 +649,7 @@ def Run(command):
                     end = text.find('")')
                     substring = text[start:end]
                     with open(os.path.realpath(__file__).replace("shell.py", "") + "preferences.toml", "w") as f:
-                        f.write("lastRun")
+                        f.write('lastRun = "' + substring + '"')
                 else:
                     if '("' in text and '")' in text:
                         if "." in text:
@@ -765,24 +772,32 @@ def Run(command):
 
             executed = 1
             RunAgain()
-
+    return
 
 def RunAgain():
+    executed = 0
     Run("")
 
 
 def StartsWith(string, locate):
     return string.lower().startswith(locate.lower())
 
+def Empty(sigint, frame):
+    a = 1
 
-def ExitExec(signum, frame):
-    executed = 2
+def ExitExec(sigint, frame):
+    global stopped
 
-    signal.signal(signal.SIGINT, originalSigInt)
+    if stopped == 0:
+        stopped = 2
 
-    try:
-        RunAgain()
-    except KeyboardInterrupt:
+        keyboard = Controller()
+        originalStdout = sys.stdout
+        sys.stdout = open(os.devnull, 'w')
+        keyboard.press(Key.enter)
+        sys.stdout.close()
+        sys.stdout = originalStdout
+    elif stopped == 2:
         sys.exit(0)
 
 
@@ -803,6 +818,7 @@ while True:
             else:
                 Run("")
         used = 1
+
     # else:
     # print("")
     # print(f"Argument {i:>6}: {arg}")
