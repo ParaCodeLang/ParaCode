@@ -9,6 +9,10 @@ import random
 from cryptography.fernet import Fernet
 import base64
 
+import speech_recognition as spr
+from googletrans import Translator
+from gtts import gTTS
+
 import string
 import os
 import math
@@ -1926,6 +1930,10 @@ class BuiltInFunction(BaseFunction):
     builtInTurtleScreen = None
     builtInTurtlePen = None
 
+    builtInRecognizer = None
+    builtInMicrophone = None
+    builtInTranslator = None
+
     def __init__(self, name):
         super().__init__(name)
 
@@ -1969,6 +1977,38 @@ class BuiltInFunction(BaseFunction):
         return RTResult().success(Number.null)
 
     execute_printColor.arg_names = ['value', 'color']
+
+    def execute_recognizer(self, exec_ctx):
+        recog = spr.Recognizer()
+        builtInRecognizer = recog
+        return RTResult().success(Number(recog))
+
+    execute_recognizer.arg_names = []
+
+    def execute_microphone(self, exec_ctx):
+        mc = spr.Microphone()
+        builtInMicrophone = mc
+        return RTResult().success(Number(mc))
+
+    execute_microphone.arg_names = []
+
+    def execute_translator(self, exec_ctx):
+        translator = Translator()
+        self.builtInTranslator = translator
+        return RTResult().success(Number(translator))
+
+    execute_translator.arg_names = []
+
+    def execute_translate(self, exec_ctx):
+        # translator = self.builtInTranslator
+        translator = Translator()
+        value = str(exec_ctx.symbol_table.get('value'))
+        fromLang = str(exec_ctx.symbol_table.get('fromLang'))
+        toLang = str(exec_ctx.symbol_table.get('toLang'))
+        result = translator.translate(value, src= fromLang, dest= toLang).text
+        return RTResult().success(Number(result))
+
+    execute_translate.arg_names = ['value', 'fromLang', 'toLang']
 
     def execute_modulo(self, exec_ctx):
         a = int(str(exec_ctx.symbol_table.get('valueOne')))
@@ -2753,6 +2793,10 @@ BuiltInFunction.cryptodecrypt = BuiltInFunction("cryptodecrypt")
 BuiltInFunction.cryptoencode = BuiltInFunction("cryptoencode")
 BuiltInFunction.cryptodecode = BuiltInFunction("cryptodecode")
 BuiltInFunction.printColor = BuiltInFunction("printColor")
+BuiltInFunction.recognizer = BuiltInFunction("recognizer")
+BuiltInFunction.microphone = BuiltInFunction("microphone")
+BuiltInFunction.translator = BuiltInFunction("translator")
+BuiltInFunction.translate = BuiltInFunction("translate")
 BuiltInFunction.print_ret = BuiltInFunction("print_ret")
 BuiltInFunction.debuglog = BuiltInFunction("debuglog")
 BuiltInFunction.debugwarning = BuiltInFunction("debugwarning")
@@ -3176,6 +3220,10 @@ global_symbol_table.set("TURTLEPENCOLOR", BuiltInFunction.turtlepencolor)
 global_symbol_table.set("TURTLEEXITONCLICK", BuiltInFunction.turtleexitonclick)
 global_symbol_table.set("TURTLEPEN", BuiltInFunction.turtlepen)
 global_symbol_table.set("PRINTCOLOR", BuiltInFunction.printColor)
+global_symbol_table.set("RECOGNIZER", BuiltInFunction.recognizer)
+global_symbol_table.set("MICROPHONE", BuiltInFunction.microphone)
+global_symbol_table.set("TRANSLATOR", BuiltInFunction.translator)
+global_symbol_table.set("TRANSLATE", BuiltInFunction.translate)
 global_symbol_table.set("HALFDIAMONDSTAR", BuiltInFunction.halfDiamondStar)
 global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)
 global_symbol_table.set("REMOVEPUNCTUATION", BuiltInFunction.removepunc)
