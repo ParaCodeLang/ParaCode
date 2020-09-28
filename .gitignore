@@ -1,4 +1,12 @@
+/.git/
 /.vs/
 /venv/
 /.idea/
 /__pycache__/
+/build/
+/dist/
+*.bat
+*.spec
+TEST.txt
+icon.ico
+preferences.toml

@@ -1,9 +1,13 @@
+import keyboard as keyb
+from inspect import signature as sig, isfunction as fun
+import win32com.client
+from ctypes import *
+
 from pynput.keyboard import Key, Controller
 import signal
 
 # from replit import db
 
-from inspect import *
 import sys
 
 import toml
@@ -19,13 +23,15 @@ from bs4 import BeautifulSoup
 import basic
 import config
 
-import colorama
+from colorama import Fore, Back, Style, init
 
 import time
 
 used = 0
 executed = 0
-originalSigInt = None
+originalSigInt = signal.getsignal(signal.SIGINT)
+originalStdout = sys.stdout
+canSubmit = True
 debug = config.debug
 
 # -- Configuration (Settings) -- #
@@ -36,7 +42,7 @@ user_style = configFile.get("shell").get("userStyle")
 console_color = configFile.get("shell").get("consoleColor")
 console_style = configFile.get("shell").get("consoleStyle")
 
-pointer = "\nParaCode Shell >>>"
+pointer = "ParaCode Shell >>>"
 pointer_color = configFile.get("shell").get("pointerColor")
 pointer_style = configFile.get("shell").get("pointerStyle")
 
@@ -72,32 +78,55 @@ clear_command = config.clear_command
 version_command = config.version_command
 
 stopped = 0
-currentlyDoingInput = False
 
 sytling = {
-    "white": "\033[37m",
-    "red": "\033[31m",
-    "green": "\033[32m",
-    "blue": "\033[34m",
-    "purple": "\033[35",
-    "cyan": "\033[36m",
-    "orange": "\033[33m",
-    "yellow": "\033[33m",
-    "magenta": "\033[35m",
-    "bright_black": "\033[90m",
-    "bright_red": "\033[91m",
-    "bright_green": "\033[92m",
-    "bright_yellow": "\033[93m",
-    "bright_blue": "\033[94m",
-    "bright_magenta": "\033[95m",
-    "bright_cyan": "\033[96m",
-    "bright_white": "\033[97m",
-    "underline": "\033[4m",
-    "italic": "\033[3m",
-    "darken": "\033[2m",
+    "white": Fore.WHITE,
+    "red": Fore.RED,
+    "green": Fore.GREEN,
+    "blue": Fore.BLUE,
+    "purple": Fore.MAGENTA,
+    "cyan": Fore.CYAN,
+    "orange": Fore.YELLOW,
+    "yellow": Fore.YELLOW,
+    "magenta": Fore.MAGENTA,
+    "bright_black": Fore.LIGHTBLACK_EX,
+    "bright_red": Fore.LIGHTRED_EX,
+    "bright_green": Fore.LIGHTGREEN_EX,
+    "bright_yellow": Fore.LIGHTYELLOW_EX,
+    "bright_blue": Fore.LIGHTBLUE_EX,
+    "bright_magenta": Fore.LIGHTMAGENTA_EX,
+    "bright_cyan": Fore.LIGHTCYAN_EX,
+    "bright_white": Fore.LIGHTWHITE_EX,
+    "brightBlack": Fore.LIGHTBLACK_EX,
+    "brightRed": Fore.LIGHTRED_EX,
+    "brightGreen": Fore.LIGHTGREEN_EX,
+    "brightYellow": Fore.LIGHTYELLOW_EX,
+    "brightBlue": Fore.LIGHTBLUE_EX,
+    "brightMagenta": Fore.LIGHTMAGENTA_EX,
+    "brightCyan": Fore.LIGHTCYAN_EX,
+    "brightWhite": Fore.LIGHTWHITE_EX,
+    "brightblack": Fore.LIGHTBLACK_EX,
+    "brightred": Fore.LIGHTRED_EX,
+    "brightgreen": Fore.LIGHTGREEN_EX,
+    "brightyellow": Fore.LIGHTYELLOW_EX,
+    "brightblue": Fore.LIGHTBLUE_EX,
+    "brightmagenta": Fore.LIGHTMAGENTA_EX,
+    "brightcyan": Fore.LIGHTCYAN_EX,
+    "brightwhite": Fore.LIGHTWHITE_EX,
+    "underline": "\033[04m",
+    "italic": "\033[03m",
+    "darken": "\033[02m",
     "invisible": "\033[08m",
     "reverse": "\033[07m",
-    "reset": "\033[0m"
+    "reset": "\033[0m",
+    "normal": Style.NORMAL,
+    "reset_all": Style.RESET_ALL,
+    "resetAll": Style.RESET_ALL,
+    "resetall": Style.RESET_ALL,
+    "bright": Style.BRIGHT,
+    "dim": Style.DIM,
+    "none": "",
+    "": ""
 }
 
 
@@ -129,8 +158,6 @@ help = '== Help ==\nFor help with a command, type HELP [command]'
 
 
 def Run(command):
-    colorama.init()
-
     global debug, packageRegistryName, executed, used
     global error
     global errorfx
@@ -141,34 +168,36 @@ def Run(command):
             else:
                 text = ""
                 try:
+                    print("")
                     text = input(pointer_color + pointer_style + pointer + console_color + console_style + " ")
                 except:
                     pass
-            if text.strip() == "": continue
+            if text.strip() == "":
+                continue
             if debug:
                 print(text)
             if text.startswith(help_command + " ") and do_help_command:
                 text = text.split(help_command + " ")[1]
                 try:
-                    if f(e("config." + text)):
+                    if fun(e("config." + text)):
                         print("== Help | " + text + " ==")
                         h = []
                         prm = [0, 0]
                         co = 0
-                        sig = signature(e("config." + text.split(" ")[0]))
+                        sig = sig(e("config." + text.split(" ")[0]))
                         for key in list(dict(sig.parameters).keys()):
                             if str(dict(sig.parameters)[key]).startswith("{}=".format(key)):
                                 prm[1] += 1
                             else:
                                 prm[0] += 1
-                        for i in str(signature(e("config." + text)))[1:-1].split(", "):
+                        for i in str(sig(e("config." + text)))[1:-1].split(", "):
                             if co <= prm[0]:
                                 h.append("[" + i.split("=")[0] + "]")
                             else:
                                 h.append("(" + i.split("=")[0] + ")")
                             co += 1
                         print("Usage: " + text + " " + ' '.join(h) + "\nParams: " + " | ".join(
-                            str(signature(e("config." + text)))[1:-1].split(",")))
+                            str(sig(e("config." + text)))[1:-1].split(",")))
                 except:
                     print(error_color + error_style + error.syntax_error.format(text))
             elif text == help_command:
@@ -706,8 +735,8 @@ def Run(command):
                                 result, error = basic.run('<stdin>', text)
                                 a = 1
                         else:
-                            if f(e("config." + c)):
-                                sig = signature(e("config." + text.split(" ")[0]))
+                            if fun(e("config." + c)):
+                                sig = sig(e("config." + text.split(" ")[0]))
                                 for key in list(dict(sig.parameters).keys()):
                                     if str(dict(sig.parameters)[key]).startswith("{}=".format(key)):
                                         prm[1] += 1
@@ -738,8 +767,8 @@ def Run(command):
                                 raise AttributeError
 
                     except:
-                        if f(e("config." + c)):
-                            sig = signature(e("config." + text.split(" ")[0]))
+                        if fun(e("config." + c)):
+                            sig = sig(e("config." + text.split(" ")[0]))
                             for key in list(dict(sig.parameters).keys()):
                                 if str(dict(sig.parameters)[key]).startswith("{}=".format(key)):
                                     prm[1] += 1
@@ -771,10 +800,14 @@ def Run(command):
                     print(error_color + error_style + errorfx.syntax_error.format(text))
 
             executed = 1
+            SetStopped(0)
             RunAgain()
     return
 
+
 def RunAgain():
+    global executed
+
     executed = 0
     Run("")
 
@@ -782,23 +815,44 @@ def RunAgain():
 def StartsWith(string, locate):
     return string.lower().startswith(locate.lower())
 
-def Empty(sigint, frame):
-    a = 1
 
-def ExitExec(sigint, frame):
-    global stopped
+def CheckExec(sigint, frame):
+    ExitExec(stopped)
 
-    if stopped == 0:
-        stopped = 2
+
+def ExitExec(stopped2):
+    stopped3 = stopped2
+    if stopped3 == 0:
+        SetCanSubmit(False)
+        SetStopped(2)
 
         keyboard = Controller()
-        originalStdout = sys.stdout
         sys.stdout = open(os.devnull, 'w')
         keyboard.press(Key.enter)
         sys.stdout.close()
         sys.stdout = originalStdout
-    elif stopped == 2:
-        sys.exit(0)
+        print("")
+
+        SetCanSubmit(True)
+    elif stopped2 == 2:
+        shell = win32com.client.Dispatch("WScript.Shell")
+        time.sleep(0.5)
+        shell.SendKeys('%{F4}')
+        sys.stdout = open(os.devnull, 'w')
+
+
+def SetStopped(stopped3):
+    global stopped
+
+    stopped = stopped3
+
+    if stopped != 0:
+        sys.stdout = originalStdout
+
+def SetCanSubmit(submit):
+    global canSubmit
+
+    canSubmit = submit
 
 
 while True:
@@ -808,8 +862,10 @@ while True:
         # print("")
         # print("")
         if __name__ == "__main__":
+            os.system('')
+            init()
             originalSigInt = signal.getsignal(signal.SIGINT)
-            signal.signal(signal.SIGINT, ExitExec)
+            signal.signal(signal.SIGINT, CheckExec)
             args = sys.argv
             if len(args) == 2:
                 print(pointer_color + pointer_style + pointer + console_color + console_style + " " + args[1])
@@ -818,6 +874,10 @@ while True:
             else:
                 Run("")
         used = 1
+
+    if canSubmit:
+        if keyb.is_pressed('enter'):
+            SetStopped(0)
 
     # else:
     # print("")
