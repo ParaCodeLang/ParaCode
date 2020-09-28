@@ -1,13 +1,13 @@
 # Configuration For The Shell
 [shell]
 userColor = "white"
-userStyle = "white"
+userStyle = "none"
 consoleColor = "white"
-consoleStyle = "white"
+consoleStyle = "none"
 pointerColor = "green"
-pointerStyle = "green"
+pointerStyle = "none"
 errorColor = "red"
-errorStyle = "red"
+errorStyle = "none"
 
 # Configuration For ParaCode
 [lang]

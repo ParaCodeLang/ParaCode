@@ -3,6 +3,7 @@
 #######################################
 
 from strings_with_arrows import *
+from colorama import Fore, Back, Style, init
 
 import random
 from cryptography.fernet import Fernet
@@ -28,29 +29,53 @@ import pygame
 # STYLING
 #######################################
 sytling = {
-    "white": "\033[37m",
-    "red": "\033[31m",
-    "green": "\033[32m",
-    "blue": "\033[34m",
-    "cyan": "\033[36m",
-    "orange": "\033[33m",
-    "yellow": "\033[33m",
-    "purple": "\033[35",
-    "magenta": "\033[35m",
-    "bright_black": "\033[90m",
-    "bright_red": "\033[91m",
-    "bright_green": "\033[92m",
-    "bright_yellow": "\033[93m",
-    "bright_blue": "\033[94m",
-    "bright_magenta": "\033[95m",
-    "bright_cyan": "\033[96m",
-    "bright_white": "\033[97m",
-    "underline": "\033[4m",
-    "italic": "\033[3m",
-    "darken": "\033[2m",
+    "white": Fore.WHITE,
+    "red": Fore.RED,
+    "green": Fore.GREEN,
+    "blue": Fore.BLUE,
+    "purple": Fore.MAGENTA,
+    "cyan": Fore.CYAN,
+    "orange": Fore.YELLOW,
+    "yellow": Fore.YELLOW,
+    "magenta": Fore.MAGENTA,
+    "bright_black": Fore.LIGHTBLACK_EX,
+    "bright_red": Fore.LIGHTRED_EX,
+    "bright_green": Fore.LIGHTGREEN_EX,
+    "bright_yellow": Fore.LIGHTYELLOW_EX,
+    "bright_blue": Fore.LIGHTBLUE_EX,
+    "bright_magenta": Fore.LIGHTMAGENTA_EX,
+    "bright_cyan": Fore.LIGHTCYAN_EX,
+    "bright_white": Fore.LIGHTWHITE_EX,
+    "brightBlack": Fore.LIGHTBLACK_EX,
+    "brightRed": Fore.LIGHTRED_EX,
+    "brightGreen": Fore.LIGHTGREEN_EX,
+    "brightYellow": Fore.LIGHTYELLOW_EX,
+    "brightBlue": Fore.LIGHTBLUE_EX,
+    "brightMagenta": Fore.LIGHTMAGENTA_EX,
+    "brightCyan": Fore.LIGHTCYAN_EX,
+    "brightWhite": Fore.LIGHTWHITE_EX,
+    "brightblack": Fore.LIGHTBLACK_EX,
+    "brightred": Fore.LIGHTRED_EX,
+    "brightgreen": Fore.LIGHTGREEN_EX,
+    "brightyellow": Fore.LIGHTYELLOW_EX,
+    "brightblue": Fore.LIGHTBLUE_EX,
+    "brightmagenta": Fore.LIGHTMAGENTA_EX,
+    "brightcyan": Fore.LIGHTCYAN_EX,
+    "brightwhite": Fore.LIGHTWHITE_EX,
+    "underline": "\033[04m",
+    "italic": "\033[03m",
+    "darken": "\033[02m",
     "invisible": "\033[08m",
     "reverse": "\033[07m",
-    "reset": "\033[0m"
+    "reset": "\033[0m",
+    "normal": Style.NORMAL,
+    "reset_all": Style.RESET_ALL,
+    "resetAll": Style.RESET_ALL,
+    "resetall": Style.RESET_ALL,
+    "bright": Style.BRIGHT,
+    "dim": Style.DIM,
+    "none": "",
+    "": ""
 }
 
 #######################################
@@ -1443,7 +1468,7 @@ class Value:
     def ored_by(self, other):
         return None, self.illegal_operation(other)
 
-    def notted(self):
+    def notted(self, other):
         return None, self.illegal_operation(other)
 
     def execute(self, args):
