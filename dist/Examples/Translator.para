@@ -1,0 +1,7 @@
+VAR value = "Hello, World!"
+PRINT(value)
+VAR translator = TRANSLATOR()
+VAR hi = TRANSLATE(value, "en", "hi")
+PRINT(hi)
+VAR eo = TRANSLATE(hi, "hi", "eo")
+PRINT(eo)
