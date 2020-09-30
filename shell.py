@@ -164,7 +164,7 @@ def Run(command):
     while stopped == 0 or stopped == 2:
         if executed == 0:
             if command is not None and command != "":
-                text = command
+                text = command.replace('\\', '/')
             else:
                 text = ""
                 try:
@@ -174,6 +174,7 @@ def Run(command):
                     pass
             if text.strip() == "":
                 continue
+            text = text.replace('\\', '/')
             if debug:
                 print(text)
             if text.startswith(help_command + " ") and do_help_command:
@@ -672,7 +673,7 @@ def Run(command):
             elif text.strip().endswith('.para') or text.strip().endswith('.paracode'):
                 result, error = basic.run('<stdin>', 'RUN("' + text + '")')
             elif text.startswith('RUN'):
-                if text.endswith('.para")') or text.endswith('.paracode")'):
+                if text.endswith('.para")') or text.endswith('.paracode")') or text.endswith('.para)') or text.endswith('.paracode)'):
                     result, error = basic.run('<stdin>', text)
                     start = text.find('RUN("') + len('RUN("')
                     end = text.find('")')
