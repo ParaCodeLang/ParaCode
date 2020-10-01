@@ -4,9 +4,9 @@ import keyboard as keyb
 from inspect import signature as sig, isfunction as fun
 if platform.system() == "Windows":
     import win32com.client
+    from pynput.keyboard import Key, Controller
 from ctypes import *
 
-from pynput.keyboard import Key, Controller
 import signal
 
 # from replit import db
@@ -830,9 +830,12 @@ def ExitExec(stopped2):
         SetCanSubmit(False)
         SetStopped(2)
 
-        keyboard = Controller()
         sys.stdout = open(os.devnull, 'w')
-        keyboard.press(Key.enter)
+        if platform.system() == "Windows":
+            keyboard = Controller()
+            keyboard.press(Key.enter)
+        else:
+            keyb.press_and_release('enter')
         sys.stdout.close()
         sys.stdout = originalStdout
         print("")
@@ -844,10 +847,10 @@ def ExitExec(stopped2):
             time.sleep(0.5)
             shell.SendKeys('%{F4}')
             sys.stdout = open(os.devnull, 'w')
+        elif platform.system() == "Linux":
+            keyb.press_and_release('ctrl+q')
         else:
-            keyboard = Controller()
-            keyboard.press(Key.ctrl)
-            keyboard.press('c')
+            keyb.press_and_release('cmd+w')
 
 
 def SetStopped(stopped3):
