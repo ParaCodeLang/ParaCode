@@ -1,6 +1,9 @@
+import platform
+
 import keyboard as keyb
 from inspect import signature as sig, isfunction as fun
-import win32com.client
+if platform.system() == "Windows":
+    import win32com.client
 from ctypes import *
 
 from pynput.keyboard import Key, Controller
@@ -836,10 +839,15 @@ def ExitExec(stopped2):
 
         SetCanSubmit(True)
     elif stopped2 == 2:
-        shell = win32com.client.Dispatch("WScript.Shell")
-        time.sleep(0.5)
-        shell.SendKeys('%{F4}')
-        sys.stdout = open(os.devnull, 'w')
+        if platform.system() == "Windows":
+            shell = win32com.client.Dispatch("WScript.Shell")
+            time.sleep(0.5)
+            shell.SendKeys('%{F4}')
+            sys.stdout = open(os.devnull, 'w')
+        else:
+            keyboard = Controller()
+            keyboard.press(Key.ctrl)
+            keyboard.press('c')
 
 
 def SetStopped(stopped3):
