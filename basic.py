@@ -3,7 +3,16 @@
 #######################################
 
 from strings_with_arrows import *
-from colorama import Fore, Back, Style, init
+
+from colorama import Fore as coloramaFore
+from colorama import Back as coloramaBack
+from colorama import Style as coloramaStyle
+from colorama import init
+from colored import fore as Fore
+from colored import back as Back
+from colored import fg as Fg
+from colored import bg as Bg
+from colored import style as Style
 
 import random
 from cryptography.fernet import Fernet
@@ -33,53 +42,86 @@ import pygame
 # STYLING
 #######################################
 sytling = {
-    "white": Fore.WHITE,
-    "red": Fore.RED,
-    "green": Fore.GREEN,
-    "blue": Fore.BLUE,
-    "purple": Fore.MAGENTA,
-    "cyan": Fore.CYAN,
-    "orange": Fore.YELLOW,
-    "yellow": Fore.YELLOW,
-    "magenta": Fore.MAGENTA,
-    "bright_black": Fore.LIGHTBLACK_EX,
-    "bright_red": Fore.LIGHTRED_EX,
-    "bright_green": Fore.LIGHTGREEN_EX,
-    "bright_yellow": Fore.LIGHTYELLOW_EX,
-    "bright_blue": Fore.LIGHTBLUE_EX,
-    "bright_magenta": Fore.LIGHTMAGENTA_EX,
-    "bright_cyan": Fore.LIGHTCYAN_EX,
-    "bright_white": Fore.LIGHTWHITE_EX,
-    "brightBlack": Fore.LIGHTBLACK_EX,
-    "brightRed": Fore.LIGHTRED_EX,
-    "brightGreen": Fore.LIGHTGREEN_EX,
-    "brightYellow": Fore.LIGHTYELLOW_EX,
-    "brightBlue": Fore.LIGHTBLUE_EX,
-    "brightMagenta": Fore.LIGHTMAGENTA_EX,
-    "brightCyan": Fore.LIGHTCYAN_EX,
-    "brightWhite": Fore.LIGHTWHITE_EX,
-    "brightblack": Fore.LIGHTBLACK_EX,
-    "brightred": Fore.LIGHTRED_EX,
-    "brightgreen": Fore.LIGHTGREEN_EX,
-    "brightyellow": Fore.LIGHTYELLOW_EX,
-    "brightblue": Fore.LIGHTBLUE_EX,
-    "brightmagenta": Fore.LIGHTMAGENTA_EX,
-    "brightcyan": Fore.LIGHTCYAN_EX,
-    "brightwhite": Fore.LIGHTWHITE_EX,
+    "white": coloramaFore.WHITE,
+    "red": coloramaFore.RED,
+    "green": coloramaFore.GREEN,
+    "blue": coloramaFore.BLUE,
+    "purple": coloramaFore.MAGENTA,
+    "cyan": coloramaFore.CYAN,
+    "orange": coloramaFore.YELLOW,
+    "yellow": coloramaFore.YELLOW,
+    "magenta": coloramaFore.MAGENTA,
+    "bright_black": coloramaFore.LIGHTBLACK_EX,
+    "bright_red": coloramaFore.LIGHTRED_EX,
+    "bright_green": coloramaFore.LIGHTGREEN_EX,
+    "bright_yellow": coloramaFore.LIGHTYELLOW_EX,
+    "bright_blue": coloramaFore.LIGHTBLUE_EX,
+    "bright_magenta": coloramaFore.LIGHTMAGENTA_EX,
+    "bright_cyan": coloramaFore.LIGHTCYAN_EX,
+    "bright_white": coloramaFore.LIGHTWHITE_EX,
+    "brightBlack": coloramaFore.LIGHTBLACK_EX,
+    "brightRed": coloramaFore.LIGHTRED_EX,
+    "brightGreen": coloramaFore.LIGHTGREEN_EX,
+    "brightYellow": coloramaFore.LIGHTYELLOW_EX,
+    "brightBlue": coloramaFore.LIGHTBLUE_EX,
+    "brightMagenta": coloramaFore.LIGHTMAGENTA_EX,
+    "brightCyan": coloramaFore.LIGHTCYAN_EX,
+    "brightWhite": coloramaFore.LIGHTWHITE_EX,
+    "brightblack": coloramaFore.LIGHTBLACK_EX,
+    "brightred": coloramaFore.LIGHTRED_EX,
+    "brightgreen": coloramaFore.LIGHTGREEN_EX,
+    "brightyellow": coloramaFore.LIGHTYELLOW_EX,
+    "brightblue": coloramaFore.LIGHTBLUE_EX,
+    "brightmagenta": coloramaFore.LIGHTMAGENTA_EX,
+    "brightcyan": coloramaFore.LIGHTCYAN_EX,
+    "brightwhite": coloramaFore.LIGHTWHITE_EX,
     "underline": "\033[04m",
     "italic": "\033[03m",
     "darken": "\033[02m",
     "invisible": "\033[08m",
     "reverse": "\033[07m",
     "reset": "\033[0m",
-    "normal": Style.NORMAL,
-    "reset_all": Style.RESET_ALL,
-    "resetAll": Style.RESET_ALL,
-    "resetall": Style.RESET_ALL,
-    "bright": Style.BRIGHT,
-    "dim": Style.DIM,
+    "normal": coloramaStyle.NORMAL,
+    "reset_all": coloramaStyle.RESET_ALL,
+    "resetAll": coloramaStyle.RESET_ALL,
+    "resetall": coloramaStyle.RESET_ALL,
+    "bright": coloramaStyle.BRIGHT,
+    "dim": coloramaStyle.DIM,
     "none": "",
-    "": ""
+    "": "",
+    "bgwhite": coloramaBack.WHITE,
+    "bgred": coloramaBack.RED,
+    "bggreen": coloramaBack.GREEN,
+    "bgblue": coloramaBack.BLUE,
+    "bgpurple": coloramaBack.MAGENTA,
+    "bgcyan": coloramaBack.CYAN,
+    "bgorange": coloramaBack.YELLOW,
+    "bgyellow": coloramaBack.YELLOW,
+    "bgmagenta": coloramaBack.MAGENTA,
+    "bgbright_black": coloramaBack.LIGHTBLACK_EX,
+    "bgbright_red": coloramaBack.LIGHTRED_EX,
+    "bgbright_green": coloramaBack.LIGHTGREEN_EX,
+    "bgbright_yellow": coloramaBack.LIGHTYELLOW_EX,
+    "bgbright_blue": coloramaBack.LIGHTBLUE_EX,
+    "bgbright_magenta": coloramaBack.LIGHTMAGENTA_EX,
+    "bgbright_cyan": coloramaBack.LIGHTCYAN_EX,
+    "bgbright_white": coloramaBack.LIGHTWHITE_EX,
+    "bgbrightBlack": coloramaBack.LIGHTBLACK_EX,
+    "bgbrightRed": coloramaBack.LIGHTRED_EX,
+    "bgbrightGreen": coloramaBack.LIGHTGREEN_EX,
+    "bgbrightYellow": coloramaBack.LIGHTYELLOW_EX,
+    "bgbrightBlue": coloramaBack.LIGHTBLUE_EX,
+    "bgbrightMagenta": coloramaBack.LIGHTMAGENTA_EX,
+    "bgbrightCyan": coloramaBack.LIGHTCYAN_EX,
+    "bgbrightWhite": coloramaBack.LIGHTWHITE_EX,
+    "bgbrightblack": coloramaBack.LIGHTBLACK_EX,
+    "bgbrightred": coloramaBack.LIGHTRED_EX,
+    "bgbrightgreen": coloramaBack.LIGHTGREEN_EX,
+    "bgbrightyellow": coloramaBack.LIGHTYELLOW_EX,
+    "bgbrightblue": coloramaBack.LIGHTBLUE_EX,
+    "bgbrightmagenta": coloramaBack.LIGHTMAGENTA_EX,
+    "bgbrightcyan": coloramaBack.LIGHTCYAN_EX,
+    "bgbrightwhite": coloramaBack.LIGHTWHITE_EX
 }
 
 #######################################
@@ -1835,7 +1877,9 @@ class OptionalFunction(OptionalBaseFunction):
         color = str(exec_ctx.symbol_table.get('color')).lower()
         if value is not None:
             if color is not None:
-                if color in sytling:
+                if color.startswith('#'):
+                    print(Fg(color) + value + sytling.get("reset"))
+                elif color in sytling:
                     print(sytling.get(color) + value + sytling.get("reset"))
                 elif exec_ctx.symbol_table.get('color') in sytling:
                     print(sytling.get(str(exec_ctx.symbol_table.get('color'))) + value + sytling.get("reset"))
@@ -1966,6 +2010,9 @@ class BuiltInFunction(BaseFunction):
     #####################################
 
     def execute_printColor(self, exec_ctx):
+        if str(exec_ctx.symbol_table.get('color')).startswith('#'):
+            print(str(exec_ctx.symbol_table.get('color')), str(
+                exec_ctx.symbol_table.get('value')), sytling.get("reset"))
         if str(exec_ctx.symbol_table.get('color')).lower() in sytling:
             print(sytling.get(str(exec_ctx.symbol_table.get('color')).lower()) + str(
                 exec_ctx.symbol_table.get('value')) + sytling.get("reset"))
@@ -2623,7 +2670,7 @@ class BuiltInFunction(BaseFunction):
             f = os.open(os.open(str(exec_ctx.symbol_table.get('value')), "w+") + " (Imported Version)", "w+")
             f.write(value3)
             if os.path.exists(str(exec_ctx.symbol_table.get('value2')) + " (Imported Version)"):
-                run(os.open(os.open(str(exec_ctx.symbol_table.get('value')), "w+") + " (Imported Version)", "w+"))
+                run('<stdin>', os.open(os.open(str(exec_ctx.symbol_table.get('value')), "w+") + " (Imported Version)", "w+"))
             f.close()
             print(str(exec_ctx.symbol_table.get('value')))
             print(str(exec_ctx.symbol_table.get('value2')))
@@ -3294,7 +3341,7 @@ global_symbol_table.set("SLICE", slice)
 
 
 # global_symbol_table.set("CONVERT", BuiltInFunction.convert)
-# global_symbol_table.set("IMPORT", BuiltInFunction.Import)
+global_symbol_table.set("IMPORT", BuiltInFunction.Import)
 
 def run(fn, text):
     # Generate tokens
