@@ -1,5 +1,5 @@
 // Importing
-//IMPORT("ParaCodeTest.para", "TEST.para")
+//IMPORT("ParaCodeTest.para", "Examples/HelloWorld.para")
 
 // Functions
 FUNCTION oopify(prefix) -> prefix + "oop"

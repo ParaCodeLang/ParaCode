@@ -1,2 +1,2 @@
 language = "python"
-run = "pip install --upgrade pip; python shell.py"
+run = "python runRepl.py"

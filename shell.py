@@ -1,7 +1,7 @@
 import platform
 
 import keyboard as keyb
-from inspect import signature as sig, isfunction as fun
+from inspect import signature as sign, isfunction as fun
 if platform.system() == "Windows":
     import win32com.client
     from pynput.keyboard import Key, Controller
@@ -26,9 +26,19 @@ from bs4 import BeautifulSoup
 import basic
 import config
 
-from colorama import Fore, Back, Style, init
+from colorama import init
+from colorama import Fore as coloramaFore
+from colorama import Back as coloramaBack
+from colorama import Style as coloramaStyle
+from colored import fore as Fore
+from colored import back as Back
+from colored import fg as Fg
+from colored import bg as Bg
+from colored import attr as Attr
 
 import time
+
+returned = config.returned
 
 used = 0
 executed = 0
@@ -83,55 +93,89 @@ version_command = config.version_command
 stopped = 0
 
 sytling = {
-    "white": Fore.WHITE,
-    "red": Fore.RED,
-    "green": Fore.GREEN,
-    "blue": Fore.BLUE,
-    "purple": Fore.MAGENTA,
-    "cyan": Fore.CYAN,
-    "orange": Fore.YELLOW,
-    "yellow": Fore.YELLOW,
-    "magenta": Fore.MAGENTA,
-    "bright_black": Fore.LIGHTBLACK_EX,
-    "bright_red": Fore.LIGHTRED_EX,
-    "bright_green": Fore.LIGHTGREEN_EX,
-    "bright_yellow": Fore.LIGHTYELLOW_EX,
-    "bright_blue": Fore.LIGHTBLUE_EX,
-    "bright_magenta": Fore.LIGHTMAGENTA_EX,
-    "bright_cyan": Fore.LIGHTCYAN_EX,
-    "bright_white": Fore.LIGHTWHITE_EX,
-    "brightBlack": Fore.LIGHTBLACK_EX,
-    "brightRed": Fore.LIGHTRED_EX,
-    "brightGreen": Fore.LIGHTGREEN_EX,
-    "brightYellow": Fore.LIGHTYELLOW_EX,
-    "brightBlue": Fore.LIGHTBLUE_EX,
-    "brightMagenta": Fore.LIGHTMAGENTA_EX,
-    "brightCyan": Fore.LIGHTCYAN_EX,
-    "brightWhite": Fore.LIGHTWHITE_EX,
-    "brightblack": Fore.LIGHTBLACK_EX,
-    "brightred": Fore.LIGHTRED_EX,
-    "brightgreen": Fore.LIGHTGREEN_EX,
-    "brightyellow": Fore.LIGHTYELLOW_EX,
-    "brightblue": Fore.LIGHTBLUE_EX,
-    "brightmagenta": Fore.LIGHTMAGENTA_EX,
-    "brightcyan": Fore.LIGHTCYAN_EX,
-    "brightwhite": Fore.LIGHTWHITE_EX,
+    "white": coloramaFore.WHITE,
+    "red": coloramaFore.RED,
+    "green": coloramaFore.GREEN,
+    "blue": coloramaFore.BLUE,
+    "purple": coloramaFore.MAGENTA,
+    "cyan": coloramaFore.CYAN,
+    "orange": coloramaFore.YELLOW,
+    "yellow": coloramaFore.YELLOW,
+    "magenta": coloramaFore.MAGENTA,
+    "bright_black": coloramaFore.LIGHTBLACK_EX,
+    "bright_red": coloramaFore.LIGHTRED_EX,
+    "bright_green": coloramaFore.LIGHTGREEN_EX,
+    "bright_yellow": coloramaFore.LIGHTYELLOW_EX,
+    "bright_blue": coloramaFore.LIGHTBLUE_EX,
+    "bright_magenta": coloramaFore.LIGHTMAGENTA_EX,
+    "bright_cyan": coloramaFore.LIGHTCYAN_EX,
+    "bright_white": coloramaFore.LIGHTWHITE_EX,
+    "brightBlack": coloramaFore.LIGHTBLACK_EX,
+    "brightRed": coloramaFore.LIGHTRED_EX,
+    "brightGreen": coloramaFore.LIGHTGREEN_EX,
+    "brightYellow": coloramaFore.LIGHTYELLOW_EX,
+    "brightBlue": coloramaFore.LIGHTBLUE_EX,
+    "brightMagenta": coloramaFore.LIGHTMAGENTA_EX,
+    "brightCyan": coloramaFore.LIGHTCYAN_EX,
+    "brightWhite": coloramaFore.LIGHTWHITE_EX,
+    "brightblack": coloramaFore.LIGHTBLACK_EX,
+    "brightred": coloramaFore.LIGHTRED_EX,
+    "brightgreen": coloramaFore.LIGHTGREEN_EX,
+    "brightyellow": coloramaFore.LIGHTYELLOW_EX,
+    "brightblue": coloramaFore.LIGHTBLUE_EX,
+    "brightmagenta": coloramaFore.LIGHTMAGENTA_EX,
+    "brightcyan": coloramaFore.LIGHTCYAN_EX,
+    "brightwhite": coloramaFore.LIGHTWHITE_EX,
     "underline": "\033[04m",
     "italic": "\033[03m",
     "darken": "\033[02m",
     "invisible": "\033[08m",
     "reverse": "\033[07m",
     "reset": "\033[0m",
-    "normal": Style.NORMAL,
-    "reset_all": Style.RESET_ALL,
-    "resetAll": Style.RESET_ALL,
-    "resetall": Style.RESET_ALL,
-    "bright": Style.BRIGHT,
-    "dim": Style.DIM,
+    "normal": coloramaStyle.NORMAL,
+    "reset_all": coloramaStyle.RESET_ALL,
+    "resetAll": coloramaStyle.RESET_ALL,
+    "resetall": coloramaStyle.RESET_ALL,
+    "bright": coloramaStyle.BRIGHT,
+    "dim": coloramaStyle.DIM,
     "none": "",
-    "": ""
+    "": "",
+    "bgwhite": coloramaBack.WHITE,
+    "bgred": coloramaBack.RED,
+    "bggreen": coloramaBack.GREEN,
+    "bgblue": coloramaBack.BLUE,
+    "bgpurple": coloramaBack.MAGENTA,
+    "bgcyan": coloramaBack.CYAN,
+    "bgorange": coloramaBack.YELLOW,
+    "bgyellow": coloramaBack.YELLOW,
+    "bgmagenta": coloramaBack.MAGENTA,
+    "bgbright_black": coloramaBack.LIGHTBLACK_EX,
+    "bgbright_red": coloramaBack.LIGHTRED_EX,
+    "bgbright_green": coloramaBack.LIGHTGREEN_EX,
+    "bgbright_yellow": coloramaBack.LIGHTYELLOW_EX,
+    "bgbright_blue": coloramaBack.LIGHTBLUE_EX,
+    "bgbright_magenta": coloramaBack.LIGHTMAGENTA_EX,
+    "bgbright_cyan": coloramaBack.LIGHTCYAN_EX,
+    "bgbright_white": coloramaBack.LIGHTWHITE_EX,
+    "bgbrightBlack": coloramaBack.LIGHTBLACK_EX,
+    "bgbrightRed": coloramaBack.LIGHTRED_EX,
+    "bgbrightGreen": coloramaBack.LIGHTGREEN_EX,
+    "bgbrightYellow": coloramaBack.LIGHTYELLOW_EX,
+    "bgbrightBlue": coloramaBack.LIGHTBLUE_EX,
+    "bgbrightMagenta": coloramaBack.LIGHTMAGENTA_EX,
+    "bgbrightCyan": coloramaBack.LIGHTCYAN_EX,
+    "bgbrightWhite": coloramaBack.LIGHTWHITE_EX,
+    "bgbrightblack": coloramaBack.LIGHTBLACK_EX,
+    "bgbrightred": coloramaBack.LIGHTRED_EX,
+    "bgbrightgreen": coloramaBack.LIGHTGREEN_EX,
+    "bgbrightyellow": coloramaBack.LIGHTYELLOW_EX,
+    "bgbrightblue": coloramaBack.LIGHTBLUE_EX,
+    "bgbrightmagenta": coloramaBack.LIGHTMAGENTA_EX,
+    "bgbrightcyan": coloramaBack.LIGHTCYAN_EX,
+    "bgbrightwhite": coloramaBack.LIGHTWHITE_EX
 }
 
+os.system('cls' if os.name=='nt' else 'clear')
 
 def e(c):
     exec('global i; i = %s' % c)
@@ -140,23 +184,53 @@ def e(c):
 
 
 try:
-    user_color = sytling[user_color]
-    user_style = sytling[user_style]
-    console_color = sytling[console_color]
-    console_style = sytling[console_style]
-    pointer_color = sytling[pointer_color]
-    pointer_style = sytling[pointer_style]
-    error_color = sytling[error_color]
-    error_style = sytling[error_style]
+    if user_color.startswith('#'):
+        user_color = Fg(user_color)
+    else:
+        user_color = sytling[user_color]
+    
+    if user_style.startswith('#'):
+        user_style = Fg(user_style)
+    else:
+        user_style = sytling[user_style]
+    
+    if console_color.startswith('#'):
+        console_color = Fg(console_color)
+    else:
+        console_color = sytling[console_color]
+    
+    if console_style.startswith('#'):
+        console_style = Fg(console_style)
+    else:
+        console_style = sytling[console_style]
+    
+    if pointer_color.startswith('#'):
+        pointer_color = Fg(pointer_color)
+    else:
+        pointer_color = sytling[pointer_color]
+    
+    if pointer_style.startswith('#'):
+        pointer_style = Fg(pointer_style)
+    else:
+        pointer_style = sytling[pointer_style]
+    
+    if error_color.startswith('#'):
+        error_color = Fg(error_color)
+    else:
+        error_color = sytling[error_color]
+    
+    if error_style.startswith('#'):
+        error_style = Fg(error_style)
+    else:
+        error_style = sytling[error_style]
 except:
     print("\033[31mInvalid colors in configuration.\033[0m")
 
 if do_help_command:
-    print("{} {} [{}] 2020 (c)\nType HELP, CREDITS, or LICENSE for more information.".format(language_name, version,
+    print((Fg('#00ff1f') + "{} {} [{}] 2020 (c)\n" + Fg('#c400ff') + "Type HELP, CREDITS, or LICENSE for more information." + Attr('reset')).format(language_name, version,
                                                                                              author))
 else:
-    print("{} {} [{}] 2020 (c)\nType CREDITS, or LICENSE for more information.".format(language_name, version, author))
-
+    print((Fg('#c400ff') + "{} {} [{}] 2020 (c)\nType CREDITS, or LICENSE for more information." + Attr('reset')).format(language_name, version, author))
 help = '== Help ==\nFor help with a command, type HELP [command]'
 
 
@@ -164,10 +238,10 @@ def Run(command):
     global debug, packageRegistryName, executed, used
     global error
     global errorfx
-    while stopped == 0 or stopped == 2:
+    while (stopped == 0 or stopped == 2) and returned == False:
         if executed == 0:
             if command is not None and command != "":
-                text = command.replace('\\', '/')
+                text = command
             else:
                 text = ""
                 try:
@@ -188,20 +262,20 @@ def Run(command):
                         h = []
                         prm = [0, 0]
                         co = 0
-                        sig = sig(e("config." + text.split(" ")[0]))
+                        sig = sign(e("config." + text.split(" ")[0]))
                         for key in list(dict(sig.parameters).keys()):
                             if str(dict(sig.parameters)[key]).startswith("{}=".format(key)):
                                 prm[1] += 1
                             else:
                                 prm[0] += 1
-                        for i in str(sig(e("config." + text)))[1:-1].split(", "):
+                        for i in str(sign(e("config." + text)))[1:-1].split(", "):
                             if co <= prm[0]:
                                 h.append("[" + i.split("=")[0] + "]")
                             else:
                                 h.append("(" + i.split("=")[0] + ")")
                             co += 1
                         print("Usage: " + text + " " + ' '.join(h) + "\nParams: " + " | ".join(
-                            str(sig(e("config." + text)))[1:-1].split(",")))
+                            str(sign(e("config." + text)))[1:-1].split(",")))
                 except:
                     print(error_color + error_style + error.syntax_error.format(text))
             elif text == help_command:
@@ -259,12 +333,12 @@ def Run(command):
                                             jsonCode = jsonCode + decoded_line
                                             print(jsonCode)
                                         else:
-                                            dict = json.loads(jsonCode)
-                                            packageRegistryName = dict['registryName']
-                                            packageSrcDir = dict['srcDir']
-                                            packageName = dict['name']
-                                            packageVersion = dict['version']
-                                            packageDescription = dict['description']
+                                            dic = json.loads(jsonCode)
+                                            packageRegistryName = dic['registryName']
+                                            packageSrcDir = dic['srcDir']
+                                            packageName = dic['name']
+                                            packageVersion = dic['version']
+                                            packageDescription = dic['description']
 
                                             packageSrcDir2 = packageSrcDir
                                             packageRegistryName2 = packageRegistryName
@@ -573,7 +647,8 @@ def Run(command):
             elif text in version_command:
                 print("ParaCode", version)
             elif text in clear_command:
-                print("\033c", end="", flush=True)
+                # print("\033c", end="", flush=True)
+                os.system('cls' if os.name=='nt' else 'clear')
                 if do_help_command:
                     print("{} {} [{}] 2020 (c)\nType HELP, CREDITS, or LICENSE for more information.".format(
                         language_name,
@@ -740,7 +815,7 @@ def Run(command):
                                 a = 1
                         else:
                             if fun(e("config." + c)):
-                                sig = sig(e("config." + text.split(" ")[0]))
+                                sig = sign(e("config." + text.split(" ")[0]))
                                 for key in list(dict(sig.parameters).keys()):
                                     if str(dict(sig.parameters)[key]).startswith("{}=".format(key)):
                                         prm[1] += 1
@@ -772,7 +847,7 @@ def Run(command):
 
                     except:
                         if fun(e("config." + c)):
-                            sig = sig(e("config." + text.split(" ")[0]))
+                            sig = sign(e("config." + text.split(" ")[0]))
                             for key in list(dict(sig.parameters).keys()):
                                 if str(dict(sig.parameters)[key]).startswith("{}=".format(key)):
                                     prm[1] += 1
@@ -806,6 +881,7 @@ def Run(command):
             executed = 1
             SetStopped(0)
             RunAgain()
+    print("HE")
     return
 
 
@@ -849,8 +925,10 @@ def ExitExec(stopped2):
             sys.stdout = open(os.devnull, 'w')
         elif platform.system() == "Linux":
             keyb.press_and_release('ctrl+q')
+            sys.stdout = open(os.devnull, 'w')
         else:
             keyb.press_and_release('cmd+w')
+            sys.stdout = open(os.devnull, 'w')
 
 
 def SetStopped(stopped3):
@@ -858,7 +936,7 @@ def SetStopped(stopped3):
 
     stopped = stopped3
 
-    if stopped != 0:
+    if stopped == 0:
         sys.stdout = originalStdout
 
 def SetCanSubmit(submit):
@@ -868,6 +946,8 @@ def SetCanSubmit(submit):
 
 
 while True:
+    returned = config.returned
+
     if used == 0:
         # print('ParaCode Shell Launched Successfully!')
         # print("")
