@@ -1,7 +1,7 @@
 import platform
 
 import keyboard as keyb
-from inspect import signature as sign, isfunction as fun
+from inspect import signature as sign, isfunction as func
 if platform.system() == "Windows":
     import win32com.client
     from pynput.keyboard import Key, Controller
@@ -175,7 +175,7 @@ sytling = {
     "bgbrightwhite": coloramaBack.LIGHTWHITE_EX
 }
 
-os.system('cls' if os.name=='nt' else 'clear')
+os.system('cls' if os.name == 'nt' else 'clear')
 
 def e(c):
     exec('global i; i = %s' % c)
@@ -257,7 +257,7 @@ def Run(command):
             if text.startswith(help_command + " ") and do_help_command:
                 text = text.split(help_command + " ")[1]
                 try:
-                    if fun(e("config." + text)):
+                    if func(e("config." + text)):
                         print("== Help | " + text + " ==")
                         h = []
                         prm = [0, 0]
@@ -648,7 +648,7 @@ def Run(command):
                 print("ParaCode", version)
             elif text in clear_command:
                 # print("\033c", end="", flush=True)
-                os.system('cls' if os.name=='nt' else 'clear')
+                os.system('cls' if os.name == 'nt' else 'clear')
                 if do_help_command:
                     print("{} {} [{}] 2020 (c)\nType HELP, CREDITS, or LICENSE for more information.".format(
                         language_name,
@@ -808,13 +808,11 @@ def Run(command):
                 prm = [0, 0]
                 try:
                     try:
-                        a = 0
                         for x in basic.KEYWORDS:
                             if text.startswith(x):
                                 result, error = basic.run('<stdin>', text)
-                                a = 1
                         else:
-                            if fun(e("config." + c)):
+                            if func(e("config." + c)):
                                 sig = sign(e("config." + text.split(" ")[0]))
                                 for key in list(dict(sig.parameters).keys()):
                                     if str(dict(sig.parameters)[key]).startswith("{}=".format(key)):
@@ -846,7 +844,7 @@ def Run(command):
                                 raise AttributeError
 
                     except:
-                        if fun(e("config." + c)):
+                        if func(e("config." + c)):
                             sig = sign(e("config." + text.split(" ")[0]))
                             for key in list(dict(sig.parameters).keys()):
                                 if str(dict(sig.parameters)[key]).startswith("{}=".format(key)):

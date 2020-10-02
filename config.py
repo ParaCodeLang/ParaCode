@@ -20,44 +20,37 @@ clear_command = ["CLEAR", "CLR"]
 version_command = ["VERSION", "-VERSION", "--VERSION", "ParaCode -VERSION", "ParaCode --VERSION", "PARACODE -VERSION",
                    "PARACODE --VERSION"]
 
-
-def ECHO(msg='', end='\n'):
-    print(msg, end=end)
-
 def DEVSETVERSION(langversion):
+    global version
     if dev == True:
         version = langversion
+        configFile['version'] = version
     
         with open("settings.toml", "w+") as f:
             f.write(toml.dumps(configFile))
 
 def DEVSETAUTHOR(langauthor):
+    global author
     if dev == True:
         author = langauthor
+        configFile['author'] = author
     
         with open("settings.toml", "w+") as f:
             f.write(toml.dumps(configFile))
 
 def DEVSETLANGNAME(langname):
+    global language_name
     if dev == True:
         language_name = langname
+        configFile['language_name'] = language_name
     
         with open("settings.toml", "w+") as f:
             f.write(toml.dumps(configFile))
 
 def PYTHON(args=''):
     os.system('python ' + args)
-
-
-def BASH(args=''):
-    os.system('bash ' + args)
-
-
-def JAVA(args=''):
-    os.system('java ' + args)
-
-def GO(args=''):
-    os.system('go ' + args)
+# def PYTHON():
+#     os.system('python')
 
 
 def AUTHOR():
