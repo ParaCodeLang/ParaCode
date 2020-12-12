@@ -1,11 +1,14 @@
-// Importing
-//IMPORT("ParaCodeTest.para", "Examples/HelloWorld.para")
-
-// Functions
+// Arrow Functions
 FUNCTION oopify(prefix) -> prefix + "oop"
 FUNCTION pooify(suffix) -> "poo" + suffix
 FUNCTION nullify(nullifier) -> "NULLIFIED"
 
+// Importing
+IMPORT 1.para
+//IMPORT 2.para
+//IMPORT 3.para
+
+// Functions
 FUNCTION join(elements, separator)
 	VAR result = ""
 	VAR len = LEN(elements)

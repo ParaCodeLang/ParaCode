@@ -1,0 +1,2 @@
+VAR input = INPUT("Name >> ")
+PRINT(input)

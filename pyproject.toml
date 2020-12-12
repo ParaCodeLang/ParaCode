@@ -1,8 +1,23 @@
 [tool.poetry]
-name = "repl_python3_ParaCode"
-version = "0.1.0"
-description = ""
-authors = ["repl.it user <replituser@example.com>"]
+name = "ParaCode"
+version = "1.2.20.4"
+description = "The ParaCode Programming Language"
+authors = ["DaRubyMiner360"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/DaRubyMiner360/ParaCode"
+repository = "https://github.com/DaRubyMiner360/ParaCode"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+include = [
+    "LICENSE",
+]
+
+[tool.poetry.scripts]
+ParaCode = 'ParaCode:shell'
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -17,6 +32,12 @@ keyboard = "^0.13.5"
 pynput = "^1.7.1"
 googletrans = "^3.0.0"
 gtts = "^2.1.1"
+tqdm = "^4.50.2"
+twine = "^3.2.0"
+wheel = "^0.35.1"
+xlib = "^0.21"
+colored = "^1.4.2"
+markdown = "^3.3.1"
 
 [tool.poetry.dev-dependencies]
 

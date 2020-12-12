@@ -1,0 +1,5 @@
+//IMPORT 3.para
+IMPORT 2
+//IMPORT ParaCore.para
+
+PRINT("1.para")

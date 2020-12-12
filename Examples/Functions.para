@@ -1,0 +1,10 @@
+FUNCTION sayHello(name)
+    PRINT("Hello, " + name + "!", "RED")
+END
+
+FUNC sayHello2(name)
+    PRINT("Hello, " + name + "!", "RED")
+END
+
+sayHello("Bob")
+sayHello2("Jerry")

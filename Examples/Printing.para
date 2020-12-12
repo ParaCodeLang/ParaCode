@@ -1,0 +1,9 @@
+// For Without Color
+PRINT("Hello, World!")
+ECHO("Hello, World!")
+
+// For Color
+PRINT("Hello, World!", "Blue")
+ECHO("Hello, World!", "Green")
+PRINTCOLOR("Hello, World!", "Yellow")
+ECHOCOLOR("Hello, World!", "Red")

@@ -2,7 +2,7 @@
 # IMPORTS
 #######################################
 
-from strings_with_arrows import *
+from ParaCode import strings_with_arrows
 
 from colorama import Fore as coloramaFore
 from colorama import Back as coloramaBack
@@ -14,11 +14,6 @@ from colored import fg as Fg
 from colored import bg as Bg
 from colored import style as Style
 
-import sys
-import os
-
-import importlib
-
 import random
 from cryptography.fernet import Fernet
 import base64
@@ -28,6 +23,7 @@ from googletrans import Translator
 from gtts import gTTS
 
 import string
+import os
 import math
 from datetime import date
 from datetime import time
@@ -37,9 +33,6 @@ import tkinter as tk
 import turtle
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
-
-import discord
-from dotenv import load_dotenv
 
 # pip install Kivy
 # import Kivy
@@ -131,10 +124,6 @@ sytling = {
     "bgbrightwhite": coloramaBack.LIGHTWHITE_EX
 }
 
-# importing = True
-originalStdout = sys.stdout
-value = "main.para"
-
 #######################################
 # CONSTANTS
 #######################################
@@ -158,7 +147,7 @@ class Error:
     def as_string(self):
         result = f'{self.error_name}: {self.details}\n'
         result += f'File {self.pos_start.fn}, line {self.pos_start.ln + 1}'
-        result += '\n\n' + string_with_arrows(self.pos_start.ftxt, self.pos_start, self.pos_end)
+        result += '\n\n' + strings_with_arrows.string_with_arrows(self.pos_start.ftxt, self.pos_start, self.pos_end)
         return result
 
 
@@ -185,7 +174,7 @@ class RTError(Error):
     def as_string(self):
         result = self.generate_traceback()
         result += f'{self.error_name}: {self.details}'
-        result += '\n\n' + string_with_arrows(self.pos_start.ftxt, self.pos_start, self.pos_end)
+        result += '\n\n' + strings_with_arrows.string_with_arrows(self.pos_start.ftxt, self.pos_start, self.pos_end)
         return result
 
     def generate_traceback(self):
@@ -260,7 +249,6 @@ TT_EOF = 'EOF'
 
 KEYWORDS = [
     'VAR',
-    'VARIABLE',
     'AND',
     'OR',
     'NOT',
@@ -272,7 +260,6 @@ KEYWORDS = [
     'STEP',
     'WHILE',
     'FUNCTION',
-    'FUNC',
     'THEN',
     'END',
     'RETURN',
@@ -326,11 +313,9 @@ class Lexer:
                 self.advance()
             elif self.text[self.pos.idx:self.pos.idx + 2] == "//":
                 self.skip_comment()
-            elif self.current_char == ';':
-                self.skip_comment()
             elif self.current_char == '#':
                 self.skip_comment()
-            elif self.current_char in '\n':
+            elif self.current_char in ';\n':
                 tokens.append(Token(TT_NEWLINE, pos_start=self.pos))
                 self.advance()
             elif self.current_char in DIGITS:
@@ -805,14 +790,14 @@ class Parser:
         if res.error:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected 'RETURN', 'CONTINUE', 'BREAK', 'VAR', 'VARIABLE', 'IF', 'FOR', 'WHILE', 'FUNCTION', 'FUNC', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
+                "Expected 'RETURN', 'CONTINUE', 'BREAK', 'VAR', 'IF', 'FOR', 'WHILE', 'FUNCTION', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
             ))
         return res.success(expr)
 
     def expr(self):
         res = ParseResult()
 
-        if self.current_tok.matches(TT_KEYWORD, 'VAR') or self.current_tok.matches(TT_KEYWORD, 'VARIABLE'):
+        if self.current_tok.matches(TT_KEYWORD, 'VAR'):
             res.register_advancement()
             self.advance()
 
@@ -843,7 +828,7 @@ class Parser:
         if res.error:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected 'VAR', 'VARIABLE', 'IF', 'FOR', 'WHILE', 'FUNCTION', 'FUNC', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
+                "Expected 'VAR', 'IF', 'FOR', 'WHILE', 'FUNCTION', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
             ))
 
         return res.success(node)
@@ -865,7 +850,7 @@ class Parser:
         if res.error:
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                "Expected int, float, identifier, '+', '-', '(', '[', 'IF', 'FOR', 'WHILE', 'FUNCTION', 'FUNC' or 'NOT'"
+                "Expected int, float, identifier, '+', '-', '(', '[', 'IF', 'FOR', 'WHILE', 'FUNCTION' or 'NOT'"
             ))
 
         return res.success(node)
@@ -910,7 +895,7 @@ class Parser:
                 if res.error:
                     return res.failure(InvalidSyntaxError(
                         self.current_tok.pos_start, self.current_tok.pos_end,
-                        "Expected ')', 'VAR', 'VARIABLE', 'IF', 'FOR', 'WHILE', 'FUNCTION', 'FUNC', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
+                        "Expected ')', 'VAR', 'IF', 'FOR', 'WHILE', 'FUNCTION', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
                     ))
 
                 while self.current_tok.type == TT_COMMA:
@@ -990,14 +975,9 @@ class Parser:
             if res.error: return res
             return res.success(func_def)
 
-        elif tok.matches(TT_KEYWORD, 'FUNC'):
-            func_def = res.register(self.func_def())
-            if res.error: return res
-            return res.success(func_def)
-
         return res.failure(InvalidSyntaxError(
             tok.pos_start, tok.pos_end,
-            "Expected int, float, identifier, '+', '-', '(', '[', IF', 'FOR', 'WHILE', 'FUNCTION', 'FUNC'"
+            "Expected int, float, identifier, '+', '-', '(', '[', IF', 'FOR', 'WHILE', 'FUNCTION'"
         ))
 
     def list_expr(self):
@@ -1022,7 +1002,7 @@ class Parser:
             if res.error:
                 return res.failure(InvalidSyntaxError(
                     self.current_tok.pos_start, self.current_tok.pos_end,
-                    "Expected ']', 'VAR', 'VARIABLE', 'IF', 'FOR', 'WHILE', 'FUNCTION', 'FUNC', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
+                    "Expected ']', 'VAR', 'IF', 'FOR', 'WHILE', 'FUNCTION', int, float, identifier, '+', '-', '(', '[' or 'NOT'"
                 ))
 
             while self.current_tok.type == TT_COMMA:
@@ -1293,10 +1273,10 @@ class Parser:
     def func_def(self):
         res = ParseResult()
 
-        if not self.current_tok.matches(TT_KEYWORD, 'FUNCTION') and not self.current_tok.matches(TT_KEYWORD, 'FUNC'):
+        if not self.current_tok.matches(TT_KEYWORD, 'FUNCTION'):
             return res.failure(InvalidSyntaxError(
                 self.current_tok.pos_start, self.current_tok.pos_end,
-                f"Expected 'FUNCTION' or 'FUNC'"
+                f"Expected 'FUNCTION'"
             ))
 
         res.register_advancement()
@@ -1892,9 +1872,6 @@ class OptionalFunction(OptionalBaseFunction):
 
     #####################################
 
-    client = discord.Client()
-    token = os.getenv("TOKEN")
-
     def execute_print(self, exec_ctx):
         value = str(exec_ctx.symbol_table.get('value'))
         color = str(exec_ctx.symbol_table.get('color')).lower()
@@ -1916,143 +1893,6 @@ class OptionalFunction(OptionalBaseFunction):
 
     execute_print.arg_names = ['value', 'color']
     execute_print.required_arg_names = []
-
-    def execute_discordclient(self, exec_ctx):
-        self.client = discord.Client()
-        return RTResult().success(Number(self.client))
-
-    execute_discordclient.arg_names = []
-    execute_discordclient.required_arg_names = []
-
-    def execute_discordtoken(self, exec_ctx):
-        if exec_ctx.symbol_table.get('token') is not None:
-            self.token = str(exec_ctx.symbol_table.get('token'))
-        else:
-            return RTResult().success(Number(self.token))
-        return RTResult().success(Number.null)
-
-    execute_discordtoken.arg_names = ['token']
-    execute_discordtoken.required_arg_names = []
-
-    joinmessage = 'Bot Online!'
-
-    def execute_ondiscordbotready(self, exec_ctx):
-        self.joinmessage = str(exec_ctx.symbol_table.get('message'))
-        return RTResult().success(Number.null)
-
-    execute_ondiscordbotready.arg_names = ['message']
-    execute_ondiscordbotready.required_arg_names = ['message']
-
-    @client.event
-    async def on_ready():
-        print(OptionalFunction.joinmessage)
-
-    action = "PRINT(\"Hello, World!\")"
-    messageAuthor = None
-    messageAuthorName = ""
-    messageContent = ""
-    message = None
-    messageChannel = None
-
-    def execute_ondiscordbotmessage(self, exec_ctx):
-        if exec_ctx.symbol_table.get('action') is not None:
-            self.action = str(exec_ctx.symbol_table.get('action'))
-        return RTResult().success(Number.null)
-
-    execute_ondiscordbotmessage.arg_names = ['action']
-    execute_ondiscordbotmessage.required_arg_names = []
-
-    @client.event
-    async def on_message(message):
-        OptionalFunction.messageAuthor = message.author
-        OptionalFunction.messageAuthorName = message.author.name
-        OptionalFunction.messageContent = message.content
-        OptionalFunction.message = message
-        OptionalFunction.messageChannel = message.channel
-        if OptionalFunction.action is not None:
-            run('<stdin>', OptionalFunction.action.replace("${messageAuthor}", messageAuthor).replace("${messageauthor}", messageAuthor).replace("${messageAuthorName}", messageAuthorName).replace("${messageauthorname}", messageAuthorName).replace("${messageContent}", messageContent).replace("${messagecontent}", messageContent).replace("${message}", message).replace("${messageChannel}", messageChannel).replace("${messagechannel}", messageChannel))
-
-    def execute_discordbotsendmessage(self, exec_ctx):
-        message = str(exec_ctx.symbol_table.get('message'))
-        channel = self.message.channel
-        channel.send(message)
-        return RTResult().success(Number.null)
-
-    execute_discordbotsendmessage.arg_names = ['message']
-    execute_discordbotsendmessage.required_arg_names = ['message']
-
-    def execute_rundiscordbot(self, exec_ctx):
-        token = self.token
-        if exec_ctx.symbol_table.get('token') is not None:
-            token = str(exec_ctx.symbol_table.get('token'))
-        self.client.run(token)
-        return RTResult().success(Number.null)
-
-    execute_rundiscordbot.arg_names = ['token']
-    execute_rundiscordbot.required_arg_names = []
-
-    # def execute_Import(self, exec_ctx):
-    #     global value
-
-    #     value2 = str(exec_ctx.symbol_table.get('file'))
-    #     file = None
-    #     code = ""
-    #     code2 = ""
-    #     if os.path.exists(value):
-    #         file = open(value,"r")
-    #         code = file.readlines()
-    #     else:
-    #         if os.path.exists('temp.core.para'):
-    #             file = open("temp.core.para","r")
-    #             code = file.readlines()
-    #             code2 = value
-    #         else:
-    #             file = open("temp.core.para", "w+")
-    #             # print(value)
-    #             file.write(value)
-    #             file.close()
-    #             file = open("temp.core.para","r")
-    #             code = file.readlines()
-    #     resultCode = code
-    #     result = value
-    #     b = open(value2,"r").read()
-    #     print(value2)
-    #     for i in resultCode:
-    #         a = True
-    #         for o in range(len(resultCode)):
-    #             if i.startswith(f'IMPORT("{value2}")') or resultCode[o].startswith(f'IMPORT("{value2}")'):
-    #                 a = False
-    #                 resultCode[o - 1] = ""
-    #                 resultCode[o] = b + "\n"
-    #                 #result += ""
-    #             else:
-    #                 a = True
-    #         if a:
-    #             result += i
-    #     sys.stdout = originalStdout
-    #     print(result)
-    #     value = result
-    #     run('<stdin>', result)
-    #     if not "IMPORT" in result:
-    #         if os.path.exists("temp.core.para"):
-    #             os.remove("temp.core.para")
-    #     return RTResult().success(String(result))
-
-    # execute_Import.arg_names = ['file']
-    # execute_Import.required_arg_names = ['file']
-
-    
-
-    def execute_input(self, exec_ctx):
-        inputText = str(exec_ctx.symbol_table.get('inputText'))
-        if inputText is None or inputText == "":
-            text = input()
-        else:
-            text = input(inputText)
-        return RTResult().success(String(text))
-
-    execute_input.arg_names = ['inputText']
-    execute_input.required_arg_names = []
 
     def execute_paragameinit(self, exec_ctx):
         pygame.init()
@@ -2084,75 +1924,16 @@ class OptionalFunction(OptionalBaseFunction):
     execute_randomnumber.arg_names = ['beg', 'end', 'step']
     execute_randomnumber.required_arg_names = []
 
-    def execute_label(self, exec_ctx):
-        # else:
-            # label = tk.Label(text=str(exec_ctx.symbol_table.get('text')))
-            # label.pack()
-        label = tk.Label(text=str(exec_ctx.symbol_table.get('text')))
-        label.pack()
-        return RTResult().success(Number(label))
-
-    execute_label.arg_names = ['text', 'background', 'foreground', 'width', 'height']
-    execute_label.required_arg_names = ['text']
-
-    def execute_button(self, exec_ctx):
-        # else:
-            # label = tk.Label(text=str(exec_ctx.symbol_table.get('text')))
-            # label.pack()
-        button = tk.Button(text=str(exec_ctx.symbol_table.get('text')))
-        button.pack()
-        return RTResult().success(Number(button))
-
-    execute_button.arg_names = ['text', 'bg', 'fg', 'width', 'height']
-    execute_button.required_arg_names = ['text']
-
-    def execute_entry(self, exec_ctx):
-        # else:
-            # label = tk.Label(text=str(exec_ctx.symbol_table.get('text')))
-            # label.pack()
-        entry = tk.Entry(text=str(exec_ctx.symbol_table.get('text')))
-        entry.pack()
-        return RTResult().success(Number(entry))
-
-    execute_entry.arg_names = ['bg', 'fg', 'width', 'height']
-    execute_entry.required_arg_names = []
-
-    def execute_parabuild(self, exec_ctx):
-        from shutil import copyfile
-        if str(exec_ctx.symbol_table.get('file')).endswith('.para') or str(exec_ctx.symbol_table.get('file')).endswith('.paracode'):
-            if exec_ctx.symbol_table.get('name') is not None and int(str(exec_ctx.symbol_table.get('name'))) != 0:
-                copyfile('shellTemplate.py', str(exec_ctx.symbol_table.get('name')) + ".py")
-                file = open(str(exec_ctx.symbol_table.get('name') + ".py"), 'r')
-                contents = file.read()
-                file.close()
-                file = open(str(exec_ctx.symbol_table.get('name') + ".py"), 'w')
-                file.write(contents.replace('shellTemplate.para', str(exec_ctx.symbol_table.get('file'))))
-
-                if exec_ctx.symbol_table.get('icon') is not None:
-                    os.system('pyinstaller --onefile --add-data="' + str(exec_ctx.symbol_table.get('file')) + '"' + str(exec_ctx.symbol_table.get('file')).replace('.para', '.py') + ' --icon=' + str(exec_ctx.symbol_table.get('icon')) + ' --name=' + str(exec_ctx.symbol_table.get('name')))
-                else:
-                    os.system('pyinstaller --onefile --add-data="' + str(exec_ctx.symbol_table.get('file')) + '"' + str(exec_ctx.symbol_table.get('file')).replace('.para', '.py') + ' --name=' + str(exec_ctx.symbol_table.get('name')))
-
-                os.path.remove(str(exec_ctx.symbol_table.get('name')).replace('.para', '.py'))
-            else:
-                copyfile('shellTemplate.py', str(exec_ctx.symbol_table.get('file')).replace('.para', '.py'))
-                file = open(str(exec_ctx.symbol_table.get('file')).replace('.para', '.py'), 'r')
-                contents = file.read()
-                file.close()
-                file = open(str(exec_ctx.symbol_table.get('file')).replace('.para', '.py'), 'w')
-                file.write(contents.replace('shellTemplate.para', str(exec_ctx.symbol_table.get('file'))))
-
-                if exec_ctx.symbol_table.get('icon') is not None:
-                    os.system('pyinstaller --onefile --add-data="' + str(exec_ctx.symbol_table.get('file')) + '"' + str(exec_ctx.symbol_table.get('file')).replace('.para', '.py') + ' --icon=' + str(exec_ctx.symbol_table.get('icon')))
-                else:
-                    os.system('pyinstaller --onefile --add-data="' + str(exec_ctx.symbol_table.get('file')) + '"' + str(exec_ctx.symbol_table.get('file')).replace('.para', '.py'))
-
-                os.path.remove(str(exec_ctx.symbol_table.get('file')).replace('.para', '.py'))
-
-        return RTResult().success(Number.null)
-
-    execute_parabuild.arg_names = ['file', 'name', 'icon']
-    execute_parabuild.required_arg_names = ['file']
+    # def execute_label(self, exec_ctx):
+    #   if exec_ctx.symbol_table.get('text') is not None:
+    #     label = tk.Label(text=str(exec_ctx.symbol_table.get('text')))
+    #     label.pack()
+    #     return RTResult().success(Number(label))
+    #   label = tk.Label(text="HELLO")
+    #   label.pack()
+    #   return RTResult().success(Number(label))
+    # execute_label.arg_names = ['background', 'foreground', 'width', 'height']
+    # execute_label.required_arg_names = ['text']
 
 
 class Function(BaseFunction):
@@ -2422,17 +2203,6 @@ class BuiltInFunction(BaseFunction):
 
     execute_demoapp.arg_names = ['enable']
 
-    def execute_stairs(self, exec_ctx):
-        N = int(str(exec_ctx.symbol_table.get('count')))
-        i = 1
-        while i < steps:
-            print('  '*i+'|_')
-            i = i + 1
-        print('__'*i+'|')
-        return RTResult().success(Number.null)
-
-    execute_stairs.arg_names = ['count']
-    
     def execute_halfDiamondStar(self, exec_ctx):
         N = int(str(exec_ctx.symbol_table.get('count')))
         for i in range(N):
@@ -2868,6 +2638,12 @@ class BuiltInFunction(BaseFunction):
 
     execute_loop.arg_names = ["function", "count"]
 
+    def execute_input(self, exec_ctx):
+        text = input()
+        return RTResult().success(String(text))
+
+    execute_input.arg_names = []
+
     def execute_input_int(self, exec_ctx):
         while True:
             text = input()
@@ -2885,6 +2661,22 @@ class BuiltInFunction(BaseFunction):
         return RTResult().success(Number.null)
 
     execute_clear.arg_names = []
+
+    def execute_Import(self, exec_ctx):
+        if os.path.exists(str(exec_ctx.symbol_table.get('value'))) and os.path.exists(
+                str(exec_ctx.symbol_table.get('value2'))):
+            value3 = os.open(str(exec_ctx.symbol_table.get('value')), "w+") + "\n\n\n" + os.open(
+                str(exec_ctx.symbol_table.get('value2')), "w+")
+            f = os.open(os.open(str(exec_ctx.symbol_table.get('value')), "w+") + " (Imported Version)", "w+")
+            f.write(value3)
+            if os.path.exists(str(exec_ctx.symbol_table.get('value2')) + " (Imported Version)"):
+                run('<stdin>', os.open(os.open(str(exec_ctx.symbol_table.get('value')), "w+") + " (Imported Version)", "w+"))
+            f.close()
+            print(str(exec_ctx.symbol_table.get('value')))
+            print(str(exec_ctx.symbol_table.get('value2')))
+        return RTResult().success(Number.null)
+
+    execute_Import.arg_names = ['value', 'value2']
 
     def execute_is_number(self, exec_ctx):
         is_number = isinstance(exec_ctx.symbol_table.get("value"), Number)
@@ -3007,188 +2799,7 @@ class BuiltInFunction(BaseFunction):
 
         try:
             with open(fn, "r") as f:
-                #script = 'IMPORT("ParaCore.para")\n\n' + f.read()
-                code = ""
-                code2 = ""
-                code3 = ""
-                codelines = []
-                file = ""
-                imported = []
-                isImported = False
-                code0 = f.read()
-                codelines = code0.splitlines()
-                code = code0
-                # while any("IMPORT " in s for s in codelines):
-                for line in codelines:
-                  if line.replace("	", "").replace(" ", "").startswith("#"):
-                    code = code.replace(line, "")
-                  elif 'IMPORT ' in line:
-                    file = line.split('IMPORT ', 1)[-1]
-                    file = file.replace('"', "")
-                    file = file.replace("\n", "")
-                    file = file.replace(".para", "")
-                    file = file.replace(".", "/")
-                    file += ".para"
-                    for q in imported:
-                      if file == q:
-                        isImported = True
-                    if not isImported:
-                      if code2 != "":
-                        code2 += "\n"
-                      codelines2f = None
-                      try:
-                        codelines2f = open(file, "r")
-                      except:
-                        file =+ "code"
-                        codelines2f = open(file, "r")
-                      codelines2 = codelines2f.read()
-                      codelines2f.close()
-                      code2 += codelines2
-                
-                      code = code.replace(line, "")
-                      imported.append(file)
-                    
-                    isImported = False
-                  elif 'IMPORTend ' in line:
-                    file = line.split('IMPORTend ', 1)[-1]
-                    file = file.replace('"', "")
-                    file = file.replace("\n", "")
-                    file = file.replace(".para", "")
-                    file = file.replace(".", "/")
-                    file += ".para"
-                    for q in imported:
-                      if file == q:
-                        isImported = True
-                    if not isImported:
-                      if code3 != "":
-                        code3 += "\n"
-                      codelines3f = None
-                      try:
-                        codelines3f = open(file, "r")
-                      except:
-                        file =+ "code"
-                        codelines3f = open(file, "r")
-                      codelines3 = codelines3f.readlines()
-                      codelines3f.close()
-                      for line3 in codelines3:
-                        code3 += line3
-                
-                      code = code.replace(line, "")
-                      imported.append(file)
-                
-                    isImported = False
-                  # else:
-                  #   # code += line[:-1]
-                  #   code += line
-                
-                  codelines = code.splitlines()
-                
-                while any("IMPORT " in s for s in code2.splitlines()):
-                  for line in code2.splitlines():
-                    if line.replace("	", "").replace(" ", "").startswith("#"):
-                      code2 = code2.replace(line, "")
-                    elif 'IMPORT ' in line:
-                      file = line.split('IMPORT ', 1)[-1]
-                      file = file.replace('"', "")
-                      file = file.replace("\n", "")
-                      file = file.replace(".para", "")
-                      file = file.replace(".", "/")
-                      file += ".para"
-                      if code2 != "":
-                        code2 += "\n"
-                      codelines2f = None
-                      try:
-                        codelines2f = open(file, "r")
-                      except:
-                        file =+ "code"
-                        codelines2f = open(file, "r")
-                      codelines2 = codelines2f.readlines()
-                      codelines2f.close()
-                      for line2 in codelines2:
-                        code2 += line2
-                
-                      code2 = code2.replace(line, "")
-                    elif 'IMPORTend ' in line:
-                      file = line.split('IMPORTend ', 1)[-1]
-                      file = file.replace('"', "")
-                      file = file.replace("\n", "")
-                      file = file.replace(".para", "")
-                      file = file.replace(".", "/")
-                      file += ".para"
-                      if code3 != "":
-                        code3 += "\n"
-                      codelines3f = None
-                      try:
-                        codelines3f = open(file, "r")
-                      except:
-                        file =+ "code"
-                        codelines3f = open(file, "r")
-                      codelines3 = codelines3f.readlines()
-                      codelines3f.close()
-                      for line3 in codelines3:
-                        code3 += line3
-                
-                      code2 = code2.replace(line, "")
-                    # else:
-                    #   # code += line[:-1]
-                    #   code2 += line
-                
-                while any("IMPORT " in s for s in code3.splitlines()):
-                  for line in code3.splitlines():
-                    if line.replace("	", "").replace(" ", "").startswith("#"):
-                      code3 = code3.replace(line, "")
-                    elif 'IMPORT ' in line:
-                      file = line.split('IMPORT ', 1)[-1]
-                      file = file.replace('"', "")
-                      file = file.replace("\n", "")
-                      file = file.replace(".para", "")
-                      file = file.replace(".", "/")
-                      file += ".para"
-                      if code2 != "":
-                        code2 += "\n"
-                      codelines2f = None
-                      try:
-                        codelines2f = open(file, "r")
-                      except:
-                        file =+ "code"
-                        codelines2f = open(file, "r")
-                      codelines2 = codelines2f.readlines()
-                      codelines2f.close()
-                      for line2 in codelines2:
-                        code2 += line2
-                
-                      code3 = code3.replace(line, "")
-                    elif 'IMPORTend ' in line:
-                      file = line.split('IMPORTend ', 1)[-1]
-                      file = file.replace('"', "")
-                      file = file.replace("\n", "")
-                      file = file.replace(".para", "")
-                      file = file.replace(".", "/")
-                      file += ".para"
-                      if code3 != "":
-                        code3 += "\n"
-                      codelines3f = None
-                      try:
-                        codelines3f = open(file, "r")
-                      except:
-                        file =+ "code"
-                        codelines3f = open(file, "r")
-                      codelines3 = codelines3f.readlines()
-                      codelines3f.close()
-                      for line3 in codelines3:
-                        # code3 += line3[:-1]
-                        code3 += line3
-                
-                        code3 = code3.replace(line, "")
-                    # else:
-                    #   # code += line[:-1]
-                    #   code3 += line
-                if code2 != "":
-                  code2 += code
-                  code = code2
-                if code3 != "":
-                  code += code3
-                script = code
+                script = f.read()
         except Exception as e:
             return RTResult().failure(RTError(
                 self.pos_start, self.pos_end,
@@ -3215,8 +2826,6 @@ BuiltInFunction.modulo = BuiltInFunction("modulo")
 BuiltInFunction.indexof = BuiltInFunction("indexof")
 OptionalFunction.print = OptionalFunction("print")
 OptionalFunction.paragameinit = OptionalFunction("paragameinit")
-
-BuiltInFunction.stairs = BuiltInFunction("stairs")
 BuiltInFunction.halfDiamondStar = BuiltInFunction("halfDiamondStar")
 BuiltInFunction.removepunc = BuiltInFunction("removepunc")
 BuiltInFunction.removeletters = BuiltInFunction("removeletters")
@@ -3236,12 +2845,6 @@ BuiltInFunction.microphone = BuiltInFunction("microphone")
 BuiltInFunction.translator = BuiltInFunction("translator")
 BuiltInFunction.translate = BuiltInFunction("translate")
 BuiltInFunction.print_ret = BuiltInFunction("print_ret")
-OptionalFunction.discordclient = OptionalFunction("discordclient")
-OptionalFunction.discordtoken = OptionalFunction("discordtoken")
-OptionalFunction.ondiscordbotready = OptionalFunction("ondiscordbotready")
-OptionalFunction.ondiscordbotmessage = OptionalFunction("ondiscordbotmessage")
-OptionalFunction.discordbotsendmessage = OptionalFunction("discordbotsendmessage")
-OptionalFunction.rundiscordbot = OptionalFunction("rundiscordbot")
 BuiltInFunction.debuglog = BuiltInFunction("debuglog")
 BuiltInFunction.debugwarning = BuiltInFunction("debugwarning")
 BuiltInFunction.debugerror = BuiltInFunction("debugerror")
@@ -3306,7 +2909,7 @@ BuiltInFunction.getyear = BuiltInFunction("getyear")
 BuiltInFunction.replace = BuiltInFunction("replace")
 BuiltInFunction.replacefirst = BuiltInFunction("replacefirst")
 BuiltInFunction.loop = BuiltInFunction("loop")
-OptionalFunction.input = OptionalFunction("input")
+BuiltInFunction.input = BuiltInFunction("input")
 BuiltInFunction.input_int = BuiltInFunction("input_int")
 BuiltInFunction.clear = BuiltInFunction("clear")
 BuiltInFunction.is_number = BuiltInFunction("is_number")
@@ -3319,7 +2922,7 @@ BuiltInFunction.extend = BuiltInFunction("extend")
 BuiltInFunction.len = BuiltInFunction("len")
 BuiltInFunction.run = BuiltInFunction("run")
 BuiltInFunction.convert = BuiltInFunction("convert")
-# OptionalFunction.Import = OptionalFunction("Import")
+BuiltInFunction.Import = BuiltInFunction("Import")
 
 
 #######################################
@@ -3620,7 +3223,6 @@ class Interpreter:
 
 global_symbol_table = SymbolTable()
 global_symbol_table.set("NULL", Number.null)
-global_symbol_table.set("NONE", Number.null)
 global_symbol_table.set("FALSE", Number.false)
 global_symbol_table.set("TRUE", Number.true)
 global_symbol_table.set("MATH_PI", Number.math_PI)
@@ -3669,8 +3271,6 @@ global_symbol_table.set("RECOGNIZER", BuiltInFunction.recognizer)
 global_symbol_table.set("MICROPHONE", BuiltInFunction.microphone)
 global_symbol_table.set("TRANSLATOR", BuiltInFunction.translator)
 global_symbol_table.set("TRANSLATE", BuiltInFunction.translate)
-
-global_symbol_table.set("STAIRS", BuiltInFunction.stairs)
 global_symbol_table.set("HALFDIAMONDSTAR", BuiltInFunction.halfDiamondStar)
 global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)
 global_symbol_table.set("REMOVEPUNCTUATION", BuiltInFunction.removepunc)
@@ -3686,12 +3286,6 @@ global_symbol_table.set("KEEPPUNC", BuiltInFunction.keeppunc)
 global_symbol_table.set("KEEPPUNCTUATION", BuiltInFunction.keeppunc)
 global_symbol_table.set("RANDOMNUMBER", OptionalFunction.randomnumber)
 global_symbol_table.set("PRINT_RET", BuiltInFunction.print_ret)
-global_symbol_table.set("DISCORDCLIENT", OptionalFunction.discordclient)
-global_symbol_table.set("DISCORDTOKEN", OptionalFunction.discordtoken)
-global_symbol_table.set("ONDISCORDBOTREADY", OptionalFunction.ondiscordbotready)
-global_symbol_table.set("ONDISCORDBOTMESSAGE", OptionalFunction.ondiscordbotmessage)
-global_symbol_table.set("DISCORDBOTSENDMESSAGE", OptionalFunction.discordbotsendmessage)
-global_symbol_table.set("RUNDISCORDBOT", OptionalFunction.rundiscordbot)
 global_symbol_table.set("CRYPTOGENERATEKEY", BuiltInFunction.cryptogeneratekey)
 global_symbol_table.set("CRYPTOENCRYPT", BuiltInFunction.cryptoencrypt)
 global_symbol_table.set("CRYPTODECRYPT", BuiltInFunction.cryptodecrypt)
@@ -3730,45 +3324,26 @@ global_symbol_table.set("GETYEAR", BuiltInFunction.getyear)
 global_symbol_table.set("REPLACE", BuiltInFunction.replace)
 global_symbol_table.set("REPLACEFIRST", BuiltInFunction.replacefirst)
 global_symbol_table.set("LOOP", BuiltInFunction.loop)
-global_symbol_table.set("INPUT", OptionalFunction.input)
+global_symbol_table.set("INPUT", BuiltInFunction.input)
 global_symbol_table.set("INPUT_INT", BuiltInFunction.input_int)
-global_symbol_table.set("INPUTINT", BuiltInFunction.input_int)
 global_symbol_table.set("CLEAR", BuiltInFunction.clear)
 global_symbol_table.set("CLS", BuiltInFunction.clear)
 global_symbol_table.set("IS_NUM", BuiltInFunction.is_number)
-global_symbol_table.set("IS_NUMBER", BuiltInFunction.is_number)
-global_symbol_table.set("ISNUM", BuiltInFunction.is_number)
-global_symbol_table.set("ISNUMBER", BuiltInFunction.is_number)
 global_symbol_table.set("IS_STR", BuiltInFunction.is_string)
-global_symbol_table.set("IS_STRING", BuiltInFunction.is_string)
-global_symbol_table.set("ISSTR", BuiltInFunction.is_string)
-global_symbol_table.set("ISSTRING", BuiltInFunction.is_string)
 global_symbol_table.set("IS_LIST", BuiltInFunction.is_list)
-global_symbol_table.set("ISLIST", BuiltInFunction.is_list)
-global_symbol_table.set("IS_FUNC", BuiltInFunction.is_function)
-global_symbol_table.set("IS_FUNCTION", BuiltInFunction.is_function)
-global_symbol_table.set("ISFUNC", BuiltInFunction.is_function)
-global_symbol_table.set("ISFUNCTION", BuiltInFunction.is_function)
+global_symbol_table.set("IS_FUN", BuiltInFunction.is_function)
 global_symbol_table.set("APPEND", BuiltInFunction.append)
 global_symbol_table.set("POP", BuiltInFunction.pop)
 global_symbol_table.set("EXTEND", BuiltInFunction.extend)
 global_symbol_table.set("LEN", BuiltInFunction.len)
 global_symbol_table.set("RUN", BuiltInFunction.run)
+global_symbol_table.set("SLICE", slice)
 
 
 # global_symbol_table.set("CONVERT", BuiltInFunction.convert)
-# global_symbol_table.set("IMPORT", OptionalFunction.Import)
+global_symbol_table.set("IMPORT", BuiltInFunction.Import)
 
 def run(fn, text):
-    # global importing
-
-    # if "IMPORT" in text:
-        # importing = False
-    # else:
-        # importing = True
-    # if not importing:
-    # sys.stdout = open(os.devnull, 'w')
-    
     # Generate tokens
     lexer = Lexer(fn, text)
     tokens, error = lexer.make_tokens()
@@ -3778,35 +3353,12 @@ def run(fn, text):
     parser = Parser(tokens)
     ast = parser.parse()
     if ast.error: return None, ast.error
-    
+
     # Run program
     interpreter = Interpreter()
     context = Context('<program>')
     context.symbol_table = global_symbol_table
     result = interpreter.visit(ast.node, context)
 
-    # run(fn, text)
     return result.value, result.error
-    # else:
-    #     #sys.stdout = originalStdout
-
-    #     # Generate tokens
-    #     lexer = Lexer(fn, text)
-    #     tokens, error = lexer.make_tokens()
-    #     if error: return None, error
-
-    #     # Generate AST
-    #     parser = Parser(tokens)
-    #     ast = parser.parse()
-    #     if ast.error: return None, ast.error
-    
-    #     # Run program
-    #     interpreter = Interpreter()
-    #     context = Context('<program>')
-    #     context.symbol_table = global_symbol_table
-    #     result = interpreter.visit(ast.node, context)
-
-    #     #importing = False
-
-    #     return result.value, result.error
 
