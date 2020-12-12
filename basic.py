@@ -1893,7 +1893,7 @@ class OptionalFunction(OptionalBaseFunction):
     #####################################
 
     client = discord.Client()
-    token = os.getenv("TOKEN")
+    token = os.environ["TOKEN"]
 
     def execute_print(self, exec_ctx):
         value = str(exec_ctx.symbol_table.get('value'))
