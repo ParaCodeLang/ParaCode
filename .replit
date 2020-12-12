@@ -1,2 +1,2 @@
 language = "python"
-run = "python runRepl.py"
+run = "pypy -i shell.py"

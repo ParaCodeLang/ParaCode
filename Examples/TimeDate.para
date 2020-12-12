@@ -1,0 +1,8 @@
+// Year
+PRINT(GETYEAR())
+
+// Month
+PRINT(GETMONTH())
+
+// Day
+PRINT(GETDAY())

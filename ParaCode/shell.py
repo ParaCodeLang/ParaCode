@@ -1,5 +1,3 @@
-import re
-
 import platform
 
 from inspect import signature as sign, isfunction as func
@@ -7,7 +5,7 @@ if platform.system() == "Windows":
     import win32com.client
     from pynput.keyboard import Key, Controller
 elif platform.system() == "Linux":
-    from pykeyboard import *
+    from pykeyboard import PyKeyboard
 else:
     import keyboard as keyb
 from ctypes import *
@@ -28,10 +26,9 @@ import requests
 import wget
 from bs4 import BeautifulSoup
 
-from basic import value
-import basic
-import config
-#import installDependencies
+from ParaCode import basic
+from ParaCode import config
+# from ParaCode import installDependencies
 
 from colorama import init
 from colorama import Fore as coloramaFore
@@ -44,8 +41,6 @@ from colored import bg as Bg
 from colored import attr as Attr
 
 import time
-
-tourStage = 0
 
 returned = config.returned
 
@@ -71,101 +66,6 @@ pointer_style = configFile.get("shell").get("pointerStyle")
 error_color = configFile.get("shell").get("errorColor")
 error_style = configFile.get("shell").get("errorStyle")
 
-
-class TrieNode(): 
-	def __init__(self): 
-		
-		# Initialising one node for trie 
-		self.children = {} 
-		self.last = False
-
-class Trie(): 
-	def __init__(self): 
-		
-		# Initialising the trie structure. 
-		self.root = TrieNode() 
-		self.word_list = [] 
-
-	def formTrie(self, keys): 
-		
-		# Forms a trie structure with the given set of strings 
-		# if it does not exists already else it merges the key 
-		# into it by extending the structure as required 
-		for key in keys: 
-			self.insert(key) # inserting one key to the trie. 
-
-	def insert(self, key): 
-		
-		# Inserts a key into trie if it does not exist already. 
-		# And if the key is a prefix of the trie node, just 
-		# marks it as leaf node. 
-		node = self.root 
-
-		for a in list(key): 
-			if not node.children.get(a): 
-				node.children[a] = TrieNode() 
-
-			node = node.children[a] 
-
-		node.last = True
-
-	def search(self, key): 
-		
-		# Searches the given key in trie for a full match 
-		# and returns True on success else returns False. 
-		node = self.root 
-		found = True
-
-		for a in list(key): 
-			if not node.children.get(a): 
-				found = False
-				break
-
-			node = node.children[a] 
-
-		return node and node.last and found 
-
-	def suggestionsRec(self, node, word): 
-		
-		# Method to recursively traverse the trie 
-		# and return a whole word. 
-		if node.last: 
-			self.word_list.append(word) 
-
-		for a,n in node.children.items(): 
-			self.suggestionsRec(n, word + a) 
-
-	def printAutoSuggestions(self, key): 
-		
-		# Returns all the words in the trie whose common 
-		# prefix is the given key thus listing out all 
-		# the suggestions for autocomplete. 
-		node = self.root 
-		not_found = False
-		temp_word = '' 
-
-		for a in list(key): 
-			if not node.children.get(a): 
-				not_found = True
-				break
-
-			temp_word += a 
-			node = node.children[a] 
-
-		if not_found: 
-			return 0
-		elif node.last and not node.children: 
-			return -1
-
-		self.suggestionsRec(node, temp_word) 
-
-		for s in self.word_list: 
-			print(s) 
-		return 1
-
-keys = ["HELP", "PRINT", "ECHO"] # keys to form the trie structure. 
-key = "" # key for autocomplete suggestions. 
-status = ["Not found", "Found"] 
 
 # {} is the command given by the user
 class error:
@@ -195,11 +95,6 @@ clear_command = config.clear_command
 version_command = config.version_command
 
 stopped = 0
-
-code = []
-
-lastInput = []
-lastInputIndex = 0
 
 sytling = {
     "white": coloramaFore.WHITE,
@@ -281,8 +176,7 @@ sytling = {
     "bgbrightblue": coloramaBack.LIGHTBLUE_EX,
     "bgbrightmagenta": coloramaBack.LIGHTMAGENTA_EX,
     "bgbrightcyan": coloramaBack.LIGHTCYAN_EX,
-    "bgbrightwhite": coloramaBack.LIGHTWHITE_EX,
-    "bold": "\033[1m"
+    "bgbrightwhite": coloramaBack.LIGHTWHITE_EX
 }
 
 os.system('cls' if os.name == 'nt' else 'clear')
@@ -343,20 +237,22 @@ else:
     print((Fg('#c400ff') + "{} {} [{}] 2020 (c)\nType CREDITS, or LICENSE for more information." + Attr('reset')).format(language_name, version, author))
 help = '== Help ==\nFor help with a command, type HELP [command]'
 
-
-def RunShell(command):
+def RunShell(command=''):
     global debug, packageRegistryName, executed, used
-    global error, errorfx
-    global value
-    global sytling
-    global tourStage
+    global error
+    global errorfx
+
+    os.system('')
+    init()
+    originalSigInt = signal.getsignal(signal.SIGINT)
+    signal.signal(signal.SIGINT, CheckExec)
 
     while (stopped == 0 or stopped == 2) and returned == False:
         if executed == 0:
+            text = command
             if command is not None and command != "":
                 text = command
             else:
-                text = ""
                 try:
                     print("")
                     text = input(pointer_color + pointer_style + pointer + console_color + console_style + " ")
@@ -364,38 +260,10 @@ def RunShell(command):
                     pass
             if text.strip() == "":
                 continue
-            text = text.replace('\\', '/')
+            text = text.replace('\\', '/').replace("'", '"')
             if debug:
                 print(text)
-            if text.startswith('[') and text.endswith(']'):
-              if ", " in text:
-                li = list(text.split(", "))
-                result, error = basic.run('<stdin>', 'PRINT({})'.format(li))
-              else:
-                if "," in text:
-                  li = list(text.split(","))
-                  result, error = basic.run('<stdin>', 'PRINT({})'.format(li))
-                elif text == "[]":
-                  result, error = basic.run('<stdin>', 'PRINT({})'.format(text))
-            elif text.isnumeric():
-              result, error = basic.run('<stdin>', 'PRINT({})'.format(text))
-            elif not text.upper().isupper():
-              res = eval(text)
-              result, error = basic.run('<stdin>', 'PRINT({})'.format(res))
-            elif text.startswith('"') and text.endswith('"'):
-              result, error = basic.run('<stdin>', 'PRINT({})'.format(text))
-            elif text == "START":
-              if tourStage == 0:
-                tourStage = 1
-                print("1. " + sytling["bold"] + sytling["green"] + "Basics" + sytling["reset"])
-                print()
-                print(sytling["bold"] + """Welcome to ParaCode! 
-ParaCode is a lightweight programming language, which aims 
-to make it as easy as possible to write expressive and 
-performant code. We'll talk about some of the details 
-later, but for now, let's write a hello-world program!\n""")
-                print(sytling["reset"] + sytling["italic"] + "Type 'PRINT(\"Hello, World!\")' into the prompt." + sytling["reset"])
-            elif text.startswith(help_command + " ") and do_help_command:
+            if text.startswith(help_command + " ") and do_help_command:
                 text = text.split(help_command + " ")[1]
                 try:
                     if func(e("config." + text)):
@@ -423,114 +291,9 @@ later, but for now, let's write a hello-world program!\n""")
                 print("== Help ==\nFor help with a command, type HELP [command]")
             elif StartsWith(text, "PCPM "):
                 string = text.replace("pcpm ", "", 1).replace("PCPM ", "", 1)
-                if StartsWith(string, "UNINSTALL "):
-                  string = string.replace("uninstall ", "", 1).replace("UNINSTALL ", "", 1)
-
-                  if StartsWith(string, "Utils"):
-                        string = string.replace("utils", "", 1).replace("UTILS", "", 1).replace("Utils", "", 1)
-                        f = open("basic.py", "r")
-                        contents = f.read()
-                        if 'global_symbol_table.set("STAIRS", BuiltInFunction.stairs)' in contents:
-                            contents = contents.replace("""
-    def execute_stairs(self, exec_ctx):
-        N = int(str(exec_ctx.symbol_table.get('count')))
-        i = 1
-        while i < steps:
-            print('  '*i+'|_')
-            i = i + 1
-        print('__'*i+'|')
-        return RTResult().success(Number.null)
-
-    execute_stairs.arg_names = ['count']
-    
-    def execute_halfDiamondStar(self, exec_ctx):
-        N = int(str(exec_ctx.symbol_table.get('count')))
-        for i in range(N):
-            for j in range(0, i + 1):
-                print("*", end="")
-            print()
-
-        for i in range(1, N):
-            for j in range(i, N):
-                print("*", end="")
-            print()
-        return RTResult().success(Number.null)
-
-    execute_halfDiamondStar.arg_names = ['count']
-
-    def execute_removepunc(self, exec_ctx):""", "\n    def execute_removepunc(self, exec_ctx):").replace("""
-BuiltInFunction.stairs = BuiltInFunction("stairs")
-BuiltInFunction.halfDiamondStar = BuiltInFunction("halfDiamondStar")
-BuiltInFunction.removepunc = BuiltInFunction("removepunc")""", 'BuiltInFunction.removepunc = BuiltInFunction("removepunc")').replace("""
-global_symbol_table.set("STAIRS", BuiltInFunction.stairs)
-global_symbol_table.set("HALFDIAMONDSTAR", BuiltInFunction.halfDiamondStar)
-global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""", 'global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)')
-                            f.close()
-                            f = open("basic.py", "w")
-                            f.write(contents)
-                            f2 = open("modules.toml", "r")
-                            read = f2.read()
-                            f2.close()
-                            f2 = open("modules.toml", "w")
-                            print(read)
-                            read = read.replace('"Utils", ', "").replace('"Utils",', "").replace('"Utils"', "")
-                            print(read)
-                            f2.write(read)
-                            f2.close()
-                elif StartsWith(string, "INSTALL "):
+                if StartsWith(string, "INSTALL "):
                     string = string.replace("install ", "", 1).replace("INSTALL ", "", 1)
-                    
-                    if StartsWith(string, "Utils"):
-                        string = string.replace("utils", "", 1).replace("UTILS", "", 1).replace("Utils", "", 1)
-                        f = open("basic.py", "r")
-                        contents = f.read()
-                        if not 'global_symbol_table.set("STAIRS", BuiltInFunction.stairs)' in contents:
-                            contents = contents.replace("\n    def execute_removepunc(self, exec_ctx):", """
-    def execute_stairs(self, exec_ctx):
-        N = int(str(exec_ctx.symbol_table.get('count')))
-        i = 1
-        while i < steps:
-            print('  '*i+'|_')
-            i = i + 1
-        print('__'*i+'|')
-        return RTResult().success(Number.null)
-
-    execute_stairs.arg_names = ['count']
-    
-    def execute_halfDiamondStar(self, exec_ctx):
-        N = int(str(exec_ctx.symbol_table.get('count')))
-        for i in range(N):
-            for j in range(0, i + 1):
-                print("*", end="")
-            print()
-
-        for i in range(1, N):
-            for j in range(i, N):
-                print("*", end="")
-            print()
-        return RTResult().success(Number.null)
-
-    execute_halfDiamondStar.arg_names = ['count']
-
-    def execute_removepunc(self, exec_ctx):""").replace('BuiltInFunction.removepunc = BuiltInFunction("removepunc")', """
-BuiltInFunction.stairs = BuiltInFunction("stairs")
-BuiltInFunction.halfDiamondStar = BuiltInFunction("halfDiamondStar")
-BuiltInFunction.removepunc = BuiltInFunction("removepunc")""").replace('global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)', """
-global_symbol_table.set("STAIRS", BuiltInFunction.stairs)
-global_symbol_table.set("HALFDIAMONDSTAR", BuiltInFunction.halfDiamondStar)
-global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
-                            f.close()
-                            f = open("basic.py", "w")
-                            f.write(contents)
-                            f2 = open("modules.toml", "r")
-                            read = f2.read()
-                            f2.close()
-                            if not '"Utils"' in read:
-                              f2 = open("modules.toml", "w")
-                              read = read.replace('installedCorePackages = ["', 'installedCorePackages = a["Utils", "').replace('installedCorePackages = [', 'installedCorePackages = ["Utils"').replace('installedCorePackages = a["Utils", "', 'installedCorePackages = ["Utils", "')
-                              f2.write(read)
-                              f2.close()
-                    elif StartsWith(string, "PyGithub "):
+                    if StartsWith(string, "PyGithub "):
                         string = string.replace("pygithub ", "", 1).replace("PYGITHUB ", "", 1).replace("PyGithub ", "",
                                                                                                         1)
 
@@ -616,7 +379,7 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                                                     for chunk in r3.iter_content(chunk_size=1024 * 1024):
                                                         if chunk:
                                                             f.write(chunk)
-                                                    print("Successfully downloaded {}!".format(fileName))
+                                                    print(f"Successfully downloaded {fileName}!")
                                                     count += 1
                                             else:
                                                 os.mkdir(os.path.realpath(__file__).replace("shell.py",
@@ -634,7 +397,7 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                                                     for chunk in r3.iter_content(chunk_size=1024 * 1024):
                                                         if chunk:
                                                             f.write(chunk)
-                                                    print("Successfully downloaded {}!".format(fileName))
+                                                    print(f"Successfully downloaded {fileName}!")
                                                     count += 1
 
                                         data = {}
@@ -662,7 +425,7 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                                                       'a') as outfile:
                                                 json.dump(data, outfile)
                                     elif ".md" in fileName or "license" in fileName or "LICENSE" in fileName:
-                                        print("Downloading file: {}!".format(fileName))
+                                        print(f"Downloading file: {fileName}!")
                                         if os.path.exists(os.path.realpath(__file__).replace("shell.py",
                                                                                              "") + configFile.get(
                                             "lang").get("packagePath") + packageRegistryName + "\\" + fileName):
@@ -674,7 +437,7 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                                                 for chunk in r2.iter_content(chunk_size=1024 * 1024):
                                                     if chunk:
                                                         f.write(chunk)
-                                                print("Successfully downloaded {}!".format(fileName))
+                                                print(f"Successfully downloaded {fileName}!")
                                                 count += 1
                                         else:
                                             os.mkdir(os.path.realpath(__file__).replace("shell.py",
@@ -692,10 +455,10 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                                                 for chunk in r2.iter_content(chunk_size=1024 * 1024):
                                                     if chunk:
                                                         f.write(chunk)
-                                                print("Successfully downloaded {}!".format(fileName))
+                                                print(f"Successfully downloaded {fileName}!")
                                                 count += 1
                                     else:
-                                        print("Downloading file: {}!".format(fileName))
+                                        print(f"Downloading file: {fileName}!")
                                         packageLink = link.replace(packageSrcDir2, "")
                                         r22 = requests.get(packageLink + packageSrcDir2)
 
@@ -710,7 +473,7 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                                                 for chunk in r22.iter_content(chunk_size=1024 * 1024):
                                                     if chunk:
                                                         f.write(chunk)
-                                                print("Successfully downloaded {}!".format(fileName))
+                                                print(f"Successfully downloaded {fileName}!")
                                                 count += 1
                                         else:
                                             os.mkdir(os.path.realpath(__file__).replace("shell.py",
@@ -728,13 +491,13 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                                                 for chunk in r22.iter_content(chunk_size=1024 * 1024):
                                                     if chunk:
                                                         f.write(chunk)
-                                                print("Successfully downloaded {}!".format(fileName))
+                                                print(f"Successfully downloaded {fileName}!")
                                                 count += 1
                             else:
                                 if count != 1:
-                                    print("Successfully downloaded {} files!".format(count))
+                                    print(f"Successfully downloaded {count} files!")
                                 else:
-                                    print("Successfully downloaded {} file!".format(count))
+                                    print(f"Successfully downloaded {count} file!")
                         else:
                             with open(os.path.realpath(__file__).replace("shell.py", "") + URL.split("/")[-1],
                                       "wb") as f:
@@ -746,9 +509,9 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                                         "https://github.com", "https://raw.githubusercontent.com").replace("/blob/",
                                                                                                            "/")
                                     r = requests.get(URL)
-                                print("Downloading file: {}!".format(fileName))
+                                print(f"Downloading file: {fileName}!")
                                 f.write(r.content)
-                                print("Successfully downloaded {}!".format(fileName))
+                                print(f"Successfully downloaded {fileName}!")
                     elif StartsWith(string, "WGet "):
                         string = string.replace("wget ", "", 1).replace("WGET ", "", 1).replace("WGet ", "", 1).replace(
                             "Wget ", "", 1)
@@ -765,9 +528,9 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                                 slash2 = URL.split("/")[4]
                                 URL = URL.replace(slash + "/", "", 1).replace(slash2 + "/", "", 1).replace(
                                     "https://github.com", "https://raw.githubusercontent.com").replace("/blob/", "/")
-                            print("Downloading file: {}!".format(fileName))
+                            print(f"Downloading file: {fileName}!")
                             wget.download(URL, os.path.realpath(__file__).replace("shell.py", "") + URL.split("/")[-1])
-                            print("Successfully downloaded {}!".format(fileName))
+                            print(f"Successfully downloaded {fileName}!")
                     elif StartsWith(string, "URLLib "):
                         string = string.replace("urllib ", "", 1).replace("URLLIB ", "", 1).replace("URLLib ", "",
                                                                                                     1).replace(
@@ -795,17 +558,17 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                                         "https://github.com", "https://raw.githubusercontent.com").replace("/blob/",
                                                                                                            "/")
                                 fileName = link.split("/")[-1]
-                                print("Downloading file: {}!".format(fileName))
+                                print(f"Downloading file: {fileName}!")
                                 urllib.request.urlretrieve(link,
                                                            os.path.realpath(__file__).replace("shell.py", "") +
                                                            link.split("/")[
                                                                -1])
-                                print("Successfully downloaded {}!".format(fileName))
+                                print(f"Successfully downloaded {fileName}!")
                                 count += 1
                             if count != 1:
-                                print("Successfully downloaded {} files!".format(count))
+                                print(f"Successfully downloaded {count} files!")
                             else:
-                                print("Successfully downloaded {} file!".format(count))
+                                print(f"Successfully downloaded {count} file!")
                         else:
                             fileName = URL.split("/")[-1]
                             if "https://github.com" in URL:
@@ -813,12 +576,12 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                                 slash2 = URL.split("/")[4]
                                 URL = URL.replace(slash + "/", "", 1).replace(slash2 + "/", "", 1).replace(
                                     "https://github.com", "https://raw.githubusercontent.com").replace("/blob/", "/")
-                            print("Downloading file: {}!".format(fileName))
+                            print(f"Downloading file: {fileName}!")
                             urllib.request.urlretrieve(URL,
                                                        os.path.realpath(__file__).replace("shell.py", "") +
                                                        URL.split("/")[
                                                            -1])
-                            print("Successfully downloaded {}!".format(fileName))
+                            print(f"Successfully downloaded {fileName}!")
                     else:
                         URL = string
 
@@ -841,18 +604,18 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                                         "https://github.com", "https://raw.githubusercontent.com").replace("/blob/",
                                                                                                            "/")
                                 fileName = link.split("/")[-1]
-                                print("Downloading file: {}!".format(fileName))
+                                print(f"Downloading file: {fileName}!")
                                 with open(os.path.realpath(__file__).replace("shell.py", "") + fileName, "wb") as f:
                                     r2 = requests.get(link)
                                     for chunk in r2.iter_content(chunk_size=1024 * 1024):
                                         if chunk:
                                             f.write(chunk)
-                                    print("Successfully downloaded {}!".format(fileName))
+                                    print(f"Successfully downloaded {fileName}!")
                                     count += 1
                             if count != 1:
-                                print("Successfully downloaded {} files!".format(count))
+                                print(f"Successfully downloaded {count} files!")
                             else:
-                                print("Successfully downloaded {} file!".format(count))
+                                print(f"Successfully downloaded {count} file!")
                         else:
                             with open(os.path.realpath(__file__).replace("shell.py", "") + URL.split("/")[-1],
                                       "wb") as f:
@@ -864,9 +627,9 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                                         "https://github.com", "https://raw.githubusercontent.com").replace("/blob/",
                                                                                                            "/")
                                     r = requests.get(URL)
-                                print("Downloading file: {}!".format(fileName))
+                                print(f"Downloading file: {fileName}!")
                                 f.write(r.content)
-                                print("Successfully downloaded {}!".format(fileName))
+                                print(f"Successfully downloaded {fileName}!")
             elif text == "LICENSE":
                 print("""Copyright (c) 2020 {}
 
@@ -909,32 +672,26 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                 preferencesFile = "preferences.toml"
                 file_exists = os.path.isfile(preferencesFile)
 
-                value1 = True
-
                 if file_exists:
                     preferences = toml.load(preferencesFile)
 
                     lastRun = preferences.get('lastRun')
                     if lastRun.endswith(".para") or lastRun.endswith(".paracode"):
                         run = lastRun
-                        basic.value = run.replace('RUN("', '').replace('")', '')
                 else:
                     run = ""
                 if run != "":
                     newText = 'RUN("' + run + '")'
-                    basic.value = run.replace('RUN("', '').replace('")', '')
                     result, error = basic.run('<stdin>', newText)
                     if debug:
                         print(newText)
                     debug = startDebug
                 else:
                     newText = 'RUN("main.para")'
-                    basic.value = newText.replace('RUN("', '').replace('")', '')
                     result, error = basic.run('<stdin>', newText)
                     if debug:
                         print(newText)
                     newText = 'RUN("main.paracode")'
-                    basic.value = newText.replace('RUN("', '').replace('")', '')
                     result, error = basic.run('<stdin>', newText)
                     if debug:
                         print(newText)
@@ -950,24 +707,20 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                 startDebug = debug
                 debug = True
                 newText = 'RUN("test.para")'
-                basic.value = newText.replace('RUN("', '').replace('")', '')
                 result, error = basic.run('<stdin>', newText)
                 if debug:
                     print(newText)
                 newText = 'RUN("test.paracode")'
-                basic.value = newText.replace('RUN("', '').replace('")', '')
                 result, error = basic.run('<stdin>', newText)
                 if debug:
                     print(newText)
                 debug = startDebug
             elif text == "TEST":
                 newText = 'RUN("test.para")'
-                basic.value = newText.replace('RUN("', '').replace('")', '')
                 result, error = basic.run('<stdin>', newText)
                 if debug:
                     print(newText)
                 newText = 'RUN("test.paracode")'
-                basic.value = newText.replace('RUN("', '').replace('")', '')
                 result, error = basic.run('<stdin>', newText)
                 if debug:
                     print(newText)
@@ -987,27 +740,22 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                     run = ""
                 if run != "":
                     newText = 'RUN("' + run + '")'
-                    basic.value = run.replace('RUN("', '').replace('")', '')
                     result, error = basic.run('<stdin>', newText)
                     if debug:
                         print(newText)
                 else:
                     newText = 'RUN("main.para")'
-                    basic.value = newText.replace('RUN("', '').replace('")', '')
                     result, error = basic.run('<stdin>', newText)
                     if debug:
                         print(newText)
                     newText = 'RUN("main.paracode")'
-                    basic.value = newText.replace('RUN("', '').replace('")', '')
                     result, error = basic.run('<stdin>', newText)
                     if debug:
                         print(newText)
             elif text.strip().endswith('.para') or text.strip().endswith('.paracode'):
-                basic.value = text.replace('RUN("', '').replace('")', '')
                 result, error = basic.run('<stdin>', 'RUN("' + text + '")')
             elif text.startswith('RUN'):
                 if text.endswith('.para")') or text.endswith('.paracode")') or text.endswith('.para)') or text.endswith('.paracode)'):
-                    basic.value = text.replace('RUN("', '').replace('")', '')
                     result, error = basic.run('<stdin>', text)
                     start = text.find('RUN("') + len('RUN("')
                     end = text.find('")')
@@ -1023,20 +771,17 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                             RunShell("")
                         else:
                             newText = text.replace('")', '.para")')
-                            basic.value = newText.replace('RUN("', '').replace('")', '').replace('RUN("').replace('")', '')
                             result, error = basic.run('<stdin>', newText)
                             if debug:
                                 print(newText)
                             newText = text
                             newText = text.replace('")', '.paracode")')
-                            basic.value = newText.replace('RUN("', '').replace('")', '').replace('RUN("').replace('")', '')
                             result, error = basic.run('<stdin>', newText)
                             if debug:
                                 print(newText)
                     else:
                         newText = text.replace('(', '("')
                         newText = newText.replace(')', '")')
-                        basic.value = newText.replace('RUN("', '').replace('")', '').replace('RUN("').replace('")', '')
                         result, error = basic.run('<stdin>', newText)
                         newText2 = newText
                         if debug:
@@ -1048,13 +793,11 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                             RunShell("")
                         else:
                             newText = newText.replace('")', '.para")')
-                            basic.value = newText.replace('RUN("', '').replace('")', '').replace('RUN("').replace('")', '')
                             result, error = basic.run('<stdin>', newText)
                             if debug:
                                 print(newText)
                             newText = newText2
                             newText = newText.replace('")', '.paracode")')
-                            basic.value = newText.replace('RUN("', '').replace('")', '').replace('RUN("').replace('")', '')
                             result, error = basic.run('<stdin>', newText)
                             if debug:
                                 print(newText)
@@ -1137,137 +880,10 @@ global_symbol_table.set("REMOVEPUNC", BuiltInFunction.removepunc)""")
                 except (AttributeError, SyntaxError):
                     print(error_color + error_style + errorfx.syntax_error.format(text))
 
-            if tourStage == 1:
-              if text.startswith("PRINT(") and "hello" in text.lower() and "world" in text.lower() and text.endswith(")"):
-                print("Well done!")
-                tourStage = 2
-                time.sleep(1)
-                print("""
-⸻
-
-All ParaCode programs are made up of terms. The simplest 
-terms are constants, which evaluate to themselves. For 
-example, an integer constant.
-
-Type '12' into the prompt.
-                """)
-
-            if tourStage == 2:
-              if text.isnumeric():
-                print("Great job!")
-                tourStage = 3
-                time.sleep(1)
-                print("""
-⸻
-
-In addition to integer constants, which represent 
-numbers, ParaCode supports string constants, which represent 
-pieces of text.
-
-Type '"Hello"' into the prompt.
-                """)
-
-            if tourStage == 3:
-              if text.startswith('"') and text.endswith('"'):
-                print("You did it!")
-                tourStage = 4
-                time.sleep(1)
-                print("""
-⸻
-
-ParaCode also supports values that contain multiple terms.
-These values are called lists. If you're familiar with
-any Lisp dialects, these will probably be pretty familiar
-to you. To express a list value, we enclose other
-terms in square brackets.
-
-Type '[1, 2, 3]' into the prompt.
-                """)
-
-            if tourStage == 4:
-              if text.startswith('[') and text.endswith(']') and text != "[]":
-                print("Wonderful!")
-                tourStage = 5
-                time.sleep(1)
-                print("""
-⸻
-
-The empty list is a little special in ParaCode, but it can
-be written about as you'd expect. It generally represents
-the absence of a value.
-
-Type '[]' into the prompt.
-                """)
-
-            if tourStage == 5:
-              if text == "[]":
-                print("Excellent!")
-                tourStage = 6
-                time.sleep(1)
-                print("""
-⸻
-
-Lists can be useful for storing data, but they can also
-be used to represent code. ParaCode programs themselves are
-just lists of terms that the ParaCode compiler evaluates.
-To write a list we want to be evaluated, we enclose other
-terms in parentheses, and separate them with spaces.
-
-Type '1 + 2' into the prompt.
-                """)
-
-            if tourStage == 6:
-              if "1" in text and "+" in text and "2" in text:
-                print("Wow!")
-                tourStage = 7
-                time.sleep(1)
-                print("""
-⸻
-
-This is an example of evaluation. '+' is a symbol that
-represents a built-in function to add two numbers. When
-we evaluate a list that starts with a function, the result
-of evaluation is the result of that function. So, (1 + 2)
-is 3.
-
-Writing all these parentheses can be kind of a pain! So
-ParaCode treats lines on the top level of the program as 
-lists, as if they were surrounded by parentheses. We still
-need to separate every term with spaces, though.
-
-Type '3 * 3' into the prompt, then press Enter twice.
-                """)
-
-            if tourStage == 7:
-              if "3" in text and "*" in text:
-                print("Perfect!")
-                tourStage = 8
-                time.sleep(1)
-                print("""
-⸻
-
-That's the basics! But there's a lot more to ParaCode that
-we'll cover in the next sections.
-
-Enter 'okay!' into the prompt when you're ready to continue.
-                """)
-                string = input("   > ")
-                if string == "okay!":
-                  print("2. " + sytling["bold"] + sytling["green"] + "Definitions" + sytling["reset"])
-                  print()
-                  print(sytling["bold"] + """We've discussed how to write simple expressions and
-constants in ParaCode up until this point. But for more 
-complex programs, we might want to assign certain values 
-names. However, this is the end of the guided tour for now!\n""")
-                  print(sytling["reset"] + sytling["italic"] + "Goodbye!" + sytling["reset"])
-                  tourStage = 9
-                else:
-                  tourStage = 7
-
             executed = 1
+        else:
             SetStopped(0)
             RunAgain()
-    return
 
 
 def RunAgain():
@@ -1297,8 +913,7 @@ def ExitExec(stopped2):
             keyboard.press(Key.enter)
         elif platform.system() == "Linux":
             k = PyKeyboard()
-            k.press_key(k.enter_key)
-            k.release_key(k.enter_key)
+            k.tap_key(k.enter_key)
         else:
             keyb.press_and_release('enter')
         sys.stdout.close()
@@ -1335,31 +950,6 @@ def SetCanSubmit(submit):
     global canSubmit
 
     canSubmit = submit
-
-while True:
-    returned = config.returned
-
-    if used == 0:
-        # print('ParaCode Shell Launched Successfully!')
-        # print("")
-        # print("")
-        # print("")
-        if __name__ == "__main__":
-            os.system('')
-            init()
-            originalSigInt = signal.getsignal(signal.SIGINT)
-            signal.signal(signal.SIGINT, CheckExec)
-
-            ""
-
-            args = sys.argv
-            if len(args) == 2:
-                print(pointer_color + pointer_style + pointer + console_color + console_style + " " + args[1])
-                time.sleep(1.25)
-                RunShell(args[1])
-            else:
-                RunShell("")
-        used = 1
 
     # if canSubmit:
         # if keyb.is_pressed('enter'):
