@@ -1,23 +1,24 @@
-// Arrow Functions
+// Lambda Functions
 FUNCTION oopify(prefix) -> prefix + "oop"
 FUNCTION pooify(suffix) -> "poo" + suffix
 FUNCTION nullify(nullifier) -> "NULLIFIED"
 
 // Importing
 IMPORT 1.para
-//IMPORT 2.para
-//IMPORT 3.para
 
 // Functions
 FUNCTION join(elements, separator)
-	VAR result = ""
+	// Variables
+  VAR result = ""
 	VAR len = LEN(elements)
 
+  // For Loops
 	FOR i = 0 TO len THEN
 		VAR result = result + elements/i
 		IF i != len - 1 THEN VAR result = result + separator
 	END
 
+  // Returning
 	RETURN result
 END
 

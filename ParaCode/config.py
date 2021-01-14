@@ -15,7 +15,7 @@ dev = False
     # dev = True
 dev = True
 
-version = "1.2.20.4"
+version = "1.3"
 author = "DaRubyMiner360"
 language_name = "ParaCode"
 

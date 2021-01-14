@@ -343,6 +343,8 @@ else:
     print((Fg('#c400ff') + "{} {} [{}] 2020 (c)\nType CREDITS, or LICENSE for more information." + Attr('reset')).format(language_name, version, author))
 help = '== Help ==\nFor help with a command, type HELP [command]'
 
+def Run():
+  print("BBBBBBBBBBBBBBBBBBBBBBBBBBB")
 
 def RunShell(command):
     global debug, packageRegistryName, executed, used
@@ -1350,8 +1352,6 @@ while True:
             originalSigInt = signal.getsignal(signal.SIGINT)
             signal.signal(signal.SIGINT, CheckExec)
 
-            ""
-
             args = sys.argv
             if len(args) == 2:
                 print(pointer_color + pointer_style + pointer + console_color + console_style + " " + args[1])
@@ -1359,6 +1359,8 @@ while True:
                 RunShell(args[1])
             else:
                 RunShell("")
+        else:
+          print("AAAAAAAAAAAAAAAAAAAAAAAAAAA")
         used = 1
 
     # if canSubmit:
