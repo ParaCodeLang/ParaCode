@@ -1,5 +1,10 @@
-//IMPORT 3.para
+IMPORT Discord
+
 IMPORT 2
-//IMPORT ParaCore.para
 
 PRINT("1.para")
+
+DISCORDCLIENT()
+RUNDISCORDBOT()
+
+PRINT("B")

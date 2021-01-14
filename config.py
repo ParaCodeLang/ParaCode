@@ -3,7 +3,7 @@ import toml
 
 configFile = toml.load("settings.toml")
 
-dev = configFile.get("dev")
+dev = False
 
 version = configFile.get("version")
 author = configFile.get("author")
@@ -20,6 +20,14 @@ clear_command = ["CLEAR", "CLR"]
 version_command = ["VERSION", "-VERSION", "--VERSION", "ParaCode -VERSION", "ParaCode --VERSION", "PARACODE -VERSION",
                    "PARACODE --VERSION"]
 
+def DEVLOGIN():
+    global dev
+
+    username = input("Username >> ")
+    password = input("Password >> ")
+    if username == "DaRubyMiner360" and password == "pOK#M)N mASTERS":
+      dev = True
+
 def DEVSETVERSION(langversion):
     global version
     if dev == True:
@@ -31,6 +39,7 @@ def DEVSETVERSION(langversion):
 
 def DEVSETAUTHOR(langauthor):
     global author
+
     if dev == True:
         author = langauthor
         configFile['author'] = author
@@ -40,6 +49,7 @@ def DEVSETAUTHOR(langauthor):
 
 def DEVSETLANGNAME(langname):
     global language_name
+
     if dev == True:
         language_name = langname
         configFile['language_name'] = language_name

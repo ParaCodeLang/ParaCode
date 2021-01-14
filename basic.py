@@ -2,6 +2,7 @@
 # IMPORTS
 #######################################
 
+import shared
 from strings_with_arrows import *
 
 from colorama import Fore as coloramaFore
@@ -17,7 +18,11 @@ from colored import style as Style
 import sys
 import os
 
+import FileEssentials
+
 import importlib
+
+import keyboard
 
 import random
 from cryptography.fernet import Fernet
@@ -1892,8 +1897,13 @@ class OptionalFunction(OptionalBaseFunction):
 
     #####################################
 
-    client = discord.Client()
-    token = os.environ["TOKEN"]
+    client = None
+    token = ''
+    
+    if shared.discordImported:
+        client = discord.Client()
+        load_dotenv()
+        token = os.getenv("TOKEN")
 
     def execute_print(self, exec_ctx):
         value = str(exec_ctx.symbol_table.get('value'))
@@ -1917,18 +1927,30 @@ class OptionalFunction(OptionalBaseFunction):
     execute_print.arg_names = ['value', 'color']
     execute_print.required_arg_names = []
 
+    def execute_ispressed(self, exec_ctx):
+        key = str(exec_ctx.symbol_table.get('key'))
+        
+        isPressed = keyboard.is_pressed(key)
+        return RTResult().success(Number(isPressed))
+
+    execute_ispressed.arg_names = ['key']
+    execute_ispressed.required_arg_names = ['key']
+    
     def execute_discordclient(self, exec_ctx):
-        self.client = discord.Client()
-        return RTResult().success(Number(self.client))
+        if shared.discordImported:
+            self.client = discord.Client()
+            return RTResult().success(Number(self.client))
+        return RTResult().success(Number.null)
 
     execute_discordclient.arg_names = []
     execute_discordclient.required_arg_names = []
 
     def execute_discordtoken(self, exec_ctx):
-        if exec_ctx.symbol_table.get('token') is not None:
-            self.token = str(exec_ctx.symbol_table.get('token'))
-        else:
-            return RTResult().success(Number(self.token))
+        if shared.discordImported:
+            if exec_ctx.symbol_table.get('token') is not None:
+                self.token = str(exec_ctx.symbol_table.get('token'))
+            else:
+                return RTResult().success(Number(self.token))
         return RTResult().success(Number.null)
 
     execute_discordtoken.arg_names = ['token']
@@ -1943,9 +1965,10 @@ class OptionalFunction(OptionalBaseFunction):
     execute_ondiscordbotready.arg_names = ['message']
     execute_ondiscordbotready.required_arg_names = ['message']
 
-    @client.event
-    async def on_ready():
-        print(OptionalFunction.joinmessage)
+    if shared.discordImported:
+        @client.event
+        async def on_ready():
+            print(OptionalFunction.joinmessage)
 
     action = "PRINT(\"Hello, World!\")"
     messageAuthor = None
@@ -1962,15 +1985,16 @@ class OptionalFunction(OptionalBaseFunction):
     execute_ondiscordbotmessage.arg_names = ['action']
     execute_ondiscordbotmessage.required_arg_names = []
 
-    @client.event
-    async def on_message(message):
-        OptionalFunction.messageAuthor = message.author
-        OptionalFunction.messageAuthorName = message.author.name
-        OptionalFunction.messageContent = message.content
-        OptionalFunction.message = message
-        OptionalFunction.messageChannel = message.channel
-        if OptionalFunction.action is not None:
-            run('<stdin>', OptionalFunction.action.replace("${messageAuthor}", messageAuthor).replace("${messageauthor}", messageAuthor).replace("${messageAuthorName}", messageAuthorName).replace("${messageauthorname}", messageAuthorName).replace("${messageContent}", messageContent).replace("${messagecontent}", messageContent).replace("${message}", message).replace("${messageChannel}", messageChannel).replace("${messagechannel}", messageChannel))
+    # if shared.discordImported:
+    #     @client.event
+    #     async def on_message(message):
+    #         OptionalFunction.messageAuthor = message.author
+    #         OptionalFunction.messageAuthorName = message.author.name
+    #         OptionalFunction.messageContent = message.content
+    #         OptionalFunction.message = message
+    #         OptionalFunction.messageChannel = message.channel
+    #         if OptionalFunction.action is not None:
+    #             run('<stdin>', OptionalFunction.action.replace("${messageAuthor}", messageAuthor).replace("${messageauthor}", messageAuthor).replace("${messageAuthorName}", messageAuthorName).replace("${messageauthorname}", messageAuthorName).replace("${messageContent}", messageContent).replace("${messagecontent}", messageContent).replace("${message}", message).replace("${messageChannel}", messageChannel).replace("${messagechannel}", messageChannel))
 
     def execute_discordbotsendmessage(self, exec_ctx):
         message = str(exec_ctx.symbol_table.get('message'))
@@ -1985,7 +2009,23 @@ class OptionalFunction(OptionalBaseFunction):
         token = self.token
         if exec_ctx.symbol_table.get('token') is not None:
             token = str(exec_ctx.symbol_table.get('token'))
-        self.client.run(token)
+        if self.client is not None:
+            self.client.run(token)
+
+        @self.client.event
+        async def on_message(message):
+            OptionalFunction.messageAuthor = message.author
+            OptionalFunction.messageAuthorName = message.author.name
+            OptionalFunction.messageContent = message.content
+            OptionalFunction.message = message
+            OptionalFunction.messageChannel = message.channel
+            if OptionalFunction.action is not None:
+                run('<stdin>', OptionalFunction.action.replace("${messageAuthor}", messageAuthor).replace("${messageauthor}", messageAuthor).replace("${messageAuthorName}", messageAuthorName).replace("${messageauthorname}", messageAuthorName).replace("${messageContent}", messageContent).replace("${messagecontent}", messageContent).replace("${message}", message).replace("${messageChannel}", messageChannel).replace("${messagechannel}", messageChannel))
+
+        @self.client.event
+        async def on_ready():
+            print(OptionalFunction.joinmessage)
+
         return RTResult().success(Number.null)
 
     execute_rundiscordbot.arg_names = ['token']
@@ -2664,7 +2704,8 @@ class BuiltInFunction(BaseFunction):
     execute_turtlepen.arg_names = []
 
     def execute_openfile(self, exec_ctx):
-        f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('filename')))
+        f = open(str(exec_ctx.symbol_table.get('filename')))
+        # f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('filename')))
         return RTResult().success(Number(f))
 
     execute_openfile.arg_names = ['filename']
@@ -2676,22 +2717,28 @@ class BuiltInFunction(BaseFunction):
     execute_closefile.arg_names = ['file']
 
     def execute_openfilemode(self, exec_ctx):
-        f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('filename')),
+        f = open(str(exec_ctx.symbol_table.get('filename')),
                  str(exec_ctx.symbol_table.get('mode')).lower())
+        # f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('filename')),
+        #          str(exec_ctx.symbol_table.get('mode')).lower())
         return RTResult().success(Number(f))
 
     execute_openfilemode.arg_names = ['filename', 'mode']
 
     def execute_readfile(self, exec_ctx):
-        f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('file')), "r")
-        string = f.read()
-        f.close()
+        string = FileEssentials.ReadFile(exec_ctx.symbol_table.get('file'))
+        # string = FileEssentials.ReadFile(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('file')))
+        
+        # f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('file')), "r")
+        # string = f.read()
+        # f.close()
         return RTResult().success(Number(string))
 
     execute_readfile.arg_names = ['file']
 
     def execute_readpartfile(self, exec_ctx):
-        f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('file')), "r")
+        f = open(str(exec_ctx.symbol_table.get('file')), "r")
+        # f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('file')), "r")
         string = f.read(exec_ctx.symbol_table.get('chars'))
         f.close()
         return RTResult().success(Number(string))
@@ -2699,7 +2746,8 @@ class BuiltInFunction(BaseFunction):
     execute_readpartfile.arg_names = ['file', 'chars']
 
     def execute_readfileline(self, exec_ctx):
-        f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('file')), "r")
+        f = open(str(exec_ctx.symbol_table.get('file')), "r")
+        # f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('file')), "r")
         string = f.readline()
         f.close()
         return RTResult().success(Number(string))
@@ -2707,42 +2755,53 @@ class BuiltInFunction(BaseFunction):
     execute_readfileline.arg_names = ['file']
 
     def execute_writefile(self, exec_ctx):
-        f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('file')), "w")
-        string = f.write(str(exec_ctx.symbol_table.get('string')))
-        f.close()
+        string = FileEssentials.WriteFile(exec_ctx.symbol_table.get('file'), exec_ctx.symbol_table.get('string'))
+        # string = FileEssentials.WriteFile(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('file')), exec_ctx.symbol_table.get('string'))
+        
+        # f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('file')), "w")
+        # string = f.write(str(exec_ctx.symbol_table.get('string')))
+        # f.close()
         return RTResult().success(Number(string))
 
     execute_writefile.arg_names = ['file', 'string']
 
     def execute_appendfile(self, exec_ctx):
-        f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('file')), "a")
-        string = f.write(str(exec_ctx.symbol_table.get('string')))
-        f.close()
+        string = FileEssentials.AppendFile(exec_ctx.symbol_table.get('file'), exec_ctx.symbol_table.get('string'))
+        # string = FileEssentials.AppendFile(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('file')), exec_ctx.symbol_table.get('string'))
+        
+        # f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('file')), "a")
+        # string = f.write(str(exec_ctx.symbol_table.get('string')))
+        # f.close()
         return RTResult().success(Number(string))
 
     execute_appendfile.arg_names = ['file', 'string']
 
     def execute_createfile(self, exec_ctx):
-        f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('filename')), "x")
-        f.close()
+        f = FileEssentials.CreateFile(exec_ctx.symbol_table.get('filename'))
+        # f = FileEssentials.CreateFile(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('filename')))
+        
+        # f = open(os.path.realpath(__file__).replace("basic.py", "") + str(exec_ctx.symbol_table.get('filename')), "x")
+        # f.close()
         return RTResult().success(Number(f))
 
     execute_createfile.arg_names = ['filename']
 
     def execute_deletefile(self, exec_ctx):
-        os.remove(str(exec_ctx.symbol_table.get('filename')))
+        FileEssentials.DeleteFile(exec_ctx.symbol_table.get('filename'))
+        # os.remove(str(exec_ctx.symbol_table.get('filename')))
         return RTResult().success(Number.null)
 
     execute_deletefile.arg_names = ['filename']
 
     def execute_fileexists(self, exec_ctx):
-        os.remove()
-        return RTResult().success(Number(os.path.exists(str(exec_ctx.symbol_table.get('filename')))))
+        return RTResult().success(Number(FileEssentials.CheckFileExists(exec_ctx.symbol_table.get('filename'))))
+        # return RTResult().success(Number(os.path.exists(str(exec_ctx.symbol_table.get('filename')))))
 
     execute_fileexists.arg_names = ['filename']
 
     def execute_deletedirectory(self, exec_ctx):
-        os.rmdir(str(exec_ctx.symbol_table.get('directory')))
+        FileEssentials.DeleteDirectory(exec_ctx.symbol_table.get('directory'))
+        # os.rmdir(str(exec_ctx.symbol_table.get('directory')))
         return RTResult().success(Number.null)
 
     execute_deletedirectory.arg_names = ['directory']
@@ -3022,6 +3081,9 @@ class BuiltInFunction(BaseFunction):
                 for line in codelines:
                   if line.replace("	", "").replace(" ", "").startswith("#"):
                     code = code.replace(line, "")
+                  elif line.replace('"', "") == "IMPORT Discord":
+                    code = code.replace(line, "")
+                    shared.discordImported = True
                   elif 'IMPORT ' in line:
                     file = line.split('IMPORT ', 1)[-1]
                     file = file.replace('"', "")
@@ -3049,8 +3111,8 @@ class BuiltInFunction(BaseFunction):
                       imported.append(file)
                     
                     isImported = False
-                  elif 'IMPORTend ' in line:
-                    file = line.split('IMPORTend ', 1)[-1]
+                  elif 'IMPORTEND ' in line:
+                    file = line.split('IMPORTEND ', 1)[-1]
                     file = file.replace('"', "")
                     file = file.replace("\n", "")
                     file = file.replace(".para", "")
@@ -3087,6 +3149,9 @@ class BuiltInFunction(BaseFunction):
                   for line in code2.splitlines():
                     if line.replace("	", "").replace(" ", "").startswith("#"):
                       code2 = code2.replace(line, "")
+                    elif line.replace('"', "") == "IMPORT Discord":
+                      code2 = code2.replace(line, "")
+                      shared.discordImported = True
                     elif 'IMPORT ' in line:
                       file = line.split('IMPORT ', 1)[-1]
                       file = file.replace('"', "")
@@ -3108,8 +3173,8 @@ class BuiltInFunction(BaseFunction):
                         code2 += line2
                 
                       code2 = code2.replace(line, "")
-                    elif 'IMPORTend ' in line:
-                      file = line.split('IMPORTend ', 1)[-1]
+                    elif 'IMPORTEND ' in line:
+                      file = line.split('IMPORTEND ', 1)[-1]
                       file = file.replace('"', "")
                       file = file.replace("\n", "")
                       file = file.replace(".para", "")
@@ -3137,6 +3202,9 @@ class BuiltInFunction(BaseFunction):
                   for line in code3.splitlines():
                     if line.replace("	", "").replace(" ", "").startswith("#"):
                       code3 = code3.replace(line, "")
+                    elif line.replace('"', "") == "IMPORT Discord":
+                      code3 = code3.replace(line, "")
+                      shared.discordImported = True
                     elif 'IMPORT ' in line:
                       file = line.split('IMPORT ', 1)[-1]
                       file = file.replace('"', "")
@@ -3158,8 +3226,8 @@ class BuiltInFunction(BaseFunction):
                         code2 += line2
                 
                       code3 = code3.replace(line, "")
-                    elif 'IMPORTend ' in line:
-                      file = line.split('IMPORTend ', 1)[-1]
+                    elif 'IMPORTEND ' in line:
+                      file = line.split('IMPORTEND ', 1)[-1]
                       file = file.replace('"', "")
                       file = file.replace("\n", "")
                       file = file.replace(".para", "")
@@ -3236,6 +3304,7 @@ BuiltInFunction.microphone = BuiltInFunction("microphone")
 BuiltInFunction.translator = BuiltInFunction("translator")
 BuiltInFunction.translate = BuiltInFunction("translate")
 BuiltInFunction.print_ret = BuiltInFunction("print_ret")
+OptionalFunction.ispressed = OptionalFunction("ispressed")
 OptionalFunction.discordclient = OptionalFunction("discordclient")
 OptionalFunction.discordtoken = OptionalFunction("discordtoken")
 OptionalFunction.ondiscordbotready = OptionalFunction("ondiscordbotready")
@@ -3686,6 +3755,7 @@ global_symbol_table.set("KEEPPUNC", BuiltInFunction.keeppunc)
 global_symbol_table.set("KEEPPUNCTUATION", BuiltInFunction.keeppunc)
 global_symbol_table.set("RANDOMNUMBER", OptionalFunction.randomnumber)
 global_symbol_table.set("PRINT_RET", BuiltInFunction.print_ret)
+global_symbol_table.set("ISPRESSED", OptionalFunction.ispressed)
 global_symbol_table.set("DISCORDCLIENT", OptionalFunction.discordclient)
 global_symbol_table.set("DISCORDTOKEN", OptionalFunction.discordtoken)
 global_symbol_table.set("ONDISCORDBOTREADY", OptionalFunction.ondiscordbotready)
