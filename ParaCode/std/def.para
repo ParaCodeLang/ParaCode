@@ -1,0 +1,39 @@
+
+/// Patch `Object` to define `patch` method as well as default compare operator
+__intern_object_patch__(Object, {
+  func patch(self, _patch) {
+    return __intern_object_patch__(self, _patch);
+  }
+  func __eql__(self, other) {
+    return __intern_default_compare__(self, other);
+  }
+});
+
+Type.patch({
+  func to_str(self) {
+    return self.name;
+  }
+});
+
+
+import "std/types/null.para";
+import "std/types/num.para";
+import "std/types/float.para";
+import "std/types/int.para";
+import "std/types/bool.para";
+import "std/types/object.para";
+import "std/types/func.para";
+import "std/types/iterable.para";
+import "std/types/array.para";
+import "std/types/str.para";
+import "std/types/range.para";
+import "std/types/macro.para";
+
+// Type aliases
+let object = Object;
+let int = Int;
+let str = Str;
+let num = Num;
+let float = Float;
+let type = Type;
+

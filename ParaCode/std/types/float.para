@@ -1,0 +1,59 @@
+let Float = Num.extend({
+  name = 'Float'
+
+  instance = {
+    _value = 0.0
+
+    func __not__(self) {
+      return __intern_int_negate__(self._value);
+    }
+
+    func __bool__(self) {
+      return !!self._value;
+    }
+
+    func __eql__(self, other) {
+      if other.type() != self.type() {
+        return 0;
+      }
+
+      return __intern_default_compare__(self._value, other._value);
+    }
+
+    func to_str(self) {
+      return __intern_num_to_str__(self._value);
+    }
+
+    func to_int(self) {
+      return 1*self._value;
+    }
+  }
+
+  func __construct__(self, value) {
+      self._value = __intern_to_float__(value);
+
+      return self;
+  }
+
+  // operator methods
+  
+  func __add__(self, other) {
+      return __intern_float_add__(self._value, other._value);
+  }
+
+  func __sub__(self, other) {     
+      return __intern_float_sub__(self._value, other._value);
+  }
+  
+  func __mul__(self, other) {
+      return __intern_float_mul__(self._value, other._value);
+  }
+
+  func __div__(self, other) {     
+      return __intern_float_div__(self._value, other._value);
+  }
+  
+  func __mod__(self, other) {
+      return __intern_float_mod__(self._value, other._value);
+  }
+});
