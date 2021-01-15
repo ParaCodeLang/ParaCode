@@ -1,2 +1,1 @@
-language = "python"
-run = "pypy -i shell.py"
+run = "python3 main.py"
