@@ -39,7 +39,3 @@ Bool.instance._value = Bool.false;
 
 let true = Bool.true;
 let false = Bool.false;
-
-let Boolean = Bool.extend({
-    name = 'Boolean'
-});

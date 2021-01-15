@@ -1,8 +1,0 @@
-// format string with "World"
-print("Hello, %!".format("World"));
-
-// Multiply string by number
-print("=" * 20);
-
-// add 10 to 42
-print(("42".to_int())+10);

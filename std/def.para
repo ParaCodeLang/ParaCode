@@ -1,4 +1,3 @@
-
 /// Patch `Object` to define `patch` method as well as default compare operator
 __intern_object_patch__(Object, {
   func patch(self, _patch) {
@@ -31,9 +30,24 @@ import "std/types/macro.para";
 
 // Type aliases
 let object = Object;
-let int = Int;
-let str = Str;
-let num = Num;
 let float = Float;
 let type = Type;
 
+let num = Num;
+let number = Num;
+let Number = Num;
+
+let int = Int;
+let Integer = Int;
+let integer = Int;
+
+let str = Str;
+let String = Str;
+let string = Str;
+
+let bool = Bool;
+let Boolean = Bool;
+let boolean = Bool;
+
+let Function = Func;
+let function = Func;

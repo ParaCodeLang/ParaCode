@@ -121,7 +121,3 @@ Str.format = Func.extend({
         }
     }
 }).new();
-
-let String = Str.extend({
-    name = 'String'
-});
