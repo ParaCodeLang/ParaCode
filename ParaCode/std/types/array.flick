@@ -1,0 +1,175 @@
+let Array = Iterable.extend({
+  name = 'Array'
+
+  instance = {
+    _value = []
+
+    func __at__(self, index: int) {
+      let value = __intern_array_at__(self._value, index);
+      return value;
+    }
+
+    func __add__(self, value) {
+      return self.append(value);
+    }
+
+    func __bitor__(self, value) {
+      let res_array = self.clone();
+
+      let remaining = value.len();
+      let len = value.len();
+
+      let index;
+      let item;
+
+      while remaining != 0 {
+        index = len - remaining;
+        item = value[index];
+
+        if res_array.find(item) == -1 {
+          res_array.append(item);
+        }
+
+        remaining -= 1;
+      }
+
+      return res_array;
+    }
+
+    func __bitand__(self, value) {
+      let res_array = [];
+
+      let remaining = self.len();
+      let len = self.len();
+
+      let index;
+      let item;
+
+      while remaining != 0 {
+        index = len - remaining;
+        item = self[index];
+
+        if value.find(item) != -1 {
+          res_array.append(item);
+        }
+
+        remaining -= 1;
+      }
+
+      return res_array;
+    }
+
+    func __iterate__(self, cb: Func) {
+      let remaining = self.len();
+      let len = self.len();
+
+      while remaining != 0 {
+        let index = len - remaining;
+
+        cb(self[index]);
+
+        remaining -= 1;
+      }
+    }
+
+    func to_str(self) {
+      let str_result = '[';
+
+      for index in Range.new(0, self.len()) {
+        let item = self[index];
+
+        str_result += item.to_str();
+
+        if index != (self.len() - 1) { # precendence is whack
+          str_result += ', ';
+        }
+      }
+
+      str_result += ']';
+
+      return str_result;
+    }
+    
+    func from(self, index) {
+        let len = self.len();
+        let newarr = [];
+        # TODO: < not !=
+        while index != len {
+            newarr += self[index];
+            index += 1;
+        }
+        return newarr;
+    }
+
+    func __set__(self, index, value) {
+      __intern_array_set__(self._value, index, value);
+      return self;
+    }
+  }
+
+  func __construct__(self, value) {
+    self._value = value;
+  }
+
+  func contains(self, value) {
+    return self.find(value) != -1;
+  }
+
+  func len(self) {
+    let _rval = __intern_array_len__(self._value);
+    return _rval;
+  }
+  
+  func append(self, value) {
+    return __intern_array_append__(self._value, value);
+  }
+
+  func update(self, index, value) {
+    return self.clone().modify(index, value);
+  }
+
+  func clone(self) {
+    return __intern_array_clone__(self._value);
+  }
+
+  func find(self, value) {
+    let length = self.len();
+    let index = 0;
+    while index != length {
+       if self._value[index] == value {
+         return index;
+       }
+       index += 1;
+    }
+    return -1;
+  }
+
+  func map(self, cb) {
+    let result = [];
+    let remaining = self.len();
+    let len = self.len();
+
+    while remaining != 0 {
+      let index = len - remaining;
+
+      result.append(cb(self[index]));
+
+      remaining -= 1;
+    }
+
+    return result;
+  }
+
+  # iterable methods
+  func step(self) {
+    return 1;
+  }
+
+  func start(self) {
+    return 0;
+  }
+
+  func end(self) {
+    return self.len();
+  }
+});
