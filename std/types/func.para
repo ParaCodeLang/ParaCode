@@ -12,7 +12,3 @@ Func.patch({
   }
 
 });
-
-let Function = Func.extend({
-    name = 'Func'
-});

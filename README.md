@@ -1,233 +1,50 @@
 # ParaCode
+### Prototypical language with knack for extensibility and meta programming
 
-The ParaCode Programming Language!
+In ParaCode, all types are objects, and vice versa. Everything is an object, and that includes functions. Objects descend from a parent object and inherit functions and variables from the parent. For example, to create a type, we extend from a parent `Object` (in this case `Type`), and define any methods
 
----
+The core library in ParaCode is written in itself, even allowing for methods to be attached with the `Object.patch()` method at runtime. Types in ParaCode are built of `Object`s and have overloadable functions for operations such as addition, subtraction, multiplication, division, modulus, and compare. Types including String, Int, Float, and Bool are all defined completely in ParaCode, including all operations that can be done on them. For instance, the call operator can be overloaded, with an example being that when a Number is called `5(10)` it multiplies the values together, allowing for a math-like syntax in programming.
 
-### Benefits of using ParaCode
+ParaCode also has many methods that have functional language characteristics for example Array mapping and lambdas, and new concept ideas such as [Prototypical Inheritance](https://en.wikipedia.org/wiki/Prototype-based_programming). 
 
-* Open Source
-* Highly Human Readable
-* Cross-Platform
-* Continuously Developed
-* Highly Portable
+Later I plan to rewrite ParaCode in C/C++ for better speed, efficiency. Both of us have more experience in C/C++. I plan to keep ParaCode code and the standard library similar to how it is today.
 
----
+[vars](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/00_vars.md) - How to declare and use variables
 
-### Getting Started
-If you are using the python files, run installDependencies.py
-If you are using the executable file, run the installDependencies executable
+[functions](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/10_functions.md) - Writing and calling functions
 
----
+[strings](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/15_strings.md) - Strings operations and interpolation
 
-### Running the shell
-##### There are two methods to run the shell
+[operators](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/16_operators.md) - Available operators + Operator overloading
 
-#### Method One:
-1. Download the ParaCode Programming Language, that being
-either your platform's executable file, or the python files.
-2. If you download the python files, run shell.py.
-If you download your platform's executable file, then run the downloaded file. (There might be an installation process here)
+[types](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/20_types.md) - Custom types
 
-#### Method Two:
-1. Install the ParaCode package with 
-```
-pip install ParaCode
-```
-2. In your python file, if you want to run the shell, import ParaCode with
-```python
-from ParaCode import shell
-```
-Otherwise, if you want to run ParaCode code without the shell, import ParaCode with
-```python
-from ParaCode import basic
-```
-3. If you are running the shell, add the following to your python file
-```python
-shell.RunShell()
-```
-Otherwise, if you are running ParaCode code without the shell, add the following to your python file
-```python
-basic.run('<stdin>', 'PRINT("Hello, World!'))
-```
-And of course, replace the second argument with the code you want to run
+[proto](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/30_proto.md) - Extending types using prototypical inheritance
 
----
+[macros](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/35_macros.md) - Macros
 
-### config.toml
-config.toml is a file that is required by ParaCode.
-This is the default config.toml:
-```ini
-# Configuration For The Shell
-[shell]
-userColor = "white"
-userStyle = "none"
-consoleColor = "white"
-consoleStyle = "none"
-pointerColor = "green"
-pointerStyle = "none"
-errorColor = "red"
-errorStyle = "none"
+[arrays](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/40_arrays.md) - Array operations
 
-# Configuration For ParaCode
-[lang]
-packagePath = "Packages/"
-```
+[iterators](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/50_iterators.md) - Building custom iterator objects
 
-### preferences.toml
-preferences.toml is a file that is not required by ParaCode, but will be created when you run a command like `RUN("HelloWorld.para")` in the shell.
-It is used by ParaCode to run the correct file when you execute the command `RUN` in the shell.
+[random](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/55_random.md) - Random number generation
 
----
+[modules](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/60_modules.md) - Modules
+
+[console](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/70_console.md) - Console input and output
+
+[files](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/80_files.md) - File reading and writing
+
 
 ### Examples
-All of the following examples can be found in the Examples Folder
-If you are using the ParaCode package, than go to the [GitHub Repository](https://github.com/DaRubyMiner360/ParaCode).
-If you have an example that you would like to submit, [Email Me](mailto:darubyminer360@gmail.com), or submit a pull request.
 
-# 
+[embedding](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/embed.py)
 
-### To run a ParaCode file (the file extentions are .para and .paracode) through code, create the file, and run
-```
-RUN("HelloWorld.para")
-```
-And replace HelloWorld.para with the file name
+[numbers](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/numbers.para)
 
-On windows, you can also just open the ParaCode file and it will automatically open in the shell and run
+[strings](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/string.para)
 
-# 
+[tic tac toe](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/ttt.para)
 
-### Comments can be any of the following
-```
-# This is a comment like Python's
-// This is a comment like many other languages
-; This is a comment like Assembly's
-```
-
-# 
-
-### Printing in ParaCode is a simple as using one of the following
-```
-// For Without Color
-PRINT("Hello, World!")
-ECHO("Hello, World!")
-
-// For Color
-PRINT("Hello, World!", "Blue")
-ECHO("Hello, World!", "Green")
-PRINTCOLOR("Hello, World!", "Yellow")
-ECHOCOLOR("Hello, World!", "Red")
-```
-
-# 
-
-### Variables
-Variables can be created and set with either the `VAR` keyword or the `VARIABLE` keyword.
-Example:
-```
-VAR string = "Hello, World!"
-PRINT(string)
-VARIABLE string = "!dlrow, olleH"
-PRINT(string)
-```
-
-# 
-
-### Functions
-Functions can be created with either the `FUNCTION` keyword or the `FUNC` keyword.
-Example:
-```
-FUNCTION sayHello(name)
-    PRINT("Hello, " + name + "!", "RED")
-END
-
-FUNC sayHello2(name)
-    PRINT("Hello, " + name + "!", "RED")
-END
-
-sayHello("Bob")
-sayHello2("Jerry")
-```
-
-# 
-
-### Creating, Deleting, Writing To, And Reading From Files
-You can create a file with `CREATEFILE(fileName)`
-Example:
-```
-CREATEFILE("text.txt")
-```
-
-You can delete a file with `DELETEFILE(fileName)`
-Example:
-```
-DELETEFILE("text.txt")
-```
-
-You can write to a file with `WRITEFILE(fileName, textToWrite)`
-Example:
-```
-WRITEFILE("text.txt", "test")
-```
-
-You can read from a file with `READFILE(fileName)`
-Example:
-```
-READFILE("text.txt")
-```
-
-You can append text to a file with `APPENDFILE(fileName, textToWrite)`
-Example:
-```
-APPENDFILE("text.txt", "test")
-```
-
-# 
-
-### Time and Date
-You can get the year with `GETYEAR()`
-Example:
-```
-PRINT(GETYEAR())
-```
-
-You can get the month with `GETMONTH()`
-Example:
-```
-PRINT(GETMONTH())
-```
-
-You can get the day with `GETDAY()`
-Example:
-```
-PRINT(GETDAY())
-```
-
-# 
-
-### Input
-You can input with `INPUT`
-Example:
-```
-VAR input = INPUT("Name >> ")
-PRINT(input)
-```
-
-# 
-
-### Colors
-You can use colors with the corresponding name, or you can use the hex value
-
----
-
-### Hello, World Application:
-```
-PRINT("Hello, World!")
-```
-
----
-
-### Discord.para
-You can create a Discord Bot using ParaCode using the built-in Discord.para API.
-To get started, add `DISCORDTOKEN(token)` to set the token, or later, when running the bot, add the token as a parameter.
-Add `VAR client = DISCORDCLIENT()`
+Be sure to check out our TicTacToe example!
+Start the REPL by running `main.py` and call `tictactoe();` to try it out!
