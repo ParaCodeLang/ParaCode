@@ -9,3 +9,5 @@ let Time = {
         return __intern_time_sleep__(seconds);
     }
 };
+
+let time = Time;

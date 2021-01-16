@@ -3,8 +3,6 @@ from error import ErrorList, Error, ErrorType
 from parser.source_location import SourceLocation
 from parser.node import *
 
-# peter parser
-
 class Parser():
     def __init__(self, tokens, source_location):
         self.tokens = tokens
