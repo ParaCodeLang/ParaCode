@@ -30,6 +30,14 @@ let Str = Array.extend({
         }
     }
 
+    func startswith(self, value) {
+        return self.find(value) == 0;
+    }
+
+    func endswith(self, value) {
+        return self.find(value) == self.len() - value.len();
+    }
+    
     func __construct__(self, value) {
         self._value = value;
     }

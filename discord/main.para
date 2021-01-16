@@ -1,0 +1,37 @@
+import "discord/Client.para";
+//from os import environ
+
+let cli = Client.new();
+
+let prefix = "para.";
+
+func on_ready() {
+    io.write(cli.user.username + " is online!");
+};
+
+func on_message_created(message) {
+    if message.content.startswith(prefix):
+        spl = message.content[prefix.len():].split(" ");
+
+        if spl[0] == "clear" {
+            if spl.len() > 1 {
+                message.channel.bulkdelete(spl[1].to_string());
+            }
+            else {
+                message.channel.bulkdelete(99);
+            }
+
+            message.channel.send("Cleared!");
+        }
+
+        if spl[0] == "ping" {
+            message.channel.send("Pong!");
+        }
+};
+
+let cli.onready = on_ready;
+let cli.messagecreate = on_message_created;
+
+# cli.guildadded = ?;
+
+cli.connect(environ["TOKEN"]);

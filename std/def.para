@@ -24,6 +24,7 @@ import "std/types/object.para";
 import "std/types/func.para";
 import "std/types/iterable.para";
 import "std/types/array.para";
+import "std/types/dictionary.para";
 import "std/types/str.para";
 import "std/types/range.para";
 import "std/types/macro.para";
@@ -32,6 +33,11 @@ import "std/types/macro.para";
 let object = Object;
 let float = Float;
 let type = Type;
+let array = Array;
+
+let dictionary = Dictionary;
+let Dict = Dictionary;
+let dict = Dictionary;
 
 let num = Num;
 let number = Num;

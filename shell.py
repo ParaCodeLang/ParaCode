@@ -18,7 +18,7 @@ def main():
 
 if __name__ == '__main__':
     try:
-        raise DeprecationWarning("ParaCode.shell is deprecated! Use ParaCode.main instead!")
+        raise DeprecationWarning("ParaCode.shell is deprecated, and will be removed in the next release! Use ParaCode.main instead!")
     except DeprecationWarning as e:
         print("\033[31m" + str(e) + "\033[0m")
     main()
