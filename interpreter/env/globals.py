@@ -65,6 +65,12 @@ class Globals:
             ('__intern_array_append__', VariableType.Function, BuiltinFunction("__intern_array_append__", None, builtin_array_append)),
             ('__intern_array_set__', VariableType.Function, BuiltinFunction("__intern_array_set__", None, builtin_array_set)),
             ('__intern_array_clone__', VariableType.Function, BuiltinFunction("__intern_array_clone__", None, builtin_array_clone)),
+
+            ('__intern_dictionary_len__', VariableType.Function, BuiltinFunction("__intern_dictionary_len__", None, builtin_dictionary_len)),
+            ('__intern_dictionary_at__', VariableType.Function, BuiltinFunction("__intern_dictionary_at__", None, builtin_dictionary_at)),
+            ('__intern_dictionary_append__', VariableType.Function, BuiltinFunction("__intern_dictionary_append__", None, builtin_dictionary_append)),
+            ('__intern_dictionary_set__', VariableType.Function, BuiltinFunction("__intern_dictionary_set__", None, builtin_dictionary_set)),
+            ('__intern_dictionary_clone__', VariableType.Function, BuiltinFunction("__intern_dictionary_clone__", None, builtin_dictionary_clone)),
             
             ('__intern_console_input__', VariableType.Function, BuiltinFunction("__intern_console_input__", None, builtin_console_input)),
             ('__intern_file_read__', VariableType.Function, BuiltinFunction("__intern_file_read__", None, builtin_file_read)),

@@ -12,7 +12,7 @@ many different forms.
 To create your own type, use the
 syntax:
 
-```
+```javascript
 let Person: type = {
   instance: {
     name: str;
@@ -35,7 +35,7 @@ use.
 
 For example:
 
-```
+```javascript
 let Person: type = {
   instance: {
     name: str;
@@ -49,15 +49,15 @@ let Person: type = {
 ```
 
 In usage:
-```
+```javascript
 person_a = Person.new();
 person_a.name = "Ron";
 
 person_b = Person.new();
 person_b.name = "Leslie";
 
-person_a.say_hello(); # prints 'hello from: Ron'
-person_b.say_hello(); # prints 'hello from: Leslie'
+person_a.say_hello(); // prints 'hello from: Ron'
+person_b.say_hello(); // prints 'hello from: Leslie'
 ```
 
 You can use the pseudo-property `type` on an object

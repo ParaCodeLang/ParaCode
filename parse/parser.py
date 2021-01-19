@@ -1,7 +1,7 @@
 from lexer import LexerToken, TokenType, Keywords, Lexer
 from error import ErrorList, Error, ErrorType
-from parser.source_location import SourceLocation
-from parser.node import *
+from parse.source_location import SourceLocation
+from parse.node import *
 
 class Parser():
     def __init__(self, tokens, source_location):

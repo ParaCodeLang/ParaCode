@@ -25,7 +25,7 @@ representing a name.
 
 If you want to loop over these names, you can use `for`.
 
-```
+```javascript
 for name in names {
     print(name);
 }
@@ -42,19 +42,17 @@ Buddy
 To access a specific item in an array by index, use the
 access operator (square brackets)
 
-`print(names[1]); # prints 'Sam'`
+`print(names[1]); // prints 'Sam'`
 
 Arrays have multiple methods, including ways of checking whether
 an object is contained by the array, appending new items to
-an array, and creating unions or intersections with other arrays.
+an array, and more.
 
-```
-names.contains('Buddy'); # true
-names.append('Tiffany'); # names is now ['Jeffrey', 'Sam', 'Buddy', 'Tiffany']
+```javascript
+names.contains('Buddy'); // true
+names.append('Tiffany'); // names is now ['Jeffrey', 'Sam', 'Buddy', 'Tiffany']
 
-names.union(['Sam', 'Tyler']) # returns ['Jeffrey', 'Sam', 'Buddy', 'Tyler']
-names | ['Sam', 'Tyler'] # returns ['Jeffrey', 'Sam', 'Buddy', 'Tyler']
+names | ['Sam', 'Tyler']; // returns ['Jeffrey', 'Sam', 'Buddy', 'Tyler']
 
-names.intersection(['Sam', 'Tyler']) # returns ['Sam']
-names & ['Sam', 'Tyler'] # returns ['Sam']
+names & ['Sam', 'Tyler']; // returns ['Sam']
 ```

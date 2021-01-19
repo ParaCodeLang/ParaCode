@@ -1,9 +1,9 @@
 #!/bin/python3
 
 from lexer import Lexer, TokenType, LexerToken
-from parser.parser import Parser
-from parser.node import NodeImport
-from parser.source_location import SourceLocation
+from parse.parser import Parser
+from parse.node import NodeImport
+from parse.source_location import SourceLocation
 from interpreter.interpreter import Interpreter
 from error import InterpreterError
 

@@ -38,4 +38,6 @@ Bool.false = Bool.new(0);
 Bool.instance._value = Bool.false;
 
 let true = Bool.true;
+let True = Bool.true;
 let false = Bool.false;
+let False = Bool.false;

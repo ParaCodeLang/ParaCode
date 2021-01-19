@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from parser.source_location import SourceLocation
+from parse.source_location import SourceLocation
 
 class Keywords(Enum):
     Let = 'let'

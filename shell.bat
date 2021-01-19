@@ -1,1 +1,1 @@
-cmd /k "shell.py"
+cmd /k "python main.py"

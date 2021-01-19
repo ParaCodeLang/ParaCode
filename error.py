@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from util import LogColour
+from util import LogColor
 
 class InterpreterError(Exception):
     pass
@@ -41,8 +41,8 @@ class Error():
         return self.location[0]
 
     def __repr__(self):
-        nstr = f"{self.location_filename}:{self.location_row}:{self.location_col}: {LogColour.Error}{self.type.name} error:{LogColour.Default}"
-        return f"{LogColour.Bold}{nstr}{LogColour.Default} {self.message}"
+        nstr = f"{self.location_filename}:{self.location_row}:{self.location_col}: {LogColor.Error}{self.type.name} error:{LogColor.Default}"
+        return f"{LogColor.Bold}{nstr}{LogColor.Default} {self.message}"
     __str__ = __repr__
         
 class ErrorList():

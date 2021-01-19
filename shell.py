@@ -1,7 +1,7 @@
 #!/bin/python3
 
 from ParaCode import ParaCode
-from parser.parser import Parser
+from parse.parser import Parser
 from examples.embed import example_embed
 
 import sys
@@ -679,15 +679,15 @@ if __name__ == '__main__':
 #                                             "lang").get("packagePath") + packageRegistryName + "\\" + fileName):
 #                                             with open(os.path.realpath(__file__).replace("shell.py",
 #                                                                                          "") + configFile.get(
-#                                                 "lang").get("packagePath") + "Packages.json",
+#                                                 "lang").get("packagePath") + "packages.json",
 #                                                       'a') as outfile:
 #                                                 json.dump(data, outfile)
 #                                         else:
 #                                             os.mkdir(os.path.realpath(__file__).replace("shell.py",
-#                                                                                         "") + "Packages")
+#                                                                                         "") + "packages")
 #                                             with open(os.path.realpath(__file__).replace("shell.py",
 #                                                                                          "") + configFile.get(
-#                                                 "lang").get("packagePath") + "Packages.json",
+#                                                 "lang").get("packagePath") + "packages.json",
 #                                                       'a') as outfile:
 #                                                 json.dump(data, outfile)
 #                                     elif ".md" in fileName or "license" in fileName or "LICENSE" in fileName:

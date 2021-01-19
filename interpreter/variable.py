@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from parser.node import NodeType, NodeFunctionExpression
+from parse.node import NodeType, NodeFunctionExpression
 from interpreter.typing.basic_type import BasicType
 from interpreter.function import Function
 from interpreter.basic_value import BasicValue

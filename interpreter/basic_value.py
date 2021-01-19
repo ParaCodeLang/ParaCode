@@ -1,4 +1,4 @@
-from parser.node import NodeFunctionExpression, NodeMacro
+from parse.node import NodeFunctionExpression, NodeMacro
 from interpreter.function import BuiltinFunction
 
 class BasicValue:

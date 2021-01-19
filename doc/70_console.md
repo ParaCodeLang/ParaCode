@@ -15,14 +15,14 @@ To print to the console:
 
 And to read input from the console:
 
-```
-let response = io.read(); # read user input and store in `response`
-io.write(response);       # print it back out to the console
+```javascript
+let response = io.read(); // read user input and store in `response`
+io.write(response);       // print it back out to the console
 ```
 
 You can also print to the console in a few different colors!
 Here's an example on how to do that:
 
-```
+```javascript
 io.write_color(Console.BLUE, "I'm blue ba ba dee ba ba die");
 ```

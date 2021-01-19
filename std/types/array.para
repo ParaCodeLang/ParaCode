@@ -78,7 +78,9 @@ let Array = Iterable.extend({
       for index in Range.new(0, self.len()) {
         let item = self[index];
 
+        if item.type() == Str { str_result += "'"; }
         str_result += item.to_str();
+        if item.type() == Str { str_result += "'"; }
 
         if index != (self.len() - 1) { // precendence is whack
           str_result += ', ';

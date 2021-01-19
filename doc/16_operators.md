@@ -37,7 +37,7 @@ standard objects.
 
 Here's an example of how you can use (and abuse) operator overloading
 
-```
+```javascript
 let Person = Type.extend({
     instance = {
         name
@@ -55,7 +55,7 @@ let Person = Type.extend({
 let person1 = Person.new('Johnny');
 let person2 = Person.new('Storm');
 
-print(person1 + person2); # prints 'Johnny Storm'
+print(person1 + person2); // prints 'Johnny Storm'
 ```
 
 If you look at some of the built in types such as `std/types/int`,
