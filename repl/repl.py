@@ -14,6 +14,7 @@ from util import LogColor
 # text seeking and other cool things
 if platform.system() != 'Windows':
     import readline
+    print("AAAAAAAA")
 
 import signal
 

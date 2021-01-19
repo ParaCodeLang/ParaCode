@@ -74,7 +74,15 @@ class Globals:
             
             ('__intern_console_input__', VariableType.Function, BuiltinFunction("__intern_console_input__", None, builtin_console_input)),
             ('__intern_file_read__', VariableType.Function, BuiltinFunction("__intern_file_read__", None, builtin_file_read)),
+            ('__intern_file_readlines__', VariableType.Function, BuiltinFunction("__intern_file_readlines__", None, builtin_file_readlines)),
             ('__intern_file_write__', VariableType.Function, BuiltinFunction("__intern_file_write__", None, builtin_file_write)),
+            ('__intern_file_append__', VariableType.Function, BuiltinFunction("__intern_file_append__", None, builtin_file_append)),
+            ('__intern_file_create__', VariableType.Function, BuiltinFunction("__intern_file_create__", None, builtin_file_create)),
+            ('__intern_file_delete__', VariableType.Function, BuiltinFunction("__intern_file_delete__", None, builtin_file_delete)),
+            ('__intern_file_deletedir__', VariableType.Function, BuiltinFunction("__intern_file_deletedir__", None, builtin_file_deletedir)),
+            ('__intern_file_exists__', VariableType.Function, BuiltinFunction("__intern_file_exists__", None, builtin_file_exists)),
+            ('__intern_is_file__', VariableType.Function, BuiltinFunction("__intern_is_file__", None, builtin_is_file)),
+            ('__intern_is_dir__', VariableType.Function, BuiltinFunction("__intern_is_dir__", None, builtin_is_dir)),
 
             ('__intern_int_add__', VariableType.Function, BuiltinFunction("__intern_int_add__", None, builtin_int_add)),
             ('__intern_int_sub__', VariableType.Function, BuiltinFunction("__intern_int_sub__", None, builtin_int_sub)),

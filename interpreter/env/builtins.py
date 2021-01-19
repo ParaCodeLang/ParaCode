@@ -1,3 +1,5 @@
+import os
+
 from interpreter.typing.basic_type import BasicType
 from interpreter.basic_object import BasicObject
 from interpreter.basic_value import BasicValue
@@ -51,6 +53,15 @@ def builtin_varinfo(arguments):
     
 
     return BasicValue(varinfo_str)
+
+def builtin_run(arguments):
+    interpreter = arguments.interpreter
+    node = arguments.node
+
+    for arg in arguments.arguments:
+        _print_object(interpreter, node, arg)
+
+    return BasicValue(len(arguments.arguments))
 
 def builtin_console_write(arguments):
     interpreter = arguments.interpreter
@@ -385,6 +396,21 @@ def builtin_file_read(arguments):
 
     return BasicValue(s)
 
+def builtin_file_readlines(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    file_path = arguments.arguments[0]
+
+    # TODO better exception handling - throw internal exception
+    try:
+        f = open(file_path.extract_value(), 'r')
+        s = f.readlines()
+    except:
+        s = ""
+
+    return BasicValue(s)
+
 def builtin_file_write(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
@@ -397,6 +423,74 @@ def builtin_file_write(arguments):
     f.close()
 
     return BasicValue(file_path)
+
+def builtin_file_append(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    file_path = arguments.arguments[0]
+    write_value = arguments.arguments[1]
+
+    f = open(file_path.extract_value(), 'a')
+    f.write(str(write_value.extract_value()))
+    f.close()
+
+    return BasicValue(file_path)
+
+def builtin_file_create(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    file_path = arguments.arguments[0]
+
+    f = open(file_path.extract_value(), 'x')
+    f.close()
+
+    return BasicValue(file_path)
+
+def builtin_file_delete(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    file_path = arguments.arguments[0]
+
+    os.remove(file_path.extract_value())
+
+    return BasicValue(file_path)
+
+def builtin_file_deletedir(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    file_path = arguments.arguments[0]
+
+    os.rmdir(file_path.extract_value())
+
+    return BasicValue(file_path)
+
+def builtin_file_exists(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    file_path = arguments.arguments[0]
+
+    return BasicValue(os.path.exists(file_path.extract_value()))
+
+def builtin_is_file(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    file_path = arguments.arguments[0]
+
+    return BasicValue(os.path.isfile(file_path.extract_value()))
+
+def builtin_is_dir(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    file_path = arguments.arguments[0]
+
+    return BasicValue(os.path.isdir(file_path.extract_value()))
 
 def builtin_func_call(arguments):
     interpreter = arguments.interpreter
