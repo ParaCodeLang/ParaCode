@@ -1,7 +1,7 @@
-from parser.parser import Parser
-from parser.node import AstNode, NodeType, NodeFunctionReturn
-from parser.source_location import SourceLocation
-from parser.node import *
+from parse.parser import Parser
+from parse.node import AstNode, NodeType, NodeFunctionReturn
+from parse.source_location import SourceLocation
+from parse.node import *
 
 from interpreter.scope import *
 from interpreter.stack import Stack

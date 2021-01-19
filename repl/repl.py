@@ -1,18 +1,22 @@
+import platform
+
 from lexer import Lexer, TokenType, LexerToken
-from parser.parser import Parser
-from parser.node import AstNode, NodeType
-from parser.source_location import SourceLocation
+from parse.parser import Parser
+from parse.node import AstNode, NodeType
+from parse.source_location import SourceLocation
 from interpreter.interpreter import Interpreter
 from interpreter.env.builtins import obj_to_string
 from error import InterpreterError
 from ast_printer import AstPrinter
-from util import LogColour
+from util import LogColor
 
 # when including readline, it switches input() over and allows
 # text seeking and other cool things
-import readline
+if platform.system() != 'Windows':
+    import readline
 
 import signal
+
 
 class Repl:
     REPL_FILENAME = '<repl>'
@@ -28,21 +32,21 @@ class Repl:
         type one of the following:
 
   {}
-            """.format('\n  '.join(map(lambda key: "{}--  {}".format(key.ljust(16), self._walkthrough_messages[key][0]), self._walkthrough_messages)))
-
+            """.format('\n  '.join(map(lambda key: "{}--  {}".format(key.ljust(16), self._walkthrough_messages[key][0]),
+                                       self._walkthrough_messages)))
 
         self.interpreter = Interpreter(SourceLocation(Repl.REPL_FILENAME))
-        
+
         print(self.welcome_message)
-                
+
         self.repl_import_defaults()
 
         signal.signal(signal.SIGINT, self.at_exit)
-        
+
     def at_exit(self, signal, frame):
         print('\nExiting...')
         exit(0)
-        
+
     def repl_import_defaults(self):
 
         # generate import nodes
@@ -53,7 +57,7 @@ class Repl:
 
         # eval asts
         self.eval_line_ast(repl_import_nodes)
-        
+
     def loop(self):
         while True:
             self.accept_input()
@@ -90,12 +94,14 @@ class Repl:
 
     def accept_input(self):
         line = ""
-        
+
         line = input('>>> ')
 
         trimmed = line.strip()
         if trimmed in self._walkthrough_messages:
-            print(self._walkthrough_messages[trimmed][1])
+            print(
+                self._walkthrough_messages[trimmed][1].replace('```\n', '').replace('```javascript\n', '').replace('`',
+                                                                                                                   ''))
 
             return
 
@@ -114,7 +120,7 @@ class Repl:
         if len(error_list.errors) > 0:
             error_list.print_errors()
             return
-            
+
         self.eval_line_ast(line_ast)
 
     def eval_line_ast(self, line_ast):
@@ -131,14 +137,14 @@ class Repl:
 
         if last_value is not None:
             obj_str = obj_to_string(self.interpreter, last_node, last_value)
-            print(f"{LogColour.Info}{obj_str}{LogColour.Default}")
+            print(f"{LogColor.Info}{obj_str}{LogColor.Default}")
 
     def parse_line(self, line):
         lexer = Lexer(line, SourceLocation(Repl.REPL_FILENAME))
         tokens = lexer.lex()
 
         parser = Parser(tokens, lexer.source_location)
-        
+
         return (parser.parse(), parser.error_list)
 
     def count_continuation_tokens(self, line):

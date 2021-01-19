@@ -37,6 +37,9 @@ let Str = Array.extend({
     func endswith(self, value) {
         return self.find(value) == self.len() - value.len();
     }
+
+//    func replace(self, toReplace, replaceWith) {
+//    }
     
     func __construct__(self, value) {
         self._value = value;
@@ -72,7 +75,6 @@ let Str = Array.extend({
         }
         
         while index != len {
-
             midx = smap.find(self[index]);
             // .find returns -1 if value does not exist in array
             if midx == -1 {

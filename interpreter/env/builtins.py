@@ -4,9 +4,9 @@ from interpreter.basic_value import BasicValue
 from interpreter.function import BuiltinFunction
 from interpreter.env.builtin.arith import *
 from interpreter.env.builtin.time import *
-from parser.node import NodeFunctionExpression, NodeCall, NodeArgumentList, NodeMemberExpression, NodeNone
+from parse.node import NodeFunctionExpression, NodeCall, NodeArgumentList, NodeMemberExpression, NodeNone
 from error import ErrorType
-from util import LogColour
+from util import LogColor
 
 def obj_to_string(interpreter, node, obj):
     obj_str = str(obj)
@@ -73,15 +73,15 @@ def builtin_printn(arguments):
 def builtin_print_color(arguments):
     color = arguments.arguments[0].extract_value()
     if color == 0:
-        print(f"{LogColour.Default}", end="")
+        print(f"{LogColor.Default}", end="")
     elif color == 1:
-        print(f"{LogColour.Error}", end="")
+        print(f"{LogColor.Error}", end="")
     elif color == 2:
-        print(f"{LogColour.Warning}", end="")
+        print(f"{LogColor.Warning}", end="")
     elif color == 3:
-        print(f"{LogColour.Info}", end="")
+        print(f"{LogColor.Info}", end="")
     elif color == 4:
-        print(f"{LogColour.Bold}", end="")
+        print(f"{LogColor.Bold}", end="")
     return BasicValue(0)
     
 
@@ -140,10 +140,22 @@ def builtin_str_len(arguments):
 def builtin_array_len(arguments):
     return BasicValue(len(arguments.arguments[0].extract_value()))
 
+def builtin_dictionary_len(arguments):
+    return BasicValue(len(arguments.arguments[0][0].extract_value()))
+
 def builtin_array_set(arguments):
     array = arguments.arguments[0].extract_value()
     index = arguments.arguments[1].extract_value()
     value = arguments.arguments[2].extract_value()
+
+    array[index] = value
+
+    return BasicValue(array)
+
+def builtin_dictionary_set(arguments):
+    array = arguments.arguments[0][0].extract_value()
+    index = arguments.arguments[0][1].extract_value()
+    value = arguments.arguments[0][2].extract_value()
 
     array[index] = value
 
@@ -154,9 +166,24 @@ def builtin_array_clone(arguments):
     new_array = array.copy()
     return BasicValue(new_array)
 
+def builtin_dictionary_clone(arguments):
+    array = arguments.arguments[0][0].extract_value()
+    new_array = array.copy()
+    return BasicValue(new_array)
+
 def builtin_array_at(arguments):
     obj = arguments.arguments[0].extract_value()
     index = arguments.arguments[1].extract_value()
+
+    if index > len(obj):
+        # TODO make throw internal exception
+        return BasicValue(None)
+
+    return BasicValue(obj[index])
+
+def builtin_dictionary_at(arguments):
+    obj = arguments.arguments[0][0].extract_value()
+    index = arguments.arguments[0][1].extract_value()
 
     if index > len(obj):
         # TODO make throw internal exception
@@ -174,6 +201,21 @@ def builtin_array_append(arguments):
 
     if len(arguments.arguments) > 1:
         for arg in arguments.arguments[1:]:
+            value.append(arg.extract_value())
+
+    return BasicValue(value)
+
+
+def builtin_dictionary_append(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value_start = arguments.arguments[0][0]
+
+    value = value_start.extract_value()
+
+    if len(arguments.arguments[0]) > 1:
+        for arg in arguments.arguments[0][1:]:
             value.append(arg.extract_value())
 
     return BasicValue(value)
@@ -410,7 +452,7 @@ def builtin_math_min(arguments):
 
 def builtin_macro_expand(arguments):
     from lexer import Lexer
-    from parser.parser import Parser
+    from parse.parser import Parser
 
     interpreter = arguments.interpreter
     this_object = arguments.this_object

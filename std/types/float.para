@@ -27,6 +27,10 @@ let Float = Num.extend({
     func to_int(self) {
       return 1*self._value;
     }
+
+    func len(self) {
+      return self.to_str().len();
+    }
   }
 
   func __construct__(self, value) {

@@ -10,7 +10,7 @@ the macro, you can use the `mixin` keyword along with a block of code
 to tell the language to insert the code here.
 
 Example:
-```
+```javascript
 macro print_times(text: str, times: int) {
   for i in Range.new(0, times) {
     mixin {
@@ -21,15 +21,15 @@ macro print_times(text: str, times: int) {
 ```
 
 Usage:
-```
+```javascript
 print_times("hello world!", 5)();
 
-# alternatively, this works
-# print_times("hello world!", 5).expand();
+// alternatively, this works
+// print_times("hello world!", 5).expand();
 
-# hello world!
-# hello world!
-# hello world!
-# hello world!
-# hello world!
+// hello world!
+// hello world!
+// hello world!
+// hello world!
+// hello world!
 ```

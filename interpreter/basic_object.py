@@ -1,6 +1,6 @@
 from interpreter.function import BuiltinFunction
 from interpreter.basic_value import BasicValue
-from parser.node import NodeFunctionExpression
+from parse.node import NodeFunctionExpression
 
 class ObjectMember:
     def __init__(self, name, value):

@@ -16,7 +16,7 @@ We can declare our own functions, as well! This piece of
 code would create our calculate function, which would simply
 add the two given numbers together.
 
-```
+```javascript
 func calculate(first: int, second: int) {
   return first + second;
 };
@@ -30,7 +30,7 @@ Functions can also be used as expressions. This allows
 us to reassign functions and swap out object methods at
 runtime. For example, to swap out the calculate method:
 
-```
+```javascript
 calculate = func (first: int, second: int) {
   return first * second;
 }

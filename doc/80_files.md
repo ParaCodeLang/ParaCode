@@ -18,7 +18,7 @@ you want to write, as well as the content you want to write
 to the file.
 
 Example:
-```
+```javascript
 File.write('file.txt', 'Hello world');
 ```
 
@@ -29,9 +29,9 @@ well as the actual data it holds.
 
 Here is an example of how to read a file into a variable.
 
-```
+```javascript
 let file = File.open('file.txt');
 let content = file.data;
 
-Console.write(content); # write output to console
+Console.write(content); // write output to console
 ```

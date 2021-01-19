@@ -1,4 +1,4 @@
-from parser.node import AstNode, NodeType
+from parse.node import AstNode, NodeType
 
 class AstPrinter:
     def print_func(self, string, indent_level):

@@ -7,7 +7,7 @@ number from a predefined range of your choice.
 
 Example:
 
-```
+```javascript
 import "std/math/random.para";
-print(random.range(1337, 25, 1)); #* prints 10  -- try with a different seed! *#
+print(random.range(1337, 25, 1)); /* prints 10  -- try with a different seed! */
 ```
