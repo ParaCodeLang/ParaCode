@@ -18,10 +18,55 @@ let File: type = Type.extend({
     return File.new(filename, data);
   }
 
+  func read(_, filename: str) {
+    let data = __intern_file_read__(filename);
+
+    return File.new(filename, data);
+  }
+
+  func readlines(_, filename: str) {
+    let data = __intern_file_readlines__(filename);
+
+    return File.new(filename, data);
+  }
+
   func write(_, filename: str, value: str) {
     __intern_file_write__(filename, value);
 
     return File.new(filename, value);
+  }
+
+  func append(_, filename: str, value: str) {
+    __intern_file_append__(filename, value);
+
+    return File.new(filename, value);
+  }
+
+  func create(_, filename: str) {
+    __intern_file_create__(filename);
+    let data = __intern_file_read__(filename);
+
+    return File.new(filename, data);
+  }
+
+  func delete(_, filename: str) {
+    __intern_file_delete__(filename);
+  }
+
+  func deletedir(_, filename: str) {
+    __intern_file_deletedir__(filename);
+  }
+
+  func exists(_, filename: str) {
+    return __intern_file_exists__(filename);
+  }
+
+  func isfile(_, filename: str) {
+    return __intern_is_file__(filename);
+  }
+
+  func isdir(_, filename: str) {
+    return __intern_is_dir__(filename);
   }
 });
 

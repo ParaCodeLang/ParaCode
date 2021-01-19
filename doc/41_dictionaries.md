@@ -44,5 +44,5 @@ names.append(['Tiffany', 'Jones']); // names is now {'Jeffrey': 'Williams', 'Sam
 
 names | [['Sam', 'Johnson'], ['Tyler', 'Scotts']]; // returns {'Jeffrey': 'Williams', 'Sam': 'Johnson', 'Buddy': 'White', 'Tyler': 'Scotts'}
 
-names & [['Sam', 'Johnson'], ['Tyler', 'Scotts']]; // returns [['Sam', 'Johnson']]
+names & [['Sam', 'Johnson'], ['Tyler', 'Scotts']]; // returns {'Sam': 'Johnson'}
 ```

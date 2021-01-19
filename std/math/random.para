@@ -13,3 +13,10 @@ let Random = {
 };
 
 let random = Random;
+
+for i in Range.new(0, 100) {
+    let rand = random.range(i, 1, 25);
+    if rand == 25 {
+        print(i.to_str() + ": " + rand.to_str());
+    }
+}
