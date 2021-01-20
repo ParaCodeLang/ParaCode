@@ -1,0 +1,14 @@
+let Tkinter = Type.extend({
+  instance = {
+    _value
+    _windowName = "Tkinter Window"
+  }
+  
+  func __construct__(self) {
+    self._value = __intern_tkinter__();
+  }
+
+  func name(self, value) {
+    self._windowName = value;
+  }
+}

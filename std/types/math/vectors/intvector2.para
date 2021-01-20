@@ -1,0 +1,89 @@
+let IntVector2 = Num.extend({
+  name = 'IntVector2'
+
+  zero
+  one
+  neone
+  up
+  down
+  right
+  left
+
+  instance = {
+    x = 0.0
+    y = 0.0
+
+    func __eql__(self, other) {
+      if other.type() != self.type() {
+        return 0;
+      }
+
+      let same = __intern_default_compare__(self.x, other.x);
+      same = same && __intern_default_compare__(self.y, other.y);
+      return same;
+    }
+
+    func to_str(self) {
+      return "[" + self.x.to_str() + ", " + self.y.to_str() + "]";
+    }
+
+    func to_array(self) {
+      return [self.x, self.y];
+    }
+
+    func getX(self) {
+      return self.x;
+    }
+
+    func getY(self) {
+      return self.y;
+    }
+  }
+
+  func __construct__(self, _x, _y) {
+      self.x = __intern_to_int__(_x);
+      self.y = __intern_to_int__(_y);
+
+      return self;
+  }
+
+  // operator methods
+  
+  func __add__(self, other) {
+      let vec = __intern_int_add__(self.x, other.x);
+      vec = __intern_int_add__(vec.y, other.y);
+      return vec;
+  }
+
+  func __sub__(self, other) {     
+      let vec = __intern_int_sub__(self.x, other.x);
+      vec = __intern_int_sub__(vec.y, other.y);
+      return vec;
+  }
+  
+  func __mul__(self, other) {
+      let vec = __intern_int_mul__(self.x, other.x);
+      vec = __intern_int_mul__(vec.y, other.y);
+      return vec;
+  }
+
+  func __div__(self, other) {     
+      let vec = __intern_int_div__(self.x, other.x);
+      vec = __intern_int_div__(vec.y, other.y);
+      return vec;
+  }
+  
+  func __mod__(self, other) {
+      let vec = __intern_int_mod__(self.x, other.x);
+      vec = __intern_int_mod__(vec.y, other.y);
+      return vec;
+  }
+});
+
+IntVector2.zero = Vector2.new(0.0, 0.0);
+IntVector2.one = Vector2.new(1.0, 1.0);
+IntVector2.neone = Vector2.new(-1.0, -1.0);
+IntVector2.up = Vector2.new(0.0, 1.0);
+IntVector2.down = Vector2.new(0.0, -1.0);
+IntVector2.right = Vector2.new(1.0, 0.0);
+IntVector2.left = Vector2.new(-1.0, 0.0);

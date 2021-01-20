@@ -11,10 +11,13 @@ from repl.repl import Repl
 from ast_printer import AstPrinter
 
 class ParaCode():
+    initialized = False
+
     def __init__(self):
         pass
 
     def eval(self, data=None, filename=None, interpret=True, default_imports=['std/__core__.para']):
+        self.initialized = True
         debug_name = "<none>"
 
         if filename != None:
@@ -66,6 +69,8 @@ class ParaCode():
         return self.eval(data=data)
         
     def call_function(self, function_name, arguments=[]):
+        if not self.initialized:
+          self.eval()
         if self.interpreter == None:
             raise Exception("ParaCode not initialized! please run ")
         if type(arguments) != list:
@@ -74,5 +79,5 @@ class ParaCode():
         return self.interpreter.call_function(function_name, arguments)
 
     def repl(self):
-        repl = Repl()
+        repl = Repl(self)
         repl.loop()

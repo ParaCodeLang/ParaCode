@@ -1,4 +1,5 @@
 import platform
+import os
 
 from lexer import Lexer, TokenType, LexerToken
 from parse.parser import Parser
@@ -14,7 +15,6 @@ from util import LogColor
 # text seeking and other cool things
 if platform.system() != 'Windows':
     import readline
-    print("AAAAAAAA")
 
 import signal
 
@@ -22,7 +22,7 @@ import signal
 class Repl:
     REPL_FILENAME = '<repl>'
 
-    def __init__(self):
+    def __init__(self, paraCode):
         self._walkthrough_messages = self.load_walkthrough_messages()
 
         self.welcome_message = """
@@ -36,6 +36,7 @@ class Repl:
             """.format('\n  '.join(map(lambda key: "{}--  {}".format(key.ljust(16), self._walkthrough_messages[key][0]),
                                        self._walkthrough_messages)))
 
+        self.paraCode = paraCode
         self.interpreter = Interpreter(SourceLocation(Repl.REPL_FILENAME))
 
         print(self.welcome_message)
@@ -49,7 +50,6 @@ class Repl:
         exit(0)
 
     def repl_import_defaults(self):
-
         # generate import nodes
         repl_import_nodes = [
             Parser.import_file(Parser, 'std/__core__.para'),
@@ -99,9 +99,13 @@ class Repl:
         line = input('>>> ')
 
         trimmed = line.strip()
-        if trimmed in self._walkthrough_messages:
+        if os.path.isfile(trimmed) and (trimmed.endswith(".para") or trimmed.endswith(".para/") or trimmed.endswith(".paracode") or trimmed.endswith(".paracode/")):
+          self.paraCode.eval_file(trimmed)
+
+          return
+        elif trimmed in self._walkthrough_messages:
             print(
-                self._walkthrough_messages[trimmed][1].replace('```\n', '').replace('```javascript\n', '').replace('`',
+                self._walkthrough_messages[trimmed][1].replace('```\n', '').replace('```javascript\n', '').replace('```js\n', '').replace('`',
                                                                                                                    ''))
 
             return

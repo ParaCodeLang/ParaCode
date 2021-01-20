@@ -29,6 +29,11 @@ import "std/types/str.para";
 import "std/types/range.para";
 import "std/types/macro.para";
 
+//import "std/tkinter/tkinter.para";
+
+
+import "std/types/math/vectors/vectors.para";
+
 // Type aliases
 let object = Object;
 let float = Float;
