@@ -13,6 +13,7 @@ class Globals:
                 'name': BasicValue('Type'),
                 'extend': BuiltinFunction('Type.extend', None, builtin_type_extend),
                 # 'type': BuiltinFunction('Type.type', None, builtin_type_type),
+                # 'is': BuiltinFunction('Type.is', None, builtin_type_is),
                 'to_str': BuiltinFunction('Type.to_str', None, builtin_type_to_str),
                 # 'new': BuiltinFunction('Object.new', None, builtin_object_new),
             },
@@ -25,6 +26,7 @@ class Globals:
                 'name': BasicValue('Object'),
                 'new': BuiltinFunction('Object.new', None, builtin_object_new),
                 'type': BuiltinFunction('Object.type', None, builtin_object_type),
+                'is': BuiltinFunction('Object.is', None, builtin_object_is),
                 'to_str': BuiltinFunction('Object.to_str', None, builtin_object_to_str)
             }
         )
@@ -101,6 +103,8 @@ class Globals:
             
             ('__intern_time_sleep__', VariableType.Function, BuiltinFunction("__intern_time_sleep__", None, builtin_time_sleep)),
             ('__intern_time_now__',   VariableType.Function, BuiltinFunction("__intern_time_now__", None, builtin_time_now)),
+
+            ('__intern_tkinter__', VariableType.Function, BuiltinFunction("__intern_tkinter__", None, builtin_tkinter)),
 
             ('__intern_macro_expand__', VariableType.Function, BuiltinFunction("__intern_macro_expand__", None, builtin_macro_expand))
         ]

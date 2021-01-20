@@ -1,5 +1,7 @@
 import os
 
+import tkinter as tk
+
 from interpreter.typing.basic_type import BasicType
 from interpreter.basic_object import BasicObject
 from interpreter.basic_value import BasicValue
@@ -296,6 +298,17 @@ def builtin_object_type(arguments):
 
     return this_object.lookup_type(interpreter.global_scope)
 
+def builtin_object_is(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+    target = arguments.arguments[0].extract_value()
+
+    if not isinstance(this_object, BasicValue):
+        interpreter.error(None, ErrorType.TypeError, 'object {} is not an instance of BasicValue'.format(this_object))
+        return None
+
+    return this_object.lookup_type(interpreter.global_scope) == target.lookup_type(interpreter.global_scope)
+
 def builtin_object_to_str(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
@@ -543,6 +556,14 @@ def builtin_math_min(arguments):
     min_value = min(values)
 
     return BasicValue(min_value)
+
+def builtin_tkinter(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    root = tk.Tk()
+
+    return BasicValue(root)
 
 def builtin_macro_expand(arguments):
     from lexer import Lexer

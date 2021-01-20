@@ -135,6 +135,10 @@ class Parser():
     def import_file(self, filename, filename_token=None):
         try:
             fp = open(filename, 'r')
+            if not filename.endswith(".para") and not filename.endswith(".para/") and not filename.endswith(".paracode") and not filename.endswith(".paracode/"):
+              self.error('source file \'{}\'s file extension (\'{}\') is not a valid ParaCode extension'.format(filename, "." + filename.split(".")[-1]))
+              fp.close()
+              return None
         except FileNotFoundError:
             self.error('source file \'{}\' does not exist'.format(filename))
             return None

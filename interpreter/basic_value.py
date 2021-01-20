@@ -1,3 +1,5 @@
+import tkinter
+
 from parse.node import NodeFunctionExpression, NodeMacro
 from interpreter.function import BuiltinFunction
 
@@ -38,8 +40,12 @@ class BasicValue:
             return global_scope.find_variable_value('Int')
         elif type(self.value) is float:
             return global_scope.find_variable_value('Float')
+        elif type(self.value) is type(tkinter.Tk()):
+            return global_scope.find_variable_value('Tkinter')
         elif type(self.value) is list:
             return global_scope.find_variable_value('Array')
+        elif type(self.value) is dict:
+            return global_scope.find_variable_value('Dict')
         elif type(self.value) is bool:
             return global_scope.find_variable_value('Bool')
         elif self.value is None:
