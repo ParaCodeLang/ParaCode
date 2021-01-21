@@ -10,8 +10,12 @@ let IntVector2 = Num.extend({
   left
 
   instance = {
-    x = 0.0
-    y = 0.0
+    x = 0
+    y = 0
+    
+    // For other vectors
+    z = 0
+    w = 0
 
     func __eql__(self, other) {
       if other.type() != self.type() {
@@ -31,6 +35,10 @@ let IntVector2 = Num.extend({
       return [self.x, self.y];
     }
 
+    func from_array(self) {
+      return self;
+    }
+
     func getX(self) {
       return self.x;
     }
@@ -41,10 +49,26 @@ let IntVector2 = Num.extend({
   }
 
   func __construct__(self, _x, _y) {
+    if _x != null && _y == null {
       self.x = __intern_to_int__(_x);
-      self.y = __intern_to_int__(_y);
+      self.y = __intern_to_int__(_x);
 
       return self;
+    }
+    else {
+      if _x == null {
+        self.x = 0;
+        self.y = 0;
+
+        return self;
+      }
+      else {
+        self.x = __intern_to_int__(_x);
+        self.y = __intern_to_int__(_y);
+
+        return self;
+      }
+    }
   }
 
   // operator methods
@@ -75,10 +99,10 @@ let IntVector2 = Num.extend({
   }
 });
 
-IntVector2.zero = Vector2.new(0.0, 0.0);
-IntVector2.one = Vector2.new(1.0, 1.0);
-IntVector2.neone = Vector2.new(-1.0, -1.0);
-IntVector2.up = Vector2.new(0.0, 1.0);
-IntVector2.down = Vector2.new(0.0, -1.0);
-IntVector2.right = Vector2.new(1.0, 0.0);
-IntVector2.left = Vector2.new(-1.0, 0.0);
+IntVector2.zero = IntVector2.new(0, 0);
+IntVector2.one = IntVector2.new(1, 1);
+IntVector2.neone = IntVector2.new(-1, -1);
+IntVector2.up = IntVector2.new(0, 1);
+IntVector2.down = IntVector2.new(0, -1);
+IntVector2.right = IntVector2.new(1, 0);
+IntVector2.left = IntVector2.new(-1, 0);
