@@ -18,8 +18,8 @@ let IntVector2 = Num.extend({
         return 0;
       }
 
-      let same = __intern_default_compare__(self.x, other.x);
-      same = same && __intern_default_compare__(self.y, other.y);
+      let same = self.x + other.x;
+      same = same && self.y + other.y;
       return same;
     }
 
@@ -50,32 +50,27 @@ let IntVector2 = Num.extend({
   // operator methods
   
   func __add__(self, other) {
-      let vec = __intern_int_add__(self.x, other.x);
-      vec = __intern_int_add__(vec.y, other.y);
+      let vec = IntVector2.new(self.x + other.x, self.y + other.y);
       return vec;
   }
 
-  func __sub__(self, other) {     
-      let vec = __intern_int_sub__(self.x, other.x);
-      vec = __intern_int_sub__(vec.y, other.y);
+  func __sub__(self, other) {
+      let vec = IntVector2.new(self.x - other.x, self.y - other.y);
       return vec;
   }
   
   func __mul__(self, other) {
-      let vec = __intern_int_mul__(self.x, other.x);
-      vec = __intern_int_mul__(vec.y, other.y);
+      let vec = IntVector2.new(self.x * other.x, self.y * other.y);
       return vec;
   }
 
   func __div__(self, other) {     
-      let vec = __intern_int_div__(self.x, other.x);
-      vec = __intern_int_div__(vec.y, other.y);
+      let vec = IntVector2.new(self.x / other.x, self.y / other.y);
       return vec;
   }
   
   func __mod__(self, other) {
-      let vec = __intern_int_mod__(self.x, other.x);
-      vec = __intern_int_mod__(vec.y, other.y);
+      let vec = IntVector2.new(self.x % other.x, self.y % other.y);
       return vec;
   }
 });
