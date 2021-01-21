@@ -33,6 +33,9 @@ import "std/types/macro.para";
 
 
 import "std/types/math/vectors/vectors.para";
+//import "std/types/math/matrix/matrix.para";
+import "std/types/math/matrix/matrix3.para";
+import "std/types/math/matrix/matrix4.para";
 
 // Type aliases
 let object = Object;
@@ -62,3 +65,15 @@ let boolean = Bool;
 
 let Function = Func;
 let function = Func;
+
+//let matrix = Matrix;
+//let Mat = Matrix;
+//let mat = Matrix;
+
+let matrix3 = Matrix3;
+let Mat3 = Matrix3;
+let mat3 = Matrix3;
+
+let matrix4 = Matrix4;
+let Mat4 = Matrix4;
+let mat4 = Matrix4;
