@@ -22,10 +22,10 @@ let IntVector4 = Num.extend({
         return 0;
       }
 
-      let same = __intern_default_compare__(self.x, other.x);
-      same = same && __intern_default_compare__(self.y, other.y);
-      same = same && __intern_default_compare__(self.z, other.z);
-      same = same && __intern_default_compare__(self.w, other.w);
+      let same = self.x + other.x;
+      same = same && self.y + other.y;
+      same = same && self.z + other.z;
+      same = same && self.w + other.w;
       return same;
     }
 
@@ -66,42 +66,27 @@ let IntVector4 = Num.extend({
   // operator methods
   
   func __add__(self, other) {
-      let vec = __intern_int_add__(self.x, other.x);
-      vec = __intern_int_add__(vec.y, other.y);
-      vec = __intern_int_add__(vec.z, other.z);
-      vec = __intern_int_add__(vec.w, other.w);
+      let vec = IntVector4.new(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w);
       return vec;
   }
 
-  func __sub__(self, other) {     
-      let vec = __intern_int_sub__(self.x, other.x);
-      vec = __intern_int_sub__(vec.y, other.y);
-      vec = __intern_int_sub__(vec.z, other.z);
-      vec = __intern_int_sub__(vec.w, other.w);
+  func __sub__(self, other) {
+      let vec = IntVector4.new(self.x - other.x, self.y - other.y, self.z - other.z, self.w - other.w);
       return vec;
   }
   
   func __mul__(self, other) {
-      let vec = __intern_int_mul__(self.x, other.x);
-      vec = __intern_int_mul__(vec.y, other.y);
-      vec = __intern_int_mul__(vec.z, other.z);
-      vec = __intern_int_mul__(vec.w, other.w);
+      let vec = IntVector4.new(self.x * other.x, self.y * other.y, self.z * other.z, self.w * other.w);
       return vec;
   }
 
   func __div__(self, other) {     
-      let vec = __intern_int_div__(self.x, other.x);
-      vec = __intern_int_div__(vec.y, other.y);
-      vec = __intern_int_div__(vec.z, other.z);
-      vec = __intern_int_div__(vec.w, other.w);
+      let vec = IntVector4.new(self.x / other.x, self.y / other.y, self.z / other.z, self.w / other.w);
       return vec;
   }
   
   func __mod__(self, other) {
-      let vec = __intern_int_mod__(self.x, other.x);
-      vec = __intern_int_mod__(vec.y, other.y);
-      vec = __intern_int_mod__(vec.z, other.z);
-      vec = __intern_int_mod__(vec.w, other.w);
+      let vec = IntVector4.new(self.x % other.x, self.y % other.y, self.z % other.z, self.w % other.w);
       return vec;
   }
 });
