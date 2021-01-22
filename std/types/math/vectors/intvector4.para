@@ -22,10 +22,10 @@ let IntVector4 = Num.extend({
         return 0;
       }
 
-      let same = self.x + other.x;
-      same = same && self.y + other.y;
-      same = same && self.z + other.z;
-      same = same && self.w + other.w;
+      let same = self.x == other.x;
+      same = same && self.y == other.y;
+      same = same && self.z == other.z;
+      same = same && self.w == other.w;
       return same;
     }
 
@@ -55,7 +55,7 @@ let IntVector4 = Num.extend({
   }
 
   func __construct__(self, _x, _y, _z, _w) {
-      if _x != null && _y == null && _z == null && _w == null {
+    if _x != null && _y == null && _z == null && _w == null {
       self.x = __intern_to_int__(_x);
       self.y = __intern_to_int__(_x);
       self.z = __intern_to_int__(_x);
@@ -80,6 +80,7 @@ let IntVector4 = Num.extend({
 
         return self;
       }
+    }
   }
 
   // operator methods
@@ -111,7 +112,7 @@ let IntVector4 = Num.extend({
 });
 
 IntVector4.zero = IntVector4.new(0, 0, 0, 0);
-IntVector4.one = IntVector4.new(1, 1, 1, 1);
+IntVector4.one = IntVector4.new(0, 0, 0, 0);
 IntVector4.neone = IntVector4.new(-1, -1, -1, -1);
 IntVector4.up = IntVector4.new(0, 1, 0, 0);
 IntVector4.down = IntVector4.new(0, -1, 0, 0);
