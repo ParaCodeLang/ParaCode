@@ -573,7 +573,7 @@ class Interpreter():
         return self.visit(node.expr)
 
     def visit_Mixin(self, node):
-        from parser.parser import Parser
+        from parse.parser import Parser
 
         parser = Parser(node.tokens, self.source_location)
         
