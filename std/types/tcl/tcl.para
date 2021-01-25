@@ -31,13 +31,17 @@ tcl.addLabel = Func.extend({
             let title = args[args[0]];
             let bgColor = null;
             let fgColor = null;
+            code = self.variableName + '.label("' + title;
             if args.len() > 1 {
               bgColor = args[1];
+              code += ', ' + bgColor;
             }
             if args.len() > 2 {
               fgColor = args[2];
+              code += ', ' + fgColor;
             }
-            return __intern_eval__(*args);
+            code += '")';
+            return __intern_eval__(code);
         }
     }
 }).new();
