@@ -11,39 +11,3 @@ Int.patch({
 
 let result = 10(20);
 print(result); // prints 200
-
-
-
-Vector4.patch({
-  func __construct__(self, _x, _y, _z, _w) {
-    if _x != null && _y == null && _z == null && _w == null {
-      self.x = __intern_to_float__(_x);
-      self.y = __intern_to_float__(_x);
-      self.z = __intern_to_float__(_x);
-      self.w = __intern_to_float__(_x);
-
-      return self;
-    }
-    else {
-      if _x == null {
-        self.x = 0.0;
-        self.y = 0.0;
-        self.z = 0.0;
-        self.w = 0.0;
-
-        return self;
-      }
-      else {
-        self.x = __intern_to_float__(_x);
-        self.y = __intern_to_float__(_y);
-        self.z = __intern_to_float__(_z);
-        self.w = __intern_to_float__(_w);
-
-        return self;
-      }
-    }
-  }
-});
-let a = vec4.new();
-let b = vec4.new(1);
-let c = vec4.new(1, 2, 3, 4);
