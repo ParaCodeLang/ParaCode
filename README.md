@@ -7,7 +7,7 @@ The core library in ParaCode is written in itself, even allowing for methods to 
 
 ParaCode also has many methods that have functional language characteristics for example Array mapping and lambdas, and new concept ideas such as [Prototypical Inheritance](https://en.wikipedia.org/wiki/Prototype-based_programming). 
 
-Later I plan to rewrite ParaCode in C/C++ for better speed, efficiency. Both of us have more experience in C/C++. I plan to keep ParaCode code and the standard library similar to how it is today.
+Later I plan to rewrite ParaCode in C/C++ for better speed, efficiency. I plan to keep ParaCode code and the standard library similar to how it is today.
 
 [vars](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/00_vars.md) - How to declare and use variables
 
