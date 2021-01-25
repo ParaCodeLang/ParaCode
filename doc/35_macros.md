@@ -14,7 +14,7 @@ Example:
 macro print_times(text: str, times: int) {
   for i in Range.new(0, times) {
     mixin {
-      print(str);
+      print(text);
     }
   }
 }

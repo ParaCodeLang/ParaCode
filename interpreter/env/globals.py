@@ -62,6 +62,8 @@ class Globals:
             ('__intern_str_len__', VariableType.Function, BuiltinFunction("__intern_str_len__", None, builtin_str_len)),
             ('__intern_str_append__', VariableType.Function, BuiltinFunction("__intern_str_append__", None, builtin_str_append)),
 
+            ('__intern_eval__', VariableType.Function, BuiltinFunction("__intern_eval__", None, builtin_eval)),
+
             ('__intern_array_len__', VariableType.Function, BuiltinFunction("__intern_array_len__", None, builtin_array_len)),
             ('__intern_array_at__', VariableType.Function, BuiltinFunction("__intern_array_at__", None, builtin_array_at)),
             ('__intern_array_append__', VariableType.Function, BuiltinFunction("__intern_array_append__", None, builtin_array_append)),
@@ -103,8 +105,6 @@ class Globals:
             
             ('__intern_time_sleep__', VariableType.Function, BuiltinFunction("__intern_time_sleep__", None, builtin_time_sleep)),
             ('__intern_time_now__',   VariableType.Function, BuiltinFunction("__intern_time_now__", None, builtin_time_now)),
-
-            ('__intern_tkinter__', VariableType.Function, BuiltinFunction("__intern_tkinter__", None, builtin_tkinter)),
 
             ('__intern_macro_expand__', VariableType.Function, BuiltinFunction("__intern_macro_expand__", None, builtin_macro_expand))
         ]

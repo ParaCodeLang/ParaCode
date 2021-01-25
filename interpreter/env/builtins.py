@@ -1,7 +1,5 @@
 import os
 
-import tkinter as tk
-
 from interpreter.typing.basic_type import BasicType
 from interpreter.basic_object import BasicObject
 from interpreter.basic_value import BasicValue
@@ -247,6 +245,22 @@ def builtin_str_append(arguments):
 
     return BasicValue(str_value)
 
+def builtin_eval(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    code = str(arguments.arguments[0].extract_value())
+    codeGlobals = globals()
+    codeLocals = locals()
+    if len(arguments.arguments) > 1 and dict(arguments.arguments[1]) != []:
+        codeGlobals = dict(arguments.arguments[1])
+    if len(arguments.arguments) > 2 and dict(arguments.arguments[2]) != []:
+        codeLocals = dict(arguments.arguments[2])
+    result = exec(code, codeGlobals, codeLocals)
+    codeGlobals.update(codeLocals)
+
+    return BasicValue(result)
+
 def builtin_object_new(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
@@ -300,7 +314,7 @@ def builtin_object_type(arguments):
 
 def builtin_object_is(arguments):
     interpreter = arguments.interpreter
-    this_object = arguments.this_object
+    this_object = arguments.this_objectaz
     target = arguments.arguments[0].extract_value()
 
     if not isinstance(this_object, BasicValue):
@@ -556,14 +570,6 @@ def builtin_math_min(arguments):
     min_value = min(values)
 
     return BasicValue(min_value)
-
-def builtin_tkinter(arguments):
-    interpreter = arguments.interpreter
-    this_object = arguments.this_object
-
-    root = tk.Tk()
-
-    return BasicValue(root)
 
 def builtin_macro_expand(arguments):
     from lexer import Lexer

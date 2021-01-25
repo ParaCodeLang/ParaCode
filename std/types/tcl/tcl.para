@@ -1,0 +1,45 @@
+let tcl = Type.extend({
+  instance = {
+    windowTitle
+    variableName
+    frames = Dictionary.new([], [])
+    labels = Dictionary.new([], [])
+
+    func setWindowTitle(self, title) {
+      self.windowTitle = title;
+      io.evaluate(self.variableName + '.title("' + title + '")');
+    }
+
+    addLabel
+  }
+
+  func __construct__(self, name) {
+    self.variableName = name;
+    io.evaluate('import tkinter as tk\n'
+      + self.variableName + ' = tk.Tk()');
+
+    self.setWindowTitle(name);
+
+    return self;
+  }
+});
+
+tcl.addLabel = Func.extend({
+    instance = {
+        func __call__(self, _args) {
+            let args = _args.from(1);
+            let title = args[args[0]];
+            let bgColor = null;
+            let fgColor = null;
+            if args.len() > 1 {
+              bgColor = args[1];
+            }
+            if args.len() > 2 {
+              fgColor = args[2];
+            }
+            return __intern_eval__(*args);
+        }
+    }
+}).new();
+
+//let app = tcl.new("TestA");

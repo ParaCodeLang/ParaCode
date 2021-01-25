@@ -1,4 +1,3 @@
-
 let Console: type = Type.extend({
     DEFAULT = 0
     RED    = 1
