@@ -38,8 +38,10 @@ let Str = Array.extend({
         return self.find(value) == self.len() - value.len();
     }
 
-//    func replace(self, toReplace, replaceWith) {
-//    }
+    func replace(self, toReplace, replaceWith) {
+        //return __intern_str_replace__(toReplace, replaceWith);
+        return io.evaluate(self + '.replace(' + toReplace + ', ' + replaceWith + ')');
+    }
     
     func __construct__(self, value) {
         self._value = value;
