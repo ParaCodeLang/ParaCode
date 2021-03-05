@@ -96,7 +96,7 @@ let Array = Iterable.extend({
         let len = self.len();
         let newarr = [];
         // TODO: < not !=
-        while index != len {
+        while index < len {
             newarr += self[index];
             index += 1;
         }

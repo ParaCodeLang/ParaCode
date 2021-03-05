@@ -100,14 +100,19 @@ class Repl:
 
         trimmed = line.strip()
         if os.path.isfile(trimmed) and (trimmed.endswith(".para") or trimmed.endswith(".para/") or trimmed.endswith(".paracode") or trimmed.endswith(".paracode/")):
-          self.paraCode.eval_file(trimmed)
-
-          return
-        elif trimmed in self._walkthrough_messages:
+            self.paraCode.eval_file(trimmed)
+            
+            return
+        elif trimmed in self._walkthrough_messages or (trimmed.endswith(".md") and trimmed.replace(".md", "", -1) in self._walkthrough_messages) or (trimmed.endswith(".md/") and trimmed.replace(".md/", "", -1) in self._walkthrough_messages):
             print(
                 self._walkthrough_messages[trimmed][1].replace('```\n', '').replace('```javascript\n', '').replace('```js\n', '').replace('`',
                                                                                                                    ''))
 
+            return
+        elif trimmed == "doc" or trimmed == "docs" or trimmed == "walkthrough" or trimmed == "walkthroughs":
+            print("""
+  {}""".format('\n  '.join(map(lambda key: "{}--  {}".format(key.ljust(16), self._walkthrough_messages[key][0]),
+                                       self._walkthrough_messages))))
             return
 
         (brace_counter, bracket_counter, paren_counter) = self.count_continuation_tokens(line)

@@ -29,7 +29,7 @@ let math = {
     }
     return x2;
   }
-  func sqrt(self, x: int) {
+  func sqrt(self, x) {
     return math.sqrtf(x.to_float());
   }
 };

@@ -1,4 +1,4 @@
-let tcl = Type.extend({
+let tk = Type.extend({
   instance = {
     windowTitle
     variableName
@@ -11,6 +11,35 @@ let tcl = Type.extend({
     func setWindowTitle(self, title) {
       self.windowTitle = title;
       return io.evaluate(self.variableName + '.title("' + title + '")');
+    }
+
+    func mainloop(self) {
+      return io.evaluate(self.variableName + '.mainloop()');
+    }
+
+    func bind(self, ev, fun) {
+      let code = 'from ParaCode import ParaCode\n'
+        + 'def run(event):\n'
+        + '   print("ASASASASASASAS")\n'
+        + '   paraCode = ParaCode.instance\n'
+        + '   data = paraCode.data\n'
+        + '   bracketCount = 0\n'
+        + '   result = ""\n'
+        + '   fun = False\n'
+        + '   for line in data.splitlines():\n'
+        + '      if line.lower().replace(" ", "").startswith("func") and " " + fun + "(" in line and "," in line and ")" in line:\n'
+        + '         func = True\n'
+        + '      if fun:\n'
+        + '         result += line + "\\n"\n'
+        + '         bracketCount += line.count("{")\n'
+        + '         bracketCount -= line.count("}")\n'
+        + '         if bracketCount == 0:\n'
+        + '            fun = False\n'
+        + '   paraCode.eval_data(result + "\\n\\n\\n\\n\\n" + "' + fun + '(event.char, event.type);' + '")\n'
+        + '   paraCode.data = data\n'
+        + self.variableName + '.bind("' + ev + '", run)';
+      print(code);
+      return io.evaluate(code);
     }
 
     addLabel
@@ -48,7 +77,7 @@ let Frame = Type.extend({
     texts = Dict.new([], [])
     frames = Dict.new([], [])
 
-    tcl1
+    tk1
 
     addLabel
     addButton
@@ -69,6 +98,14 @@ let Frame = Type.extend({
     func setSize(self, width, height) {
       self.setWidth(width);
       return self.setHeight(height);
+    }
+
+    func bind(self, ev, fun) {
+      return io.evaluate('from ParaCode import ParaCode\n'
+        + 'def run(event):\n'
+        + '   paraCode = ParaCode()\n'
+        + '   paraCode.eval_data(' + fun + '(event.char, event.type)' + ')\n'
+        + self.variableName + '.bind("' + ev + '", run)');
     }
 
     pack
@@ -99,7 +136,7 @@ let Frame = Type.extend({
 
 let frame = Func.extend({
   instance = {
-    tcl1
+    tk1
 
     func __call__(self, _args) {
       let args = _args.from(1);
@@ -107,7 +144,7 @@ let frame = Func.extend({
       let height;
       let bgColor;
       let fgColor;
-      let master = self.tcl1.variableName;
+      let master = self.tk1.variableName;
       let code = 'import tkinter as tk; ' + text + ' = tk.Frame(';
       if args.len() > 0 {
         master = args[0];
@@ -131,20 +168,20 @@ let frame = Func.extend({
       }
       code += ')';
       let index = 1;
-      for frame in self.tcl1.frames {
+      for frame in self.tk1.frames {
         index += 1;
       }
       let fr = Frame.new('frame' + index.to_str());
-      fr.tcl1 = self.tcl1;
+      fr.tk1 = self.tk1;
       fr.master = master;
-      self.tcl1.frame[text] = fr;
+      self.tk1.frame[text] = fr;
       io.evaluate(code);
       return fr;
     }
   }
 
-  func __construct__(self, tcl1) {
-    self.tcl1 = tcl1;
+  func __construct__(self, tk1) {
+    self.tk1 = tk1;
 
     return self;
   }
@@ -156,11 +193,15 @@ let Label = Type.extend({
     variableName
     master
     
-    tcl1
+    tk1
 
     func setText(self, text) {
       self.text = text;
       return io.evaluate(self.variableName + '.config(text="' + text + '")');
+    }
+
+    func bind(self, ev, fun) {
+      return io.evaluate('from ParaCode import ParaCode; paraCode = ParaCode(); ' + self.variableName + '.bind("' + ev + '", lambda fun: paraCode.eval_data(' + fun + '(event.char, event.type)' + '))');
     }
 
     pack
@@ -185,14 +226,14 @@ let Label = Type.extend({
 
 let label = Func.extend({
   instance = {
-    tcl1
+    tk1
 
     func __call__(self, _args) {
       let args = _args.from(1);
       let text = args[0];
       let bgColor;
       let fgColor;
-      let master = self.tcl1.variableName;
+      let master = self.tk1.variableName;
       let code = 'import tkinter as tk; ' + text + ' = tk.Label(text="' + text + '"';
       if args.len() > 1 {
         bgColor = args[1];
@@ -208,16 +249,16 @@ let label = Func.extend({
       }
       code += ')';
       let lb = Label.new(text);
-      lb.tcl1 = self.tcl1;
+      lb.tk1 = self.tk1;
       lb.master = master;
-      self.tcl1.labels[text] = lb;
+      self.tk1.labels[text] = lb;
       io.evaluate(code);
       return lb;
     }
   }
 
-  func __construct__(self, tcl1) {
-    self.tcl1 = tcl1;
+  func __construct__(self, tk1) {
+    self.tk1 = tk1;
 
     return self;
   }
@@ -231,7 +272,7 @@ let Button = Type.extend({
     variableName
     master
     
-    tcl1
+    tk1
 
     func setText(self, text) {
       self.text = text;
@@ -251,6 +292,10 @@ let Button = Type.extend({
     func setSize(self, width, height) {
       self.setWidth(width);
       return self.setHeight(height);
+    }
+
+    func bind(self, ev, fun) {
+      return io.evaluate('from ParaCode import ParaCode; paraCode = ParaCode(); ' + self.variableName + '.bind("' + ev + '", lambda fun: paraCode.eval_data(' + fun + '(event.char, event.type)' + '))');
     }
 
     pack
@@ -275,14 +320,14 @@ let Button = Type.extend({
 
 let button = Func.extend({
   instance = {
-    tcl1
+    tk1
 
     func __call__(self, _args) {
       let args = _args.from(1);
       let text = args[0];
       let bgColor;
       let fgColor;
-      let master = self.tcl1.variableName;
+      let master = self.tk1.variableName;
       let code = 'import tkinter as tk; ' + text + ' = tk.Label(text="' + text + '"';
       if args.len() > 1 {
         width = args[1];
@@ -306,16 +351,16 @@ let button = Func.extend({
       }
       code += ')';
       let b = Button.new(text);
-      b.tcl1 = self.tcl1;
+      b.tk1 = self.tk1;
       b.master = master;
-      self.tcl1.buttons[text] = b;
+      self.tk1.buttons[text] = b;
       io.evaluate(code);
       return b;
     }
   }
 
-  func __construct__(self, tcl1) {
-    self.tcl1 = tcl1;
+  func __construct__(self, tk1) {
+    self.tk1 = tk1;
 
     return self;
   }
@@ -329,7 +374,7 @@ let Entry = Type.extend({
     variableName
     master
     
-    tcl1
+    tk1
 
     func setText(self, text) {
       self.text = text;
@@ -349,6 +394,10 @@ let Entry = Type.extend({
     func setSize(self, width, height) {
       self.setWidth(width);
       return self.setHeight(height);
+    }
+
+    func bind(self, ev, fun) {
+      return io.evaluate('from ParaCode import ParaCode; paraCode = ParaCode(); ' + self.variableName + '.bind("' + ev + '", lambda fun: paraCode.eval_data(' + fun + '(event.char, event.type)' + '))');
     }
 
     get
@@ -381,20 +430,17 @@ let Entry = Type.extend({
 
 let entry = Func.extend({
   instance = {
-    tcl1
+    tk1
 
     func __call__(self, _args) {
       let args = _args.from(1);
       let bgColor;
       let fgColor;
-      let master = self.tcl1.variableName;
+      let master = self.tk1.variableName;
       let index = 1;
-      for entry1 in Range.new(self.tcl1.entries.len()) {
-        index += 1;
-      }
-      print(index.to_str());
-      let text = 'entry' + index.to_str();
-      let code = 'import tkinter as tk; ' + text + ' = tk.Entry(text="' + text + '"';
+      index += self.tk1.entries.len();
+      let text1 = 'entry' + index.to_str();
+      let code = 'import tkinter as tk; ' + text1 + ' = tk.Entry(';
       if args.len() > 0 {
         width = args[0];
         code += ', width=' + width;
@@ -412,17 +458,17 @@ let entry = Func.extend({
         code += ', master=' + master;
       }
       code += ')';
-      let ent = Entry.new(text);
-      ent.tcl1 = self.tcl1;
+      let ent = Entry.new(text1);
+      ent.tk1 = self.tk1;
       ent.master = master;
-      self.tcl1.entries = self.tcl1.entries.append([text, ent]);
+      self.tk1.entries = self.tk1.entries.append([text1, ent]);
       io.evaluate(code);
       return ent;
     }
   }
 
-  func __construct__(self, tcl1) {
-    self.tcl1 = tcl1;
+  func __construct__(self, tk1) {
+    self.tk1 = tk1;
 
     return self;
   }
@@ -436,7 +482,7 @@ let Text = Type.extend({
     variableName
     master
     
-    tcl1
+    tk1
 
     func setText(self, text) {
       self.text = text;
@@ -456,6 +502,10 @@ let Text = Type.extend({
     func setSize(self, width, height) {
       self.setWidth(width);
       return self.setHeight(height);
+    }
+
+    func bind(self, ev, fun) {
+      return io.evaluate('from ParaCode import ParaCode; paraCode = ParaCode(); ' + self.variableName + '.bind("' + ev + '", lambda fun: paraCode.eval_data(' + fun + '(event.char, event.type)' + '))');
     }
 
     get
@@ -488,47 +538,45 @@ let Text = Type.extend({
 
 let text = Func.extend({
   instance = {
-    tcl1
+    tk1
 
     func __call__(self, _args) {
       let args = _args.from(1);
       let bgColor;
       let fgColor;
-      let master = self.tcl1.variableName;
+      let master = self.tk1.variableName;
       let index = 1;
-      for text1 in self.tcl1.texts {
-        index += 1;
-      }
-      let text = 'text' + index.to_str();
-      let code = 'import tkinter as tk; ' + text + ' = tk.Entry(text="' + text + '"';
-      if args.len() > 1 {
-        width = args[1];
+      index += self.tk1.texts.len();
+      let text1 = 'text' + index.to_str();
+      let code = 'import tkinter as tk; ' + text1 + ' = tk.Text(';
+      if args.len() > 0 {
+        width = args[0];
         code += ', width=' + width;
       }
-      if args.len() > 2 {
-        bgColor = args[2];
+      if args.len() > 1 {
+        bgColor = args[1];
         code += ', bg="' + bgColor + '"';
       }
-      if args.len() > 3 {
-        fgColor = args[3];
+      if args.len() > 2 {
+        fgColor = args[2];
         code += ', fg="' + fgColor + '"';
       }
-      if args.len() > 4 {
-        master = args[4];
+      if args.len() > 3 {
+        master = args[3];
         code += ', master=' + master;
       }
       code += ')';
-      let tex = Text.new(text);
-      tex.tcl1 = self.tcl1;
+      let tex = Text.new(text1);
+      tex.tk1 = self.tk1;
       tex.master = master;
-      self.tcl1.texts[text] = tex;
+      self.tk1.texts = self.tk1.texts.append([text1, tex]);
       io.evaluate(code);
       return tex;
     }
   }
 
-  func __construct__(self, tcl1) {
-    self.tcl1 = tcl1;
+  func __construct__(self, tk1) {
+    self.tk1 = tk1;
 
     return self;
   }
@@ -536,12 +584,12 @@ let text = Func.extend({
 
 let doGet = Func.extend({
   instance = {
-    tcl1
+    tk1
 
     func __call__(self, _args) {
       let args = _args.from(1);
       let index;
-      let code = 'import tkinter as tk; ' + self.tcl1.variableName + '.get(';
+      let code = 'import tkinter as tk; ' + self.tk1.variableName + '.get(';
       if args.len() > 0 {
         index = args[0];
         code += index.to_str();
@@ -551,8 +599,8 @@ let doGet = Func.extend({
     }
   }
 
-  func __construct__(self, tcl1) {
-    self.tcl1 = tcl1;
+  func __construct__(self, tk1) {
+    self.tk1 = tk1;
 
     return self;
   }
@@ -560,31 +608,37 @@ let doGet = Func.extend({
 
 let doDelete = Func.extend({
   instance = {
-    tcl1
+    tk1
 
     func __call__(self, _args) {
       let args = _args.from(1);
-      let code = 'import tkinter as tk; ' + self.tcl1.variableName + '.delete(';
+      let code = 'import tkinter as tk; ' + self.tk1.variableName + '.delete(';
       let index1 = args[0];
       let index2;
-      code += index1.to_str();
+      if index1.type() == Str {
+        code += '"' + index1.to_str() + '"';
+      }
+      else {
+        code += index1.to_str();
+      }
+
       if args.len() > 1 {
         index2 = args[1];
-        if args[0].type() == Str {
-          code += '"' + index2 + '"';
+        code += ', ';
+        if index2.type() == Str {
+          code += '"' + index2.to_str() + '"';
         }
         else {
-          code += index2;
+          code += index2.to_str();
         }
-        code += ', ' + index2.to_str();
       }
       code += ')';
       return io.evaluate(code);
     }
   }
 
-  func __construct__(self, tcl1) {
-    self.tcl1 = tcl1;
+  func __construct__(self, tk1) {
+    self.tk1 = tk1;
 
     return self;
   }
@@ -592,11 +646,11 @@ let doDelete = Func.extend({
 
 let doInsert = Func.extend({
   instance = {
-    tcl1
+    tk1
 
     func __call__(self, _args) {
       let args = _args.from(1);
-      let code = 'import tkinter as tk; ' + self.tcl1.variableName + '.insert(';
+      let code = 'import tkinter as tk; ' + self.tk1.variableName + '.insert(';
       let index = args[0];
       let text = args[1].to_str();
       if index.type() == Str {
@@ -605,23 +659,16 @@ let doInsert = Func.extend({
       else {
         code += index.to_str();
       }
-      print("DDDDDDDDD");
       code += ', "';
-      print('text: ' + text);
       code += text;
       code += '"';
-      print("EEEEEEEEEEE");
-      print(code);
       code += ')';
-      print(code);
-      print("FFFFFFFFFFFF");
-      print(code);
       return io.evaluate(code);
     }
   }
 
-  func __construct__(self, tcl1) {
-    self.tcl1 = tcl1;
+  func __construct__(self, tk1) {
+    self.tk1 = tk1;
 
     return self;
   }
@@ -629,13 +676,13 @@ let doInsert = Func.extend({
 
 let doPack = Func.extend({
   instance = {
-    tcl1
+    tk1
 
     func __call__(self, _args) {
       let args = _args.from(1);
       let padX;
       let padY;
-      let code = 'import tkinter as tk; ' + self.tcl1.variableName + '.pack(';
+      let code = 'import tkinter as tk; ' + self.tk1.variableName + '.pack(';
       if args.len() > 0 {
         padX = args[0];
         code += 'padx=' + padX;
@@ -649,8 +696,8 @@ let doPack = Func.extend({
     }
   }
 
-  func __construct__(self, tcl1) {
-    self.tcl1 = tcl1;
+  func __construct__(self, tk1) {
+    self.tk1 = tk1;
 
     return self;
   }
@@ -658,7 +705,7 @@ let doPack = Func.extend({
 
 let doPlace = Func.extend({
   instance = {
-    tcl1
+    tk1
 
     func __call__(self, _args) {
       let args = _args.from(1);
@@ -667,7 +714,7 @@ let doPlace = Func.extend({
       let padX;
       let padY;
       let sticky;
-      let code = 'import tkinter as tk; ' + self.tcl1.variableName + '.place(';
+      let code = 'import tkinter as tk; ' + self.tk1.variableName + '.place(';
       code += 'x="' + x + '"';
       code += ', y="' + y + '"';
       if args.len() > 2 {
@@ -687,8 +734,8 @@ let doPlace = Func.extend({
     }
   }
 
-  func __construct__(self, tcl1) {
-    self.tcl1 = tcl1;
+  func __construct__(self, tk1) {
+    self.tk1 = tk1;
 
     return self;
   }
@@ -696,13 +743,13 @@ let doPlace = Func.extend({
 
 let doGrid = Func.extend({
   instance = {
-    tcl1
+    tk1
 
     func __call__(self, _args) {
       let args = _args.from(1);
       let row = args[0];
       let column = args[1];
-      let code = 'import tkinter as tk; ' + self.tcl1.variableName + '.grid(';
+      let code = 'import tkinter as tk; ' + self.tk1.variableName + '.grid(';
       code += 'row="' + row + '"';
       code += ', column="' + column + '"';
       code += ')';
@@ -710,8 +757,8 @@ let doGrid = Func.extend({
     }
   }
 
-  func __construct__(self, tcl1) {
-    self.tcl1 = tcl1;
+  func __construct__(self, tk1) {
+    self.tk1 = tk1;
 
     return self;
   }
@@ -719,19 +766,19 @@ let doGrid = Func.extend({
 
 let doDestroy = Func.extend({
   instance = {
-    tcl1
+    tk1
 
     func __call__(self, _args) {
       let args = _args.from(1);
       let row = args[0];
       let column = args[1];
-      let code = 'import tkinter as tk; ' + self.tcl1.variableName + '.destroy()';
+      let code = 'import tkinter as tk; ' + self.tk1.variableName + '.destroy()';
       return io.evaluate(code);
     }
   }
 
-  func __construct__(self, tcl1) {
-    self.tcl1 = tcl1;
+  func __construct__(self, tk1) {
+    self.tk1 = tk1;
 
     return self;
   }

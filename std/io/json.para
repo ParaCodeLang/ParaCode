@@ -1,0 +1,24 @@
+let Json: type = Type.extend({
+  instance = {
+  }
+  
+  func dump(_, filename: str) {
+    __intern_json_dump__(filename);
+  }
+
+  func dumps(_, data: str) {
+    __intern_json_dumps__(data);
+  }
+
+  func load(_, filename: str) {
+    __intern_json_load__(filename);
+  }
+
+  func loads(_, data: str) {
+    __intern_json_loads__(data);
+  }
+});
+
+io.patch({
+  json = Json
+});

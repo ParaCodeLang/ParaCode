@@ -1,0 +1,45 @@
+let os = Type.extend({
+  clear
+  quit
+  exit
+  system
+	args
+});
+
+os.args = __intern_os_args__();
+
+os.clear = Func.extend({
+    instance = {
+        func __call__(self, _args) {
+            let args = _args.from(1);
+            return __intern_clear__(*args);
+        }
+    }
+}).new();
+
+os.quit = Func.extend({
+    instance = {
+        func __call__(self, _args) {
+            let args = _args.from(1);
+            return __intern_quit__(*args);
+        }
+    }
+}).new();
+
+os.exit = Func.extend({
+    instance = {
+        func __call__(self, _args) {
+            let args = _args.from(1);
+            return __intern_sysexit__(*args);
+        }
+    }
+}).new();
+
+os.system = Func.extend({
+    instance = {
+        func __call__(self, _args) {
+            let args = _args.from(1);
+            return __intern_os_system__(*args);
+        }
+    }
+}).new();

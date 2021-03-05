@@ -35,6 +35,8 @@ Later I plan to rewrite ParaCode in C/C++ for better speed, efficiency. I plan t
 
 [files](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/80_files.md) - File reading and writing
 
+[json](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/81_json.md) - File reading and writing
+
 
 ### Examples
 
