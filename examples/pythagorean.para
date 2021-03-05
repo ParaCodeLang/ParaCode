@@ -1,7 +1,7 @@
 import "std/os.para";
 import "std/time.para";
 
-func start() {
+func start() {	
 	let mode = io.read("Select a mode\n1: Hypotenuse\n2: Leg\n>> ");
 	if (mode.tolower().replace(" ", "") == "hypotenuse") {
 		hypotenuse();
@@ -38,6 +38,5 @@ func leg() {
 	let b = math.sqrt(b2);
 	print("The missing leg is " + b + ".");
 }
-
 os.clear();
 start();
