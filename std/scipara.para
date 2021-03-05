@@ -1,0 +1,278 @@
+io.evaluate("import os\ntry:\n    import scipy\nexcept ImportError:\n    os.system('pip install numpy scipy matplotlib ipython jupyter pandas sympy nose')");
+
+let SciPara: type = Type.extend({
+  instance = {
+  }
+
+  __version__
+
+  stats
+  constants
+
+  func mean(_, arr: array) {
+    let result = __intern_scipara_mean__(arr);
+
+    return result;
+  }
+
+  func median(_, arr: array) {
+    let result = __intern_scipara_median__(arr);
+
+    return result;
+  }
+});
+
+let SciParaStats: type = Type.extend({
+  instance = {
+  }
+
+  func mode(_, arr: array) {
+    let result = __intern_scipara_mode__(arr);
+
+    return result;
+  }
+});
+
+let SciParaConstants: type = Type.extend({
+  instance = {
+  }
+
+  liter
+  pi
+  yotta
+  zetta
+  exa
+  peta
+  tera
+  giga
+  mega
+  kilo
+  hecto
+  deka
+  deci
+  centi
+  milli
+  micro
+  nano
+  pico
+  femto
+  atto
+  zepto
+  kibi
+  mebi
+  gibi
+  tebi
+  pebi
+  exbi
+  zebi
+  yobi
+  gram
+  metric_ton
+  grain
+  lb
+  pound
+  oz
+  ounce
+  stone
+  long_ton
+  short_ton
+  troy_ounce
+  troy_pound
+  carat
+  atomic_mass
+  m_u
+  u
+  degree
+  arcmin
+  arcminute
+  arcsec
+  arcsecond
+  minute
+  hour
+  day
+  week
+  year
+  Julian_year
+  inch
+  foot
+  yard
+  mile
+  mil
+  pt
+  point
+  survey_foot
+  survey_mile
+  nautical_mile
+  fermi
+  angstrom
+  micron
+  au
+  astronomical_unit
+  light_year
+  parsec
+  atm
+  atmosphere
+  bar
+  torr
+  mmHg
+  psi
+  hectare
+  acre
+  liter
+  litre
+  gallon
+  gallon_US
+  gallon_imp
+  fluid_ounce
+  fluid_ounce_US
+  fluid_ounce_imp
+  barrel
+  bbl
+  kmh
+  mph
+  mach
+  speed_of_sound
+  knot
+  zero_Celsius
+  degree_Fahrenheit
+  eV
+  electron_volt
+  calorie
+  calorie_th
+  calorie_IT
+  erg
+  Btu
+  Btu_IT
+  Btu_th
+  ton_TNT
+  hp
+  horsepower
+  dyn
+  dyne
+  lbf
+  pound_force
+  kgf
+  kilogram_force
+});
+
+SciPara.__version__ = __intern_scipara_getversion__();
+
+SciParaConstants.liter = __intern_scipara_getliter__();
+SciParaConstants.pi = __intern_scipara_getpi__();
+SciParaConstants.yotta = __intern_scipara_getyotta__();
+SciParaConstants.zetta = __intern_scipara_getzetta__();
+SciParaConstants.exa = __intern_scipara_getexa__();
+SciParaConstants.peta = __intern_scipara_getpeta__();
+SciParaConstants.tera = __intern_scipara_gettera__();
+SciParaConstants.giga = __intern_scipara_getgiga__();
+SciParaConstants.mega = __intern_scipara_getmega__();
+SciParaConstants.kilo = __intern_scipara_getkilo__();
+SciParaConstants.hecto = __intern_scipara_gethecto__();
+SciParaConstants.deka = __intern_scipara_getdeka__();
+SciParaConstants.deci = __intern_scipara_getdeci__();
+SciParaConstants.centi = __intern_scipara_getcenti__();
+SciParaConstants.milli = __intern_scipara_getmilli__();
+SciParaConstants.micro = __intern_scipara_getmicro__();
+SciParaConstants.nano = __intern_scipara_getnano__();
+SciParaConstants.pico = __intern_scipara_getpico__();
+SciParaConstants.femto = __intern_scipara_getfemto__();
+SciParaConstants.atto = __intern_scipara_getatto__();
+SciParaConstants.zepto = __intern_scipara_getzepto__();
+SciParaConstants.kibi = __intern_scipara_getkibi__();
+SciParaConstants.mebi = __intern_scipara_getmebi__();
+SciParaConstants.gibi = __intern_scipara_getgibi__();
+SciParaConstants.tebi = __intern_scipara_gettebi__();
+SciParaConstants.pebi = __intern_scipara_getpebi__();
+SciParaConstants.exbi = __intern_scipara_getexbi__();
+SciParaConstants.zebi = __intern_scipara_getzebi__();
+SciParaConstants.yobi = __intern_scipara_getyobi__();
+SciParaConstants.gram = __intern_scipara_getgram__();
+SciParaConstants.metric_ton = __intern_scipara_getmetric_ton__();
+SciParaConstants.grain = __intern_scipara_getgrain__();
+SciParaConstants.lb = __intern_scipara_getlb__();
+SciParaConstants.pound = __intern_scipara_getpound__();
+SciParaConstants.oz = __intern_scipara_getoz__();
+SciParaConstants.ounce = __intern_scipara_getounce__();
+SciParaConstants.stone = __intern_scipara_getstone__();
+SciParaConstants.long_ton = __intern_scipara_getlong_ton__();
+SciParaConstants.short_ton = __intern_scipara_getshort_ton__();
+SciParaConstants.troy_ounce = __intern_scipara_gettroy_ounce__();
+SciParaConstants.troy_pound = __intern_scipara_gettroy_pound__();
+SciParaConstants.carat = __intern_scipara_getcarat__();
+SciParaConstants.atomic_mass = __intern_scipara_getatomic_mass__();
+SciParaConstants.m_u = __intern_scipara_getm_u__();
+SciParaConstants.u = __intern_scipara_getu__();
+SciParaConstants.degree = __intern_scipara_getdegree__();
+SciParaConstants.arcmin = __intern_scipara_getarcmin__();
+SciParaConstants.arcminute = __intern_scipara_getarcminute__();
+SciParaConstants.arcsec = __intern_scipara_getarcsec__();
+SciParaConstants.arcsecond = __intern_scipara_getarcsecond__();
+SciParaConstants.minute = __intern_scipara_getminute__();
+SciParaConstants.hour = __intern_scipara_gethour__();
+SciParaConstants.day = __intern_scipara_getday__();
+SciParaConstants.week = __intern_scipara_getweek__();
+SciParaConstants.year = __intern_scipara_getyear__();
+SciParaConstants.Julian_year = __intern_scipara_getJulian_year__();
+SciParaConstants.inch = __intern_scipara_getinch__();
+SciParaConstants.foot = __intern_scipara_getfoot__();
+SciParaConstants.yard = __intern_scipara_getyard__();
+SciParaConstants.mile = __intern_scipara_getmile__();
+SciParaConstants.mil = __intern_scipara_getmil__();
+SciParaConstants.pt = __intern_scipara_getpt__();
+SciParaConstants.point = __intern_scipara_getpoint__();
+SciParaConstants.survey_foot = __intern_scipara_getsurvey_foot__();
+SciParaConstants.survey_mile = __intern_scipara_getsurvey_mile__();
+SciParaConstants.nautical_mile = __intern_scipara_getnautical_mile__();
+SciParaConstants.fermi = __intern_scipara_getfermi__();
+SciParaConstants.angstrom = __intern_scipara_getangstrom__();
+SciParaConstants.micron = __intern_scipara_getmicron__();
+SciParaConstants.au = __intern_scipara_getau__();
+SciParaConstants.astronomical_unit = __intern_scipara_getastronomical_unit__();
+SciParaConstants.light_year = __intern_scipara_getlight_year__();
+SciParaConstants.parsec = __intern_scipara_getparsec__();
+SciParaConstants.atm = __intern_scipara_getatm__();
+SciParaConstants.atmosphere = __intern_scipara_getatmosphere__();
+SciParaConstants.bar = __intern_scipara_getbar__();
+SciParaConstants.torr = __intern_scipara_gettorr__();
+SciParaConstants.mmHg = __intern_scipara_getmmHg__();
+SciParaConstants.psi = __intern_scipara_getpsi__();
+SciParaConstants.hectare = __intern_scipara_gethectare__();
+SciParaConstants.acre = __intern_scipara_getacre__();
+SciParaConstants.liter = __intern_scipara_getliter__();
+SciParaConstants.litre = __intern_scipara_getlitre__();
+SciParaConstants.gallon = __intern_scipara_getgallon__();
+SciParaConstants.gallon_US = __intern_scipara_getgallon_US__();
+SciParaConstants.gallon_imp = __intern_scipara_getgallon_imp__();
+SciParaConstants.fluid_ounce = __intern_scipara_getfluid_ounce__();
+SciParaConstants.fluid_ounce_US = __intern_scipara_getfluid_ounce_US__();
+SciParaConstants.fluid_ounce_imp = __intern_scipara_getfluid_ounce_imp__();
+SciParaConstants.barrel = __intern_scipara_getbarrel__();
+SciParaConstants.bbl = __intern_scipara_getbbl__();
+SciParaConstants.kmh = __intern_scipara_getkmh__();
+SciParaConstants.mph = __intern_scipara_getmph__();
+SciParaConstants.mach = __intern_scipara_getmach__();
+SciParaConstants.speed_of_sound = __intern_scipara_getspeed_of_sound__();
+SciParaConstants.knot = __intern_scipara_getknot__();
+SciParaConstants.zero_Celsius = __intern_scipara_getzero_Celsius__();
+SciParaConstants.degree_Fahrenheit = __intern_scipara_getdegree_Fahrenheit__();
+SciParaConstants.eV = __intern_scipara_geteV__();
+SciParaConstants.electron_volt = __intern_scipara_getelectron_volt__();
+SciParaConstants.calorie = __intern_scipara_getcalorie__();
+SciParaConstants.calorie_th = __intern_scipara_getcalorie_th__();
+SciParaConstants.calorie_IT = __intern_scipara_getcalorie_IT__();
+SciParaConstants.erg = __intern_scipara_geterg__();
+SciParaConstants.Btu = __intern_scipara_getBtu__();
+SciParaConstants.Btu_IT = __intern_scipara_getBtu_IT__();
+SciParaConstants.Btu_th = __intern_scipara_getBtu_th__();
+SciParaConstants.ton_TNT = __intern_scipara_getton_TNT__();
+SciParaConstants.hp = __intern_scipara_gethp__();
+SciParaConstants.horsepower = __intern_scipara_gethorsepower__();
+SciParaConstants.dyn = __intern_scipara_getdyn__();
+SciParaConstants.dyne = __intern_scipara_getdyne__();
+SciParaConstants.lbf = __intern_scipara_getlbf__();
+SciParaConstants.pound_force = __intern_scipara_getpound_force__();
+SciParaConstants.kgf = __intern_scipara_getkgf__();
+SciParaConstants.kilogram_force = __intern_scipara_getkilogram_force__();
+
+SciPara.stats = SciParaStats
+SciPara.constants = SciParaConstants

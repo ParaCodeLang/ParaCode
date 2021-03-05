@@ -1,0 +1,43 @@
+import "std/os.para";
+import "std/time.para";
+
+func start() {
+	let mode = io.read("Select a mode\n1: Hypotenuse\n2: Leg\n>> ");
+	if (mode.tolower().replace(" ", "") == "hypotenuse") {
+		hypotenuse();
+	}
+	elif (mode.tolower().replace(" ", "") == "1") {
+		hypotenuse();
+	}
+	elif (mode.tolower().replace(" ", "") == "leg") {
+		leg();
+	}
+	elif (mode.tolower().replace(" ", "") == "2") {
+		leg();
+	}
+	else {
+		print("Invalid option!");
+	}
+	start();
+}
+
+func hypotenuse() {
+	// Find missing hypotenuse (a^2 + b^2 = c^2)
+	let a = io.read("What is side a?\n>> ").to_float();
+	let b = io.read("What is side b?\n>> ").to_float();
+	let c2 = (a * a) + (b * b);
+	let hypotenuse = math.sqrt(c2);
+	print("The hypotenuse is " + hypotenuse + ".");
+}
+
+func leg() {
+	// Find missing leg (c^2 - a^2 = b^2)
+	let hypotenuse = io.read("What is the hypotenuse?\n>> ").to_float();
+	let a = io.read("What is side a?\n>> ").to_float();
+	let b2 = (hypotenuse * hypotenuse) - (a * a);
+	let b = math.sqrt(b2);
+	print("The missing leg is " + b + ".");
+}
+
+os.clear();
+start();

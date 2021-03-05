@@ -38,13 +38,21 @@ let Str = Array.extend({
         return self.find(value) == self.len() - value.len();
     }
 
-    func replace(self, toReplace, replaceWith) {
-        //return __intern_str_replace__(toReplace, replaceWith);
-        return io.evaluate(self + '.replace(' + toReplace + ', ' + replaceWith + ')');
+    replace
+
+		func tolower(self) {
+        return __intern_str_tolower__(self._value);
+    }
+
+		func toupper(self) {
+        return __intern_str_toupper__(self._value);
     }
     
     func __construct__(self, value) {
         self._value = value;
+				self.replace = intern_replace.new(self);
+
+				return self;
     }
 
     func clone(self) {
@@ -93,6 +101,50 @@ let Str = Array.extend({
         return value;
     }
 
+		func to_float(self) {
+        let len = self.len();
+        
+        if len <= 0 {
+            return 0;
+        }
+
+        let value = 0;
+				let svalue = "";
+				let dvalue = "";
+
+        let index = 0;
+        
+        // apply any unary negative
+        while self[index] == '-' {
+            svalue += '-';
+            index += 1;
+        }
+        
+				while index != len {
+						if self[index] == '.' {
+							dvalue = self.replace(svalue + ".", "");
+							let div = "1";
+							let l = dvalue.to_int().len();
+							let i = 0;
+							while i != l {
+								div += "0";
+								i += 1;
+							}
+							value = svalue.to_int();
+							value = value + (dvalue.to_int() / div.to_int());
+							index = len;
+						}
+						else {
+            	svalue += self[index];
+							index += 1;
+						}
+        }
+				if value == 0 {
+					value = svalue.to_int();
+				}
+        return value;
+    }
+
     func reverse(self) {
         let newstr = "";
         let index = self.len();
@@ -133,3 +185,29 @@ Str.format = Func.extend({
         }
     }
 }).new();
+
+let intern_replace = Func.extend({
+  	instance = {
+				value
+
+  	  	func __call__(self, _args) {
+  	  	  	let args = _args.from(1);
+  	  	  	let toReplace = args[0];
+						let replaceWith = args[1];
+  	  	  	if args.len() > 2 {
+  	  	  	  	let amount = args[2];
+								return __intern_str_replace__(self.value._value, toReplace._value, replaceWith._value, amount);
+  	  	  	}
+						else {
+								return __intern_str_replace__(self.value._value, toReplace._value, replaceWith._value);
+						}
+						return self.value;
+  	  	}
+  	}
+
+		func __construct__(self, value) {
+				self.value = value;
+
+				return self;
+		}
+});

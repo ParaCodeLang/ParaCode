@@ -1,4 +1,6 @@
 import os
+import sys
+import json
 
 from interpreter.typing.basic_type import BasicType
 from interpreter.basic_object import BasicObject
@@ -244,6 +246,42 @@ def builtin_str_append(arguments):
             str_value = str_value + str(arg.extract_value())
 
     return BasicValue(str_value)
+
+def builtin_str_replace(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    toReplace = str(arguments.arguments[1].extract_value())
+    replaceWith = str(arguments.arguments[2].extract_value())
+		
+    result = value
+    
+    if len(arguments.arguments) > 3:
+      amount = int(str(arguments.arguments[3].extract_value()))
+      result = value.replace(toReplace, replaceWith, amount)
+    else:
+      result = value.replace(toReplace, replaceWith)
+
+    return BasicValue(result)
+
+def builtin_str_tolower(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = value.lower()
+    
+    return BasicValue(result)
+
+def builtin_str_toupper(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = value.upper()
+    
+    return BasicValue(result)
 
 def builtin_eval(arguments):
     interpreter = arguments.interpreter
@@ -518,6 +556,874 @@ def builtin_is_dir(arguments):
     file_path = arguments.arguments[0]
 
     return BasicValue(os.path.isdir(file_path.extract_value()))
+
+def builtin_json_load(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    file_path = arguments.arguments[0]
+
+    # TODO better exception handling - throw internal exception
+    try:
+        with open(file_path.extract_value(), "r") as f:
+          s = json.load(f)
+    except:
+        s = json.loads("{\n}")
+
+    return BasicValue(s)
+
+def builtin_json_loads(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    text = arguments.arguments[0]
+
+    # TODO better exception handling - throw internal exception
+    try:
+        s = json.loads(text.extract_value())
+    except:
+        s = json.loads("{\n}")
+
+    return BasicValue(s)
+
+def builtin_json_dump(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    data = arguments.arguments[0].extract_value()
+    file = arguments.arguments[1].extract_value()
+    doindent = False
+    indent = -1
+    if len(arguments.arguments) > 2:
+        indent = arguments.arguments[2].extract_value()
+        doindent = True
+
+    with open(file, "w") as f:
+        if doindent:
+            json.dump(data, f, indent=indent)
+        else:
+            json.dump(data, f)
+        return BasicValue(f.read())
+
+    return BasicValue(None)
+
+def builtin_json_dumps(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    data = arguments.arguments[0].extract_value()
+    doindent = False
+    indent = -1
+    if len(arguments.arguments) > 1:
+        indent = arguments.arguments[1].extract_value()
+        doindent = True
+
+    if doindent:
+        return BasicValue(json.dumps(data, indent=indent))
+    else:
+        return BasicValue(json.dumps(data))
+
+def builtin_numpara_mean(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+    
+    data = arguments.arguments[0].extract_value()
+    for i in range(len(data)):
+        if type(data[i]) == type(arguments.arguments[0]):
+            data[i] = data[i].extract_value()
+
+    import numpy
+    
+    result = numpy.mean(data)
+    return BasicValue(result.item())
+
+def builtin_numpara_median(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    data = arguments.arguments[0].extract_value()
+    for i in range(len(data)):
+        if type(data[i]) == type(arguments.arguments[0]):
+            data[i] = data[i].extract_value()
+
+    import numpy
+
+    result = numpy.median(data)
+    return BasicValue(result.item())
+
+def builtin_scipara_mean(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+    
+    data = arguments.arguments[0].extract_value()
+    for i in range(len(data)):
+        if type(data[i]) == type(arguments.arguments[0]):
+            data[i] = data[i].extract_value()
+
+    import scipy
+    
+    result = scipy.mean(data)
+    return BasicValue(result.item())
+
+def builtin_scipara_median(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    data = arguments.arguments[0].extract_value()
+    for i in range(len(data)):
+        if type(data[i]) == type(arguments.arguments[0]):
+            data[i] = data[i].extract_value()
+
+    import scipy
+
+    result = scipy.median(data)
+    return BasicValue(result.item())
+
+def builtin_scipara_mode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    data = arguments.arguments[0].extract_value()
+    for i in range(len(data)):
+        if type(data[i]) == type(arguments.arguments[0]):
+            data[i] = data[i].extract_value()
+
+    from scipy import stats
+
+    result = stats.mode(data)
+    return BasicValue([result.mode, result.count])
+
+def builtin_scipara_getliter(arguments):
+    from scipy import constants
+
+    liter = constants.liter
+    return BasicValue(liter)
+
+def builtin_scipara_getpi(arguments):
+    from scipy import constants
+
+    pi = constants.pi
+    return BasicValue(pi)
+
+def builtin_scipara_getyotta(arguments):
+    from scipy import constants
+
+    result = constants.yotta
+    return BasicValue(result)
+
+def builtin_scipara_getzetta(arguments):
+    from scipy import constants
+
+    result = constants.zetta
+    return BasicValue(result)
+
+def builtin_scipara_getexa(arguments):
+    from scipy import constants
+
+    result = constants.exa
+    return BasicValue(result)
+
+def builtin_scipara_getpeta(arguments):
+    from scipy import constants
+
+    result = constants.peta
+    return BasicValue(result)
+
+def builtin_scipara_gettera(arguments):
+    from scipy import constants
+
+    result = constants.tera
+    return BasicValue(result)
+
+def builtin_scipara_getgiga(arguments):
+    from scipy import constants
+
+    result = constants.giga
+    return BasicValue(result)
+    
+def builtin_scipara_getmega(arguments):
+    from scipy import constants
+
+    result = constants.mega
+    return BasicValue(result)
+
+def builtin_scipara_getkilo(arguments):
+    from scipy import constants
+
+    result = constants.kilo
+    return BasicValue(result)
+
+def builtin_scipara_gethecto(arguments):
+    from scipy import constants
+
+    result = constants.hecto
+    return BasicValue(result)
+
+def builtin_scipara_getdeka(arguments):
+    from scipy import constants
+
+    result = constants.deka
+    return BasicValue(result)
+
+def builtin_scipara_getdeci(arguments):
+    from scipy import constants
+
+    result = constants.deci
+    return BasicValue(result)
+
+def builtin_scipara_getcenti(arguments):
+    from scipy import constants
+
+    result = constants.centi
+    return BasicValue(result)
+
+def builtin_scipara_getmilli(arguments):
+    from scipy import constants
+
+    result = constants.milli
+    return BasicValue(result)
+
+def builtin_scipara_getmicro(arguments):
+    from scipy import constants
+
+    result = constants.micro
+    return BasicValue(result)
+
+def builtin_scipara_getnano(arguments):
+    from scipy import constants
+
+    result = constants.nano
+    return BasicValue(result)
+
+def builtin_scipara_getpico(arguments):
+    from scipy import constants
+
+    result = constants.pico
+    return BasicValue(result)
+
+def builtin_scipara_getfemto(arguments):
+    from scipy import constants
+
+    result = constants.femto
+    return BasicValue(result)
+
+def builtin_scipara_getatto(arguments):
+    from scipy import constants
+
+    result = constants.atto
+    return BasicValue(result)
+
+def builtin_scipara_getzepto(arguments):
+    from scipy import constants
+
+    result = constants.zepto
+    return BasicValue(result)
+
+def builtin_scipara_getkibi(arguments):
+    from scipy import constants
+
+    result = constants.kibi
+    return BasicValue(result)
+
+def builtin_scipara_getmebi(arguments):
+    from scipy import constants
+
+    result = constants.mebi
+    return BasicValue(result)
+
+def builtin_scipara_getgibi(arguments):
+    from scipy import constants
+
+    result = constants.gibi
+    return BasicValue(result)
+
+def builtin_scipara_gettebi(arguments):
+    from scipy import constants
+
+    result = constants.tebi
+    return BasicValue(result)
+
+def builtin_scipara_getpebi(arguments):
+    from scipy import constants
+
+    result = constants.pebi
+    return BasicValue(result)
+
+def builtin_scipara_getexbi(arguments):
+    from scipy import constants
+
+    result = constants.exbi
+    return BasicValue(result)
+
+def builtin_scipara_getzebi(arguments):
+    from scipy import constants
+
+    result = constants.zebi
+    return BasicValue(result)
+
+def builtin_scipara_getyobi(arguments):
+    from scipy import constants
+
+    result = constants.yobi
+    return BasicValue(result)
+
+def builtin_scipara_getgram(arguments):
+    from scipy import constants
+
+    result = constants.gram
+    return BasicValue(result)
+
+def builtin_scipara_getmetric_ton(arguments):
+    from scipy import constants
+
+    result = constants.metric_ton
+    return BasicValue(result)
+
+def builtin_scipara_getgrain(arguments):
+    from scipy import constants
+
+    result = constants.grain
+    return BasicValue(result)
+
+def builtin_scipara_getlb(arguments):
+    from scipy import constants
+
+    result = constants.lb
+    return BasicValue(result)
+
+def builtin_scipara_getpound(arguments):
+    from scipy import constants
+
+    result = constants.pound
+    return BasicValue(result)
+
+def builtin_scipara_getoz(arguments):
+    from scipy import constants
+
+    result = constants.oz
+    return BasicValue(result)
+
+def builtin_scipara_getounce(arguments):
+    from scipy import constants
+
+    result = constants.ounce
+    return BasicValue(result)
+
+def builtin_scipara_getstone(arguments):
+    from scipy import constants
+
+    result = constants.stone
+    return BasicValue(result)
+
+def builtin_scipara_getlong_ton(arguments):
+    from scipy import constants
+
+    result = constants.long_ton
+    return BasicValue(result)
+
+def builtin_scipara_getshort_ton(arguments):
+    from scipy import constants
+
+    result = constants.short_ton
+    return BasicValue(result)
+
+def builtin_scipara_gettroy_ounce(arguments):
+    from scipy import constants
+
+    result = constants.troy_ounce
+    return BasicValue(result)
+
+def builtin_scipara_gettroy_pound(arguments):
+    from scipy import constants
+
+    result = constants.troy_pound
+    return BasicValue(result)
+
+def builtin_scipara_getcarat(arguments):
+    from scipy import constants
+
+    result = constants.carat
+    return BasicValue(result)
+
+def builtin_scipara_getatomic_mass(arguments):
+    from scipy import constants
+
+    result = constants.atomic_mass
+    return BasicValue(result)
+
+def builtin_scipara_getm_u(arguments):
+    from scipy import constants
+
+    result = constants.m_u
+    return BasicValue(result)
+
+def builtin_scipara_getu(arguments):
+    from scipy import constants
+
+    result = constants.u
+    return BasicValue(result)
+
+def builtin_scipara_getdegree(arguments):
+    from scipy import constants
+
+    result = constants.degree
+    return BasicValue(result)
+
+def builtin_scipara_getarcmin(arguments):
+    from scipy import constants
+
+    result = constants.arcmin
+    return BasicValue(result)
+
+def builtin_scipara_getarcminute(arguments):
+    from scipy import constants
+
+    result = constants.arcminute
+    return BasicValue(result)
+
+def builtin_scipara_getarcsec(arguments):
+    from scipy import constants
+
+    result = constants.arcsec
+    return BasicValue(result)
+
+def builtin_scipara_getarcsecond(arguments):
+    from scipy import constants
+
+    result = constants.arcsecond
+    return BasicValue(result)
+
+def builtin_scipara_getminute(arguments):
+    from scipy import constants
+
+    result = constants.minute
+    return BasicValue(result)
+
+def builtin_scipara_gethour(arguments):
+    from scipy import constants
+
+    result = constants.hour
+    return BasicValue(result)
+
+def builtin_scipara_getday(arguments):
+    from scipy import constants
+
+    result = constants.day
+    return BasicValue(result)
+
+def builtin_scipara_getweek(arguments):
+    from scipy import constants
+
+    result = constants.week
+    return BasicValue(result)
+
+def builtin_scipara_getyear(arguments):
+    from scipy import constants
+
+    result = constants.year
+    return BasicValue(result)
+
+def builtin_scipara_getJulian_year(arguments):
+    from scipy import constants
+
+    result = constants.Julian_year
+    return BasicValue(result)
+
+def builtin_scipara_getinch(arguments):
+    from scipy import constants
+
+    result = constants.inch
+    return BasicValue(result)
+
+def builtin_scipara_getfoot(arguments):
+    from scipy import constants
+
+    result = constants.foot
+    return BasicValue(result)
+
+def builtin_scipara_getyard(arguments):
+    from scipy import constants
+
+    result = constants.yard
+    return BasicValue(result)
+
+def builtin_scipara_getmile(arguments):
+    from scipy import constants
+
+    result = constants.mile
+    return BasicValue(result)
+
+def builtin_scipara_getmil(arguments):
+    from scipy import constants
+
+    result = constants.mil
+    return BasicValue(result)
+
+def builtin_scipara_getpt(arguments):
+    from scipy import constants
+
+    result = constants.pt
+    return BasicValue(result)
+
+def builtin_scipara_getpoint(arguments):
+    from scipy import constants
+
+    result = constants.point
+    return BasicValue(result)
+
+def builtin_scipara_getsurvey_foot(arguments):
+    from scipy import constants
+
+    result = constants.survey_foot
+    return BasicValue(result)
+
+def builtin_scipara_getsurvey_mile(arguments):
+    from scipy import constants
+
+    result = constants.survey_mile
+    return BasicValue(result)
+
+def builtin_scipara_getnautical_mile(arguments):
+    from scipy import constants
+
+    result = constants.nautical_mile
+    return BasicValue(result)
+
+def builtin_scipara_getfermi(arguments):
+    from scipy import constants
+
+    result = constants.fermi
+    return BasicValue(result)
+
+def builtin_scipara_getangstrom(arguments):
+    from scipy import constants
+
+    result = constants.angstrom
+    return BasicValue(result)
+
+def builtin_scipara_getmicron(arguments):
+    from scipy import constants
+
+    result = constants.micron
+    return BasicValue(result)
+
+def builtin_scipara_getau(arguments):
+    from scipy import constants
+
+    result = constants.au
+    return BasicValue(result)
+
+def builtin_scipara_getastronomical_unit(arguments):
+    from scipy import constants
+
+    result = constants.astronomical_unit
+    return BasicValue(result)
+
+def builtin_scipara_getlight_year(arguments):
+    from scipy import constants
+
+    result = constants.light_year
+    return BasicValue(result)
+
+def builtin_scipara_getparsec(arguments):
+    from scipy import constants
+
+    result = constants.parsec
+    return BasicValue(result)
+
+def builtin_scipara_getatm(arguments):
+    from scipy import constants
+
+    result = constants.atm
+    return BasicValue(result)
+
+def builtin_scipara_getatmosphere(arguments):
+    from scipy import constants
+
+    result = constants.atmosphere
+    return BasicValue(result)
+
+def builtin_scipara_getbar(arguments):
+    from scipy import constants
+
+    result = constants.bar
+    return BasicValue(result)
+
+def builtin_scipara_gettorr(arguments):
+    from scipy import constants
+
+    result = constants.torr
+    return BasicValue(result)
+
+def builtin_scipara_getmmHg(arguments):
+    from scipy import constants
+
+    result = constants.mmHg
+    return BasicValue(result)
+
+def builtin_scipara_getpsi(arguments):
+    from scipy import constants
+
+    result = constants.psi
+    return BasicValue(result)
+
+def builtin_scipara_getectare(arguments):
+    from scipy import constants
+
+    result = constants.ectare
+    return BasicValue(result)
+
+def builtin_scipara_getacre(arguments):
+    from scipy import constants
+
+    result = constants.acre
+    return BasicValue(result)
+
+def builtin_scipara_getliter(arguments):
+    from scipy import constants
+
+    result = constants.liter
+    return BasicValue(result)
+
+def builtin_scipara_getlitre(arguments):
+    from scipy import constants
+
+    result = constants.litre
+    return BasicValue(result)
+
+def builtin_scipara_getgallon(arguments):
+    from scipy import constants
+
+    result = constants.gallon
+    return BasicValue(result)
+
+def builtin_scipara_getgallon_US(arguments):
+    from scipy import constants
+
+    result = constants.gallon_US
+    return BasicValue(result)
+
+def builtin_scipara_getgallon_imp(arguments):
+    from scipy import constants
+
+    result = constants.gallon_imp
+    return BasicValue(result)
+
+def builtin_scipara_getfluid_ounce(arguments):
+    from scipy import constants
+
+    result = constants.fluid_ounce
+    return BasicValue(result)
+
+def builtin_scipara_getfluid_ounce_US(arguments):
+    from scipy import constants
+
+    result = constants.fluid_ounce_US
+    return BasicValue(result)
+
+def builtin_scipara_getfluid_ounce_imp(arguments):
+    from scipy import constants
+
+    result = constants.fluid_ounce_imp
+    return BasicValue(result)
+
+def builtin_scipara_getbarrel(arguments):
+    from scipy import constants
+
+    result = constants.barrel
+    return BasicValue(result)
+
+def builtin_scipara_getbbl(arguments):
+    from scipy import constants
+
+    result = constants.bbl
+    return BasicValue(result)
+
+def builtin_scipara_getkmh(arguments):
+    from scipy import constants
+
+    result = constants.kmh
+    return BasicValue(result)
+
+def builtin_scipara_getmph(arguments):
+    from scipy import constants
+
+    result = constants.mph
+    return BasicValue(result)
+
+def builtin_scipara_getmach(arguments):
+    from scipy import constants
+
+    result = constants.mach
+    return BasicValue(result)
+
+def builtin_scipara_getspeed_of_sound(arguments):
+    from scipy import constants
+
+    result = constants.speed_of_sound
+    return BasicValue(result)
+
+def builtin_scipara_getknot(arguments):
+    from scipy import constants
+
+    result = constants.knot
+    return BasicValue(result)
+
+def builtin_scipara_getzero_Celsius(arguments):
+    from scipy import constants
+
+    result = constants.zero_Celsius
+    return BasicValue(result)
+
+def builtin_scipara_getdegree_Fahrenheit(arguments):
+    from scipy import constants
+
+    result = constants.degree_Fahrenheit
+    return BasicValue(result)
+
+def builtin_scipara_geteV(arguments):
+    from scipy import constants
+
+    result = constants.eV
+    return BasicValue(result)
+
+def builtin_scipara_getelectron_volt(arguments):
+    from scipy import constants
+
+    result = constants.electron_volt
+    return BasicValue(result)
+
+def builtin_scipara_getcalorie(arguments):
+    from scipy import constants
+
+    result = constants.calorie
+    return BasicValue(result)
+
+def builtin_scipara_getcalorie_th(arguments):
+    from scipy import constants
+
+    result = constants.calorie_th
+    return BasicValue(result)
+
+def builtin_scipara_getcalorie_IT(arguments):
+    from scipy import constants
+
+    result = constants.calorie_IT
+    return BasicValue(result)
+
+def builtin_scipara_geterg(arguments):
+    from scipy import constants
+
+    result = constants.erg
+    return BasicValue(result)
+
+def builtin_scipara_getBtu(arguments):
+    from scipy import constants
+
+    result = constants.Btu
+    return BasicValue(result)
+
+def builtin_scipara_getBtu_IT(arguments):
+    from scipy import constants
+
+    result = constants.Btu_IT
+    return BasicValue(result)
+
+def builtin_scipara_getBtu_th(arguments):
+    from scipy import constants
+
+    result = constants.Btu_th
+    return BasicValue(result)
+
+def builtin_scipara_getton_TNT(arguments):
+    from scipy import constants
+
+    result = constants.ton_TNT
+    return BasicValue(result)
+
+def builtin_scipara_gethp(arguments):
+    from scipy import constants
+
+    result = constants.hp
+    return BasicValue(result)
+
+def builtin_scipara_gethorsepower(arguments):
+    from scipy import constants
+
+    result = constants.horsepower
+    return BasicValue(result)
+
+def builtin_scipara_getdyn(arguments):
+    from scipy import constants
+
+    result = constants.dyn
+    return BasicValue(result)
+
+def builtin_scipara_getdyne(arguments):
+    from scipy import constants
+
+    result = constants.dyne
+    return BasicValue(result)
+
+def builtin_scipara_getlbf(arguments):
+    from scipy import constants
+
+    result = constants.lbf
+    return BasicValue(result)
+
+def builtin_scipara_getpound_force(arguments):
+    from scipy import constants
+
+    result = constants.pound_force
+    return BasicValue(result)
+
+def builtin_scipara_getkgf(arguments):
+    from scipy import constants
+
+    result = constants.kgf
+    return BasicValue(result)
+
+def builtin_scipara_getkilogram_force(arguments):
+    from scipy import constants
+
+    result = constants.kilogram_force
+    return BasicValue(result)
+
+def builtin_scipara_getversion(arguments):
+    import scipy
+
+    version = scipy.__version__
+    return BasicValue(version)
+
+def builtin_os_args(arguments):
+    return BasicValue(sys.argv)
+
+def builtin_clear(arguments):
+    # Windows
+    if os.name == 'nt':
+      os.system('cls')
+    
+    # Mac and Linux
+    else:
+      os.system('clear')
+
+    return BasicValue(None)
+
+def builtin_quit(arguments):
+    if len(arguments.arguments) > 0:
+      quit(int(str(arguments.arguments[0])))
+    else:
+      quit()
+
+    return BasicValue(None)
+
+def builtin_sysexit(arguments):
+    if len(arguments.arguments) > 0:
+      sys.exit(str(arguments.arguments[0]))
+    else:
+      sys.exit()
+
+    return BasicValue(None)
 
 def builtin_func_call(arguments):
     interpreter = arguments.interpreter

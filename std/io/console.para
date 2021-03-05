@@ -21,11 +21,20 @@ let Console: type = Type.extend({
         self.write(msg);
         self.color(self.DEFAULT);
     }
-
-    func read(_) {
-        return __intern_console_input__();
-    }
+    read
 });
+
+Console.read = Func.extend({
+    instance = {
+        func __call__(self, _args) {
+            let args = _args.from(1);
+            for i in Range.new(0, args.len()) {
+              Console.write(args[i]);
+            }
+            return __intern_console_input__();
+        }
+    }
+}).new();
 
 
 io.patch({

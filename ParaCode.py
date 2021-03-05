@@ -11,12 +11,14 @@ from repl.repl import Repl
 from ast_printer import AstPrinter
 
 class ParaCode():
+    instance = None
+    data = ""
     initialized = False
 
     def __init__(self):
-        pass
+        ParaCode.instance = self
 
-    def eval(self, data=None, filename=None, interpret=True, default_imports=['std/__core__.para']):
+    def eval(self, data=None, filename=None, interpret=True, default_imports=['std/__core__.para'], source_location=None):
         self.initialized = True
         debug_name = "<none>"
 
@@ -49,11 +51,15 @@ class ParaCode():
             error_list.print_errors()
             return
 
+        source_loc = source_location
+        if source_loc is None:
+          source_loc = self.parser.source_location
+
         return_code = None
         if interpret:
 
             # init interpreter and visit nodes
-            self.interpreter = Interpreter(self.parser.source_location)
+            self.interpreter = Interpreter(source_loc)
 
             try:
                 for node in self.ast:

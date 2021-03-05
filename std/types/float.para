@@ -28,6 +28,10 @@ let Float = Num.extend({
       return 1*self._value;
     }
 
+		func to_float(self) {
+      return self._value;
+    }
+
     func len(self) {
       return self.to_str().len();
     }
