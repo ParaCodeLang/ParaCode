@@ -56,7 +56,7 @@ To install ParaCode, run the following commands:
 wget "http://github.com/DaRubyMiner360/ParaCode/archive/rewrite.zip" -O temp.zip
 unzip temp.zip
 rm temp.zip
-mv ParaCode-rewrite/* .
-mv ParaCode-rewrite/.* .
+mv -f ParaCode-rewrite/* .
+mv -f ParaCode-rewrite/.* .
 rmdir ParaCode-rewrite
 ```

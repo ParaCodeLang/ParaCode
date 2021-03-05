@@ -124,14 +124,14 @@ let Str = Array.extend({
 						if self[index] == '.' {
 							dvalue = self.replace(svalue + ".", "");
 							let div = "1";
-							let l = dvalue.to_int().len();
+							let l = dvalue.len();
 							let i = 0;
 							while i != l {
 								div += "0";
 								i += 1;
 							}
-							value = svalue.to_int();
-							value = value + (dvalue.to_int() / div.to_int());
+							value = svalue.to_int().to_float();
+							value = value + (dvalue.to_int().to_float() / div.to_int().to_float());
 							index = len;
 						}
 						else {
@@ -140,7 +140,7 @@ let Str = Array.extend({
 						}
         }
 				if value == 0 {
-					value = svalue.to_int();
+					value = svalue.to_int().to_float();
 				}
         return value;
     }
