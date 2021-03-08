@@ -51,8 +51,52 @@ Later I plan to rewrite ParaCode in C/C++ for better speed, efficiency. I plan t
 Be sure to check out our TicTacToe example!
 Start the REPL by running `main.py` and call `tictactoe();` to try it out!
 
-To install ParaCode, run the following commands:
+To update ParaCode, run the following command:
 ```shell
+update.sh
+```
+or to install or update, run:
+```shell
+rm doc/*
+rmdir doc
+rm examples/*
+rmdir examples
+rm interpreter/env/builtin/*
+rmdir interpreter/env/builtin
+rm interpreter/env/*
+rmdir interpreter/env
+rm interpreter/typing/*
+rmdir interpreter/typing
+rm interpreter/*
+rmdir interpreter
+rm parse/*
+rmdir parse
+rm repl/*
+rmdir repl
+rm std/experimental/*
+rmdir std/experimental
+rm std/io/*
+rmdir std/io
+rm std/math/*
+rmdir std/math
+rm std/types/math/*
+rmdir std/types/math
+rm std/types/tk/*
+rmdir std/types/tk
+rm std/types/*
+rmdir std/types
+rm std/util/*
+rmdir std/util
+rm std/*
+rmdir std
+rm installDependencies.py
+rm lexer.py
+rm mandle.para
+rm ParaCodeInstaller.iss
+rm shell.py
+rm shellTemplate.py
+rm util.py
+rm test.para
 wget "http://github.com/DaRubyMiner360/ParaCode/archive/rewrite.zip" -O temp.zip
 unzip temp.zip
 rm temp.zip
