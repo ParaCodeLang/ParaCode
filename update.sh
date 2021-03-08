@@ -1,0 +1,46 @@
+rm doc/*
+rmdir doc
+rm examples/*
+rmdir examples
+rm interpreter/env/builtin/*
+rmdir interpreter/env/builtin
+rm interpreter/env/*
+rmdir interpreter/env
+rm interpreter/typing/*
+rmdir interpreter/typing
+rm interpreter/*
+rmdir interpreter
+rm parse/*
+rmdir parse
+rm repl/*
+rmdir repl
+rm std/experimental/*
+rmdir std/experimental
+rm std/io/*
+rmdir std/io
+rm std/math/*
+rmdir std/math
+rm std/types/math/*
+rmdir std/types/math
+rm std/types/tk/*
+rmdir std/types/tk
+rm std/types/*
+rmdir std/types
+rm std/util/*
+rmdir std/util
+rm std/*
+rmdir std
+rm installDependencies.py
+rm lexer.py
+rm mandle.para
+rm ParaCodeInstaller.iss
+rm shell.py
+rm shellTemplate.py
+rm util.py
+rm test.para
+wget "http://github.com/DaRubyMiner360/ParaCode/archive/rewrite.zip" -O temp.zip
+unzip temp.zip
+rm temp.zip
+mv -f ParaCode-rewrite/* .
+mv -f ParaCode-rewrite/.* .
+rmdir ParaCode-rewrite
