@@ -51,5 +51,8 @@ Later I plan to rewrite ParaCode in C/C++ for better speed, efficiency. I plan t
 Be sure to check out our TicTacToe example!
 Start the REPL by running `main.py` and call `tictactoe();` to try it out!
 
-To update ParaCode, run `update.sh`.
+To update ParaCode, run the `update.sh` file. On most devices this can be done with
+```shell
+sh update.sh
+```
 Or, to install and update ParaCode, run everything from `update.sh`.
