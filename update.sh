@@ -82,6 +82,7 @@ rm update.sh
 wget "http://github.com/DaRubyMiner360/ParaCode/archive/rewrite.zip" -O temp.zip
 unzip temp.zip
 rm temp.zip
+rm ParaCode-rewrite/.replit
 mv ParaCode-rewrite/* .
 mv ParaCode-rewrite/.* .
 rm ParaCode-rewrite/discord/core/*
