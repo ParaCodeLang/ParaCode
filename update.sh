@@ -74,12 +74,11 @@ rm std/*
 rmdir std
 rm installDependencies.py
 rm lexer.py
-rm mandle.para
 rm ParaCodeInstaller.iss
 rm shell.py
 rm shellTemplate.py
 rm util.py
-rm test.para
+rm update.sh
 wget "http://github.com/DaRubyMiner360/ParaCode/archive/rewrite.zip" -O temp.zip
 unzip temp.zip
 rm temp.zip

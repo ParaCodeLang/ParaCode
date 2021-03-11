@@ -1,15 +1,18 @@
-import config
 import setuptools
 
+language_name = "ParaCode"
+author = "DaRubyMiner360"
+version = "1.1.2"
+
 with open("README.md", "r") as fh:
-    long_description = fh.read().replace("ParaCode", config.language_name)
+    long_description = fh.read().replace("ParaCode", language_name)
 
 setuptools.setup(
-    name=config.language_name,
-    version=config.version,
-    author=config.author,
+    name=language_name,
+    version=version,
+    author=author,
     author_email="darubyminer360@gmail.com",
-    description="The " + config.language_name + " Programming Language",
+    description="The " + language_name + " Programming Language",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/DaRubyMiner360/ParaCode",
