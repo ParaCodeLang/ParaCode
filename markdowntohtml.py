@@ -1,8 +1,11 @@
 import markdown
 
+inputFile = input('Input File >> ')
+outputFile = input('Output File >> ')
+
 markdown.markdownFromFile(
-    input='README.md',
-    output='README.html',
+    input=inputFile
+    output=outputFile,
     encoding='utf8',
     extensions=['fenced_code', 'codehilite'],
 )
