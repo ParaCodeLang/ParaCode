@@ -1,5 +1,7 @@
 package main
 
+// go build -o PCPM -ldflags "-s -w" main.go
+
 import (
   "fmt"
   "os"
@@ -28,11 +30,11 @@ func main() {
   os.Mkdir("./pkg_data", 0755)
 
   if len(os.Args) < 2 {
-    fmt.Println("packager expects at least one argument!")
+    fmt.Println("PCPM expects at least one argument!")
     os.Exit(1)
   }
 
-  if os.Args[1] != "install" && os.Args[1] != "update" && os.Args[1] != "remove" && os.Args[1] != "publish" {
+  if os.Args[1] != "install" && os.Args[1] != "get" && os.Args[1] != "update" && os.Args[1] != "remove" && os.Args[1] != "uninstall" && os.Args[1] != "publish" {
     fmt.Println("Invalid option " + os.Args[1] + "!")
     os.Exit(1)
   }
@@ -87,16 +89,16 @@ func main() {
   }
 
   if _, err := os.Stat("./pkg_data/" + packagename); os.IsNotExist(err) {
-    if os.Args[1] == "update" || os.Args[1] == "remove" {
+    if os.Args[1] == "update" || os.Args[1] == "remove" || os.Args[1] == "uninstall" {
       fmt.Println("Package " + packagename + " is not installed!")
       os.Exit(1)
     }
-  } else if os.Args[1] == "install" {
+  } else if os.Args[1] == "install" || os.Args[1] == "get" {
     fmt.Println("Package " + packagename + " is already installed!")
     os.Exit(1)
   }
 
-  if os.Args[1] == "remove" {
+  if os.Args[1] == "remove" || os.Args[1] == "uninstall" {
     os.RemoveAll("./pkg_data/" + packagename)
     os.Exit(0)
   }

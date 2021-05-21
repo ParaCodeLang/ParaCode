@@ -1,8 +1,5 @@
 #!/bin/python3
 
-# go build -o PCPM -ldflags "-s -w" main.go
-
-
 import os
 from ParaCode import ParaCode
 from parse.parser import Parser

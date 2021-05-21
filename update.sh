@@ -78,6 +78,8 @@ rm ParaCodeInstaller.iss
 rm shell.py
 rm shellTemplate.py
 rm util.py
+rm main.go
+rm PCPM
 rm update.sh
 
 wget "http://github.com/DaRubyMiner360/ParaCode/archive/rewrite.zip" -O temp.zip
