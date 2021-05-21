@@ -1,29 +1,29 @@
 ### Packages
 
-Sometimes you will want to use code from 
-external API's or packages.
-
-The package manager is very incomplete, 
-and has room for much improvement. However, 
-certain packages can be installed without the
-use of PCPM.
+You might want to use an external package
+to expand upon the ParaCode codebase.
 
 Let's get started by showing how to install
-FileEssentials.
+a package.
 
-Start by by running this:
-
+You can install a package with:
 ```shell
-rm FileEssentials/* .
-rm FileEssentials/.* .
-rmdir FileEssentials
+./PCPM install PACKAGENAME
+```
+You can also use `get` instead of `install`.
 
-wget "http://github.com/DaRubyMiner360/FileEssentials/archive/ParaCode-Rewrite.zip" -O temp.zip
-unzip temp.zip
-rm temp.zip
-
-mv FileEssentials-ParaCode-Rewrite/* .
-mv FileEssentials-ParaCode-Rewrite/.* .
+You can update an installed package with:
+```shell
+./PCPM update PACKAGENAME
 ```
 
-Now, read through the FileEssentials README.
+You can uninstall a package with:
+```shell
+./PCPM uninstall PACKAGENAME
+```
+You can also use `remove` instead of `uninstall`.
+
+You can publish a package with:
+```shell
+./PCPM publish PACKAGENAME VERSION
+```
