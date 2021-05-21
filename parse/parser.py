@@ -140,8 +140,16 @@ class Parser():
               fp.close()
               return None
         except FileNotFoundError:
-            self.error('source file \'{}\' does not exist'.format(filename))
-            return None
+            filename2 = "pkg_data/" + filename
+            try:
+                fp = open(filename2, 'r')
+                if not filename2.endswith(".para") and not filename2.endswith(".para/") and not filename2.endswith(".paracode") and not filename2.endswith(".paracode/"):
+                    self.error('source file \'{}\'s file extension (\'{}\') is not a valid ParaCode extension'.format(filename, "." + filename.split(".")[-1]))
+                fp.close()
+                return None
+            except FileNotFoundError:
+                self.error('source file \'{}\' does not exist'.format(filename))
+                return None
                 
         data = fp.read()
         
