@@ -65,7 +65,7 @@ Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(
 [Registry]
 Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"; ValueType: expandsz; ValueName: "Path"; ValueData: "{olddata};{app}"
 
-; Add 'Open In ParaCode Shell' menu item to the Shell menu for PDF files:
+; Add 'Open In ParaCode Shell' menu item to the Shell menu for .para files:
 Root: "HKCR"; Subkey: "SystemFileAssociations\.para\shell\Open In ParaCode Shell"; ValueType: none; ValueName: ""; ValueData: "ParaCode Source File"; Flags: uninsdeletekey
 ; Specify icon for the menu item:
 Root: "HKCR"; Subkey: "SystemFileAssociations\.para\shell\Open In ParaCode Shell"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\icon.ico"; Flags: uninsdeletekey
@@ -76,7 +76,7 @@ Root: "HKCR"; Subkey: "SystemFileAssociations\.para\shell\Open In ParaCode Shell
 Root: "HKCR"; Subkey: "SystemFileAssociations\.para\shell\Open In ParaCode Shell\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}""  ""RUN(%1)"""; Flags: uninsdeletekey
 
 
-; Add 'Open In ParaCode Shell' menu item to the Shell menu for PDF files:
+; Add 'Open In ParaCode Shell' menu item to the Shell menu for .paracode files:
 Root: "HKCR"; Subkey: "SystemFileAssociations\.paracode\shell\Open In ParaCode Shell"; ValueType: none; ValueName: ""; ValueData: "ParaCode Source File"; Flags: uninsdeletekey
 ; Specify icon for the menu item:
 Root: "HKCR"; Subkey: "SystemFileAssociations\.paracode\shell\Open In ParaCode Shell"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\icon.ico"; Flags: uninsdeletekey

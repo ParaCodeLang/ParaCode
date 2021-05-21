@@ -79,30 +79,20 @@ rm shell.py
 rm shellTemplate.py
 rm util.py
 rm update.sh
+
 wget "http://github.com/DaRubyMiner360/ParaCode/archive/rewrite.zip" -O temp.zip
 unzip temp.zip
 rm temp.zip
+
 rm ParaCode-rewrite/.replit
 mv ParaCode-rewrite/* .
 mv ParaCode-rewrite/.* .
-rm ParaCode-rewrite/discord/core/*
-rmdir ParaCode-rewrite/discord/core/*
-rmdir ParaCode-rewrite/discord/core
-rm ParaCode-rewrite/discord/*
-rmdir ParaCode-rewrite/discord/*
-rmdir ParaCode-rewrite/discord
-rm ParaCode-rewrite/packages/*/*/*/*/*/*
-rm ParaCode-rewrite/packages/*/*/*/*/*
-rmdir ParaCode-rewrite/packages/*/*/*/*/*
-rm ParaCode-rewrite/packages/*/*/*/*
-rmdir ParaCode-rewrite/packages/*/*/*/*
-rm ParaCode-rewrite/packages/*/*/*
-rmdir ParaCode-rewrite/packages/*/*/*
-rm ParaCode-rewrite/packages/*/*
-rmdir ParaCode-rewrite/packages/*/*
-rm ParaCode-rewrite/packages/*
-rmdir ParaCode-rewrite/packages/*
-rmdir ParaCode-rewrite/packages
+rm ParaCode-rewrite/WIP/discord/core/*
+rmdir ParaCode-rewrite/WIP/discord/core/*
+rmdir ParaCode-rewrite/WIP/discord/core
+rm ParaCode-rewrite/WIP/discord/*
+rmdir ParaCode-rewrite/WIP/discord/*
+rmdir ParaCode-rewrite/WIP/discord
 rm ParaCode-rewrite/__pycache__/*
 rmdir ParaCode-rewrite/__pycache__/*
 rmdir ParaCode-rewrite/__pycache__

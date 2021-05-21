@@ -4,4 +4,3 @@ class LogColor():
     Warning = "\033[33m"
     Info = "\033[34m"
     Bold = "\033[1m"
-
