@@ -46,7 +46,13 @@ Later I plan to rewrite ParaCode in C/C++ for better speed, efficiency. I plan t
 
 [strings](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/string.para)
 
+[patching](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/patching.para)
+
+[operator overloading](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/operator_overloading.para)
+
 [tic tac toe](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/ttt.para)
+
+[pythagorean theorem calculator](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/pythagorean.para)
 
 Be sure to check out our TicTacToe example!
 Start the REPL by running `main.py` and call `tictactoe();` to try it out!
