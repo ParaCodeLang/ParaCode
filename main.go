@@ -11,6 +11,7 @@ import (
   "strings"
   "strconv"
   "bytes"
+  "path/filepath"
 )
 
 func later_version(a string, b string) string {
@@ -58,12 +59,25 @@ func main() {
       "version": os.Args[3],
     }
 
-    files, _ := ioutil.ReadDir("./" + packagename)
+    filepath.Walk("./" + packagename, func(path string, info os.FileInfo, err error) error {
+      if !info.IsDir() {
+        path = strings.Replace(path, packagename + "/", "", 1)
 
-    for _, f := range files {
-      dat, _ := ioutil.ReadFile("./" + packagename + "/" + f.Name())
-      jsonmap["_" + f.Name()] = string(dat)
-    }
+        dat, _ := ioutil.ReadFile("./" + packagename + "/" + path)
+        jsonmap["_" + path] = string(dat)
+      }
+      return nil
+    })
+    
+    // files, _ := ioutil.ReadDir("./" + packagename)
+    
+    // for _, f := range files {
+    //   if f.IsDir() {
+    //   } else {
+    //     dat, _ := ioutil.ReadFile("./" + packagename + "/" + f.Name())
+    //     jsonmap["_" + f.Name()] = string(dat)
+    //   }
+    // }
 
     requestBody, _ := json.Marshal(jsonmap)
 
