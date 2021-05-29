@@ -1,1 +1,1 @@
-run = "python3 main.py"
+run = "g++ main main.cpp ; ./main"
