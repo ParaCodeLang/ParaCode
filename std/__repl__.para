@@ -1,9 +1,9 @@
 // Handy Repl functions and variables
 
 func tictactoe() {
-  import "examples/ttt.para";
+    import "examples/ttt.para";
 
-  ttt.new().play();
+    ttt.new().play();
 }
 
 let sep_str = '\n' + (' ' * 22) + ('-' * 30) + '\n';

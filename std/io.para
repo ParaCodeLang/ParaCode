@@ -1,18 +1,16 @@
-let io = Type.extend({
-  evaluate
-});
-
-io.evaluate = Func.extend({
-    instance = {
-        func __call__(self, _args) {
-            let args = _args.from(1);
-            return __intern_eval__(*args);
-        }
-    }
-}).new();
-
 import "std/io/file.para";
 import "std/io/console.para";
+
+let io = Type.extend({
+    evaluate = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_eval__(*args);
+            }
+        }
+    }).new()
+});
 
 let print = Func.extend({
     instance = {

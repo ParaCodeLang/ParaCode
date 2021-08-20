@@ -29,7 +29,7 @@ Console.read = Func.extend({
         func __call__(self, _args) {
             let args = _args.from(1);
             for i in Range.new(0, args.len()) {
-              Console.write(args[i]);
+                Console.write(args[i]);
             }
             return __intern_console_input__();
         }
