@@ -1,21 +1,18 @@
 io.evaluate("import os\ntry:\n    import numpy\nexcept ImportError:\n    os.system('pip install numpy')");
 
 let NumPara: type = Type.extend({
-  instance = {
-  }
+    instance = {
+    }
 
-  //func __construct__(self) {
-  //}
+    func mean(_, arr: array) {
+        let result = __intern_numpara_mean__(arr);
 
-  func mean(_, arr: array) {
-    let result = __intern_numpara_mean__(arr);
+        return result;
+    }
 
-    return result;
-  }
+    func median(_, arr: array) {
+        let result = __intern_numpara_median__(arr);
 
-  func median(_, arr: array) {
-    let result = __intern_numpara_median__(arr);
-
-    return result;
-  }
+        return result;
+    }
 });

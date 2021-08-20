@@ -26,7 +26,7 @@ let Str = Array.extend({
         }
 
         func to_str(self) {
-          return self._value;
+            return self._value;
         }
     }
 
@@ -40,19 +40,19 @@ let Str = Array.extend({
 
     replace
 
-		func tolower(self) {
+	func tolower(self) {
         return __intern_str_tolower__(self._value);
     }
 
-		func toupper(self) {
+	func toupper(self) {
         return __intern_str_toupper__(self._value);
     }
     
     func __construct__(self, value) {
         self._value = value;
-				self.replace = intern_replace.new(self);
+        self.replace = intern_replace.new(self);
 
-				return self;
+        return self;
     }
 
     func clone(self) {
@@ -101,7 +101,7 @@ let Str = Array.extend({
         return value;
     }
 
-		func to_float(self) {
+	func to_float(self) {
         let len = self.len();
         
         if len <= 0 {
@@ -109,8 +109,8 @@ let Str = Array.extend({
         }
 
         let value = 0;
-				let svalue = "";
-				let dvalue = "";
+        let svalue = "";
+        let dvalue = "";
 
         let index = 0;
         
@@ -120,28 +120,28 @@ let Str = Array.extend({
             index += 1;
         }
         
-				while index != len {
-						if self[index] == '.' {
-							dvalue = self.replace(svalue + ".", "");
-							let div = "1";
-							let l = dvalue.len();
-							let i = 0;
-							while i != l {
-								div += "0";
-								i += 1;
-							}
-							value = svalue.to_int().to_float();
-							value = value + (dvalue.to_int().to_float() / div.to_int().to_float());
-							index = len;
-						}
-						else {
-            	svalue += self[index];
-							index += 1;
-						}
+        while index != len {
+            if self[index] == '.' {
+                dvalue = self.replace(svalue + ".", "");
+                let div = "1";
+                let l = dvalue.len();
+                let i = 0;
+                while i != l {
+                    div += "0";
+                    i += 1;
+                }
+                value = svalue.to_int().to_float();
+                value = value + (dvalue.to_int().to_float() / div.to_int().to_float());
+                index = len;
+            }
+            else {
+                svalue += self[index];
+                index += 1;
+            }
         }
-				if value == 0 {
-					value = svalue.to_int().to_float();
-				}
+        if value == 0 {
+            value = svalue.to_int().to_float();
+        }
         return value;
     }
 
@@ -158,56 +158,54 @@ let Str = Array.extend({
     func to_str(self) {
         return self.name;
     }
-    func format() {}
-});
+    
+    format = Func.extend({
+        instance = {
+            func __call__(self, args) {
+                let str = args[0];
 
-
-Str.format = Func.extend({
-    instance = {
-        func __call__(self, args) {
-            let str = args[0];
-
-            let newstr = "";
-            let length = str.len();
-            let index = 0;
-            let argidx = 1;
-            while index != length {
-                if str[index] == '%' {
-                    newstr += (args[argidx]);
-                    argidx += 1;
+                let newstr = "";
+                let length = str.len();
+                let index = 0;
+                let argidx = 1;
+                while index != length {
+                    if str[index] == '%' {
+                        newstr += (args[argidx]);
+                        argidx += 1;
+                    }
+                    else {
+                        newstr += str[index];
+                    }
+                    index += 1;
                 }
-                else {
-                    newstr += str[index];
-                }
-                index += 1;
+                return newstr;
             }
-            return newstr;
         }
-    }
-}).new();
+    }).new()
+});
 
 let intern_replace = Func.extend({
   	instance = {
-				value
+		value
 
   	  	func __call__(self, _args) {
   	  	  	let args = _args.from(1);
   	  	  	let toReplace = args[0];
-						let replaceWith = args[1];
+			let replaceWith = args[1];
   	  	  	if args.len() > 2 {
   	  	  	  	let amount = args[2];
-								return __intern_str_replace__(self.value._value, toReplace._value, replaceWith._value, amount);
+                return __intern_str_replace__(self.value._value, toReplace._value, replaceWith._value, amount);
   	  	  	}
-						else {
-								return __intern_str_replace__(self.value._value, toReplace._value, replaceWith._value);
-						}
-						return self.value;
+            else {
+                return __intern_str_replace__(self.value._value, toReplace._value, replaceWith._value);
+            }
+            return self.value;
   	  	}
   	}
 
-		func __construct__(self, value) {
-				self.value = value;
+    func __construct__(self, value) {
+        self.value = value;
 
-				return self;
-		}
+        return self;
+    }
 });

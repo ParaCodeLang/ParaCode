@@ -1,68 +1,67 @@
 macro match(expr, block) {
-  let cases = [];
+    let cases = [];
 
-  let _ = Type.extend({
-    func __lt__(self, other) {
-      return ['<', other];
+    let _ = Type.extend({
+        func __lt__(self, other) {
+            return ['<', other];
+        }
+
+        func __lte__(self, other) {
+            return ['<=', other];
+        }
+
+        func __gt__(self, other) {
+            return ['>', other];
+        }
+
+        func __gte__(self, other) {
+            return ['>=', other];
+        }
+
+        func __eql__(self, other) {
+            return ['==', other];
+        }
+
+        func __noteql__(self, other) {
+            return ['!=', other];
+        }
+    });
+
+    macro when(ary: Array, block) {
+        let tok: str = ary[0];
+        let val = ary[1];
+        cases.append([tok, val, block]);
     }
 
-    func __lte__(self, other) {
-      return ['<=', other];
+    // Yield execution to the given block
+    block();
+
+    mixin {
+        for ary in cases {
+            let tok = ary[0][0];
+            let val = ary[0][1];
+            let blk = ary[1];
+
+            let cond: bool = false;
+
+            if tok == '<' {
+                cond = expr < val;
+            } elif tok == '<=' {
+                cond = expr <= val;
+            } elif tok == '>' {
+                cond = expr > val;
+            } elif tok == '>=' {
+                cond = expr >= val;
+            } elif tok == '==' {
+                cond = expr == val;
+            } elif tok == '!=' {
+                cond = expr != val;
+            }
+
+            if cond {
+                // Condition satisfied, pass execution to block
+                blk();
+            }
+        }
     }
-
-    func __gt__(self, other) {
-      return ['>', other];
-    }
-
-    func __gte__(self, other) {
-      return ['>=', other];
-    }
-
-    func __eql__(self, other) {
-      return ['==', other];
-    }
-
-    func __noteql__(self, other) {
-      return ['!=', other];
-    }
-
-  });
-
-  macro when(ary: Array, block) {
-    let tok: str = ary[0];
-    let val = ary[1];
-    cases.append([tok, val, block]);
-  }
-
-  // yield execution to the given block
-  block();
-
-  mixin {
-    for ary in cases {
-      let tok = ary[0][0];
-      let val = ary[0][1];
-      let blk = ary[1];
-
-      let cond: bool = false;
-
-      if tok == '<' {
-        cond = expr < val;
-      } elif tok == '<=' {
-        cond = expr <= val;
-      } elif tok == '>' {
-        cond = expr > val;
-      } elif tok == '>=' {
-        cond = expr >= val;
-      } elif tok == '==' {
-        cond = expr == val;
-      } elif tok == '!=' {
-        cond = expr != val;
-      }
-
-      if cond {
-        // condition satisfied, pass execution to block
-        blk();
-      }
-    }
-  }
 }

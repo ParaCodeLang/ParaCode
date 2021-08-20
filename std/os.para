@@ -1,45 +1,165 @@
 let os = Type.extend({
-  clear
-  quit
-  exit
-  system
-	args
+    args = __intern_os_args__()
+    name = __intern_os_name__()
+    
+    clear = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_clear__(*args);
+            }
+        }
+    }).new()
+    
+    quit = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_quit__(*args);
+            }
+        }
+    }).new()
+
+    exit = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_exit__(*args);
+            }
+        }
+    }).new()
+
+    system = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_os_system__(*args);
+            }
+        }
+    }).new()
+    
+    getenv = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_os_getenv__(*args);
+            }
+        }
+    }).new()
+    
+    putenv = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_os_putenv__(*args);
+            }
+        }
+    }).new()
+    
+    chdir = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_os_chdir__(*args);
+            }
+        }
+    }).new()
+    
+    getcwd = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                return __intern_os_getcwd__();
+            }
+        }
+    }).new()
+    
+    listdir = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_os_listdir__(*args);
+            }
+        }
+    }).new()
+
+    mkdir = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_os_mkdir__(*args);
+            }
+        }
+    }).new()
+
+    makedirs = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_os_makedirs__(*args);
+            }
+        }
+    }).new()
+
+    remove = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_os_remove__(*args);
+            }
+        }
+    }).new()
+
+    removedirs = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_os_removedirs__(*args);
+            }
+        }
+    }).new()
+
+    rename = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_os_rename__(*args);
+            }
+        }
+    }).new()
+
+    renames = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_os_renames__(*args);
+            }
+        }
+    }).new()
+
+    replace = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_os_replace__(*args);
+            }
+        }
+    }).new()
+
+    rmdir = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_os_rmdir__(*args);
+            }
+        }
+    }).new()
+
+    scandir = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_os_scandir__(*args);
+            }
+        }
+    }).new()
 });
-
-os.args = __intern_os_args__();
-
-os.clear = Func.extend({
-    instance = {
-        func __call__(self, _args) {
-            let args = _args.from(1);
-            return __intern_clear__(*args);
-        }
-    }
-}).new();
-
-os.quit = Func.extend({
-    instance = {
-        func __call__(self, _args) {
-            let args = _args.from(1);
-            return __intern_quit__(*args);
-        }
-    }
-}).new();
-
-os.exit = Func.extend({
-    instance = {
-        func __call__(self, _args) {
-            let args = _args.from(1);
-            return __intern_sysexit__(*args);
-        }
-    }
-}).new();
-
-os.system = Func.extend({
-    instance = {
-        func __call__(self, _args) {
-            let args = _args.from(1);
-            return __intern_os_system__(*args);
-        }
-    }
-}).new();

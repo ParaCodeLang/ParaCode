@@ -9,15 +9,15 @@ let Bool = Num.extend({
     }
 
     func _invert(self, value) {
-      return value.__not__();
+        return value.__not__();
     }
 
     func __bool__(self) {
-      return self._value;
+        return self._value;
     }
 
     func __not__(self) {
-      return self._value.__not__();
+        return self._value.__not__();
     }
     
     func __construct__(self, value) {

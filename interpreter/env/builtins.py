@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import base64
 
 from interpreter.typing.basic_type import BasicType
 from interpreter.basic_object import BasicObject
@@ -280,6 +281,224 @@ def builtin_str_toupper(arguments):
 
     value = str(arguments.arguments[0].extract_value())
     result = value.upper()
+    
+    return BasicValue(result)
+
+def builtin_base64_b64encode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.b64encode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_b64decode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.b64decode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_standard_b64encode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.standard_b64encode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_standard_b64decode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.standard_b64decode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_urlsafe_b64encode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.urlsafe_b64encode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_urlsafe_b64decode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.urlsafe_b64decode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_b32encode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.b32encode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_b32decode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.b32decode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_b16encode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.b16encode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_b16decode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.b16decode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_a85encode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.a85encode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_a85decode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.a85decode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_b85encode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.b85encode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_b85decode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.b85decode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_a64encode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.a64encode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_a64decode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.a64decode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_a32encode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.a32encode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_a32decode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.a32decode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_a16encode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.a16encode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_a16decode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.a16decode(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_encodebytes(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.encodebytes(value)
+    
+    return BasicValue(result)
+
+def builtin_base64_decodebytes(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = base64.decodebytes(value)
+    
+    return BasicValue(result)
+
+def builtin_str_base64_encode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    encoding = str(arguments.arguments[1].extract_value())
+    result = value.encode(encoding)
+    
+    return BasicValue(result)
+
+def builtin_str_base64_decode(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    encoding = str(arguments.arguments[1].extract_value())
+    result = value.decode(encoding)
     
     return BasicValue(result)
 
@@ -1397,6 +1616,67 @@ def builtin_scipara_getversion(arguments):
 
 def builtin_os_args(arguments):
     return BasicValue(sys.argv)
+
+def builtin_os_name(arguments):
+    return BasicValue(os.name)
+
+def builtin_os_getenv(arguments):
+    if len(arguments.arguments) > 1:
+        return BasicValue(os.getenv(str(arguments.arguments[0]), str(arguments.arguments[1])))
+    return BasicValue(os.getenv(str(arguments.arguments[0])))
+
+def builtin_os_putenv(arguments):
+    os.putenv(str(arguments.arguments[0]), str(arguments.arguments[1]))
+    return BasicValue(None)
+
+def builtin_os_chdir(arguments):
+    os.chdir(str(arguments.arguments[0]))
+    return BasicValue(None)
+
+def builtin_os_getcwd(arguments):
+    return BasicValue(os.getcwd())
+
+def builtin_os_listdir(arguments):
+    if len(arguments.arguments) > 0:
+        return BasicValue(os.listdir(str(arguments.arguments[0])))
+    return BasicValue(os.listdir())
+
+def builtin_os_mkdir(arguments):
+    os.mkdir(str(arguments.arguments[0]))
+    return BasicValue(None)
+
+def builtin_os_makedirs(arguments):
+    os.makedirs(str(arguments.arguments[0]))
+    return BasicValue(None)
+    
+def builtin_os_remove(arguments):
+    os.remove(str(arguments.arguments[0]))
+    return BasicValue(None)
+
+def builtin_os_removedirs(arguments):
+    os.removedirs(str(arguments.arguments[0]))
+    return BasicValue(None)
+
+def builtin_os_rename(arguments):
+    os.rename(str(arguments.arguments[0]), str(arguments.arguments[1]))
+    return BasicValue(None)
+
+def builtin_os_renames(arguments):
+    os.renames(str(arguments.arguments[0]), str(arguments.arguments[1]))
+    return BasicValue(None)
+
+def builtin_os_replace(arguments):
+    os.replace(str(arguments.arguments[0]), str(arguments.arguments[1]))
+    return BasicValue(None)
+
+def builtin_os_rmdir(arguments):
+    os.rmdir(str(arguments.arguments[0]))
+    return BasicValue(None)
+
+def builtin_os_scandir(arguments):
+    if len(arguments.arguments) > 0:
+        return BasicValue(os.scandir(str(arguments.arguments[0])))
+    return BasicValue(os.scandir())
 
 def builtin_clear(arguments):
     # Windows
