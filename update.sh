@@ -21,7 +21,7 @@ rm temp.zip
 rm ParaCode-rewrite/.replit
 mv ParaCode-rewrite/* .
 mv ParaCode-rewrite/.* .
-rm -f ParaCode-rewrite
+rmdir -f ParaCode-rewrite
 
 
 
