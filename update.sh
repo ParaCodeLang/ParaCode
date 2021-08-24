@@ -18,6 +18,8 @@ wget "http://github.com/DaRubyMiner360/ParaCode/archive/rewrite.zip" -O temp.zip
 unzip temp.zip
 rm temp.zip
 
+rm ParaCode-rewrite/README.md
+rm ParaCode-rewrite/LICENSE
 rm ParaCode-rewrite/.replit
 mv ParaCode-rewrite/* .
 mv ParaCode-rewrite/.* .
