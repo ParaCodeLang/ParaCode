@@ -50,7 +50,7 @@ let Array = Iterable.extend({
                 item = self[index];
 
                 if value.find(item) != -1 {
-                res_array.append(item);
+                    res_array.append(item);
                 }
 
                 remaining -= 1;

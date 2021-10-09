@@ -1,0 +1,13 @@
+let ArgumentError = Exception.extend({
+    name = 'ArgumentError'
+
+    instance = {
+        func raise(self) {
+            return raise(self, "Argument Error");
+        }
+    }
+
+    func __construct__(self, _message) {
+        self.message = _message;
+    }
+});

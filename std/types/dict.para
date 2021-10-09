@@ -5,98 +5,97 @@ let Dict = Iterable.extend({
         _value = [[], []]
 
         func __at__(self, index) {
-        let result = self.atkey(index);
+            let result = self.atkey(index);
 
-        return result;
+            return result;
         }
+        
         func __add__(self, value) {
-        return self.append(value);
+            return self.append(value);
         }
 
         func __bitor__(self, value) {
-        let res_dictionary = self.clone();
+            let res_dictionary = self.clone();
 
-        let remaining = value.len();
-        let len = value.len();
+            let remaining = value.len();
+            let len = value.len();
 
-        let index;
-        let item;
+            let index;
+            let item;
 
-        while remaining != 0 {
-            index = len - remaining;
-            item = value[index];
+            while remaining != 0 {
+                index = len - remaining;
+                item = value._value[index];
 
-            if res_dictionary._value[0].find(item[0]) == -1 && res_dictionary._value[1].find(item[1]) == -1 {
-            print(item);
-            print(item.len());
-            res_dictionary.append(item);
+                if res_dictionary._value[0].find(item[0]) == -1 && res_dictionary._value[1].find(item[1]) == -1 {
+                    res_dictionary.append(item);
+                }
+
+                remaining -= 1;
             }
 
-            remaining -= 1;
-        }
-
-        return res_dictionary;
+            return res_dictionary;
         }
 
         func __bitand__(self, value) {
-        let res_dictionary = Dictionary.new([], []);
+            let res_dictionary = Dictionary.new([], []);
 
-        let remaining = self.len();
-        let len = self.len();
+            let remaining = self.len();
+            let len = self.len();
 
-        let index;
-        let key;
-        let dictValue;
+            let index;
+            let key;
+            let dictValue;
 
-        while remaining != 0 {
-            index = len - remaining;
-            key = self._value[0][index];
-            dictValue = self._value[1][index];
+            while remaining != 0 {
+                index = len - remaining;
+                key = self._value[0][index];
+                dictValue = self._value[1][index];
 
-            if value[0].find(key) != -1 && value[1].find(dictValue) != -1 && value[0].find(key) == value[1].find(dictValue) {
-            res_dictionary.append([key, value]);
+                if value._value[0].find(key) != -1 && value._value[1].find(dictValue) != -1 && value._value[0].find(key) == value._value[1].find(dictValue) {
+                    res_dictionary.append([key, value]);
+                }
+
+                remaining -= 1;
             }
 
-            remaining -= 1;
-        }
-
-        return res_dictionary;
+            return res_dictionary;
         }
 
         func __iterate__(self, cb: Func) {
-        let remaining = self.len();
-        let len = self.len();
+            let remaining = self.len();
+            let len = self.len();
 
-        while remaining != 0 {
-            let index = len - remaining;
+            while remaining != 0 {
+                let index = len - remaining;
 
-            cb([self._value[0][index], self._value[1][index]]);
+                cb([self._value[0][index], self._value[1][index]]);
 
-            remaining -= 1;
-        }
-        }
-
-        func to_str(self) {
-        let str_result = '{';
-
-        for index in Range.new(0, self.len()) {
-            let key = self._value[0][index];
-            let value = self._value[1][index];
-
-            if value.type() == Str { str_result += "'"; }
-            str_result += key.to_str();
-            if value.type() == Str { str_result += "': '"; } else { str_result += ": "; }
-            str_result += value.to_str();
-            if value.type() == Str { str_result += "'"; }
-
-            if index != (self.len() - 1) { // Precendence is whack
-            str_result += ", ";
+                remaining -= 1;
             }
         }
 
-        str_result += '}';
+        func to_str(self) {
+            let str_result = '{';
 
-        return str_result;
+            for index in Range.new(0, self.len()) {
+                let key = self._value[0][index];
+                let value = self._value[1][index];
+
+                if value.type() == Str { str_result += "'"; }
+                str_result += key.to_str();
+                if value.type() == Str { str_result += "': '"; } else { str_result += ": "; }
+                str_result += value.to_str();
+                if value.type() == Str { str_result += "'"; }
+
+                if index != (self.len() - 1) { // Precendence is whack
+                    str_result += ", ";
+                }
+            }
+
+            str_result += '}';
+
+            return str_result;
         }
 
         func from(self, index) {
@@ -119,8 +118,7 @@ let Dict = Iterable.extend({
 
     // Constructor
     func __construct__(self, keys, values) {
-        self._value[0] = keys;
-        self._value[1] = values;
+        self._value = [keys, values];
     }
 
     func setOrAppend(self, key, value) {
@@ -162,17 +160,17 @@ let Dict = Iterable.extend({
         let resultIndex = -1;
 
         for i in Range.new(0, self.len()) {
-        if self._value[0][i] == aindex {
-            resultIndex = i;
-        }
-        else {
-            if i == self.len() - 1 && resultIndex == -1 {
-            let intIndex = self.len() - 1;
-            if intIndex != -1 {
-                resultIndex = intIndex;
+            if self._value[0][i] == aindex {
+                resultIndex = i;
             }
+            else {
+                if i == self.len() - 1 && resultIndex == -1 {
+                    let intIndex = self.len() - 1;
+                    if intIndex != -1 {
+                        resultIndex = intIndex;
+                    }
+                }
             }
-        }
         }
 
         return resultIndex;

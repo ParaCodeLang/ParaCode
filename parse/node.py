@@ -17,13 +17,14 @@ class NodeType(Enum):
     While    = auto()
     For      = auto()
     IfStatement  = auto()
+    Try  = auto()
     ArgumentList = auto()
     SplatArgument = auto()
     FunctionReturn     = auto()
     FunctionExpression = auto()
     Macro = auto()
     Mixin = auto()
-    ArrayExpression   = auto()
+    ArrayExpression  = auto()
     ObjectExpression = auto()
     MemberExpression = auto()
     ArrayAccessExpression = auto()
@@ -150,6 +151,16 @@ class NodeIfStatement(AstNode):
         self.expr = expr
         self.block = block
         self.else_block = else_block
+
+class NodeTryCatch(AstNode):
+    def __init__(self, block, catch_block, expr, else_block, finally_block, token, variable):
+        AstNode.__init__(self, NodeType.Try, token)
+        self.block = block
+        self.catch_block = catch_block
+        self.expr = expr
+        self.else_block = else_block
+        self.finally_block = finally_block
+        self.variable = variable
 
 class NodeArgumentList(AstNode):
     def __init__(self, arguments, token):

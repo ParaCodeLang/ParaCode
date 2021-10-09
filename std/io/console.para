@@ -1,16 +1,14 @@
 let Console: type = Type.extend({
     DEFAULT = 0
-    RED    = 1
-    YELLOW = 2
-    BLUE   = 3
-    BOLD   = 4
+    RED     = 1
+    YELLOW  = 2
+    BLUE    = 3
+    BOLD    = 4
 
     instance = {
     }
     
-    func write(_, line) {
-        __intern_console_write__(line);
-    }
+    write
     
     func color(_, num) {
         __intern_print_color__(num);
@@ -23,6 +21,15 @@ let Console: type = Type.extend({
     }
     read
 });
+
+Console.write = Func.extend({
+    instance = {
+        func __call__(self, _args) {
+            let args = _args.from(1);
+            __intern_console_write__(*args);
+        }
+    }
+}).new();
 
 Console.read = Func.extend({
     instance = {

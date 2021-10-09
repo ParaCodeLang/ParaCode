@@ -19,6 +19,10 @@ let Bool = Num.extend({
     func __not__(self) {
         return self._value.__not__();
     }
+
+    func __bitnot__(self) {
+        return self._value.__bitnot__();
+    }
     
     func __construct__(self, value) {
         self._value = self._invert(self._invert(value));

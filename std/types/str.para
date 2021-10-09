@@ -47,6 +47,10 @@ let Str = Array.extend({
 	func toupper(self) {
         return __intern_str_toupper__(self._value);
     }
+
+    func totitle(self) {
+        return __intern_str_totitle__(self._value);
+    }
     
     func __construct__(self, value) {
         self._value = value;

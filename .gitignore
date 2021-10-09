@@ -7,5 +7,4 @@
 /dist/
 *.bat
 *.spec
-preferences.toml
 .env

@@ -46,14 +46,50 @@ class Globals:
             ('Object', VariableType.Type, self.basic_object),
             ('Func', VariableType.Type, self.func_type),
             ('__intern_object_patch__', VariableType.Function, BuiltinFunction("__intern_object_patch__", None, builtin_object_patch)),
+            ('__intern_math_e__', VariableType.Function, BuiltinFunction("__intern_math_e__", None, builtin_math_e)),
+            ('__intern_math_inf__', VariableType.Function, BuiltinFunction("__intern_math_inf__", None, builtin_math_inf)),
+            ('__intern_math_nan__', VariableType.Function, BuiltinFunction("__intern_math_nan__", None, builtin_math_nan)),
+            ('__intern_math_pi__', VariableType.Function, BuiltinFunction("__intern_math_pi__", None, builtin_math_pi)),
+            ('__intern_math_tau__', VariableType.Function, BuiltinFunction("__intern_math_tau__", None, builtin_math_tau)),
             ('__intern_math_max__', VariableType.Function, BuiltinFunction("__intern_math_max__", None, builtin_math_max)),
             ('__intern_math_min__', VariableType.Function, BuiltinFunction("__intern_math_min__", None, builtin_math_min)),
+            ('__intern_math_degrees__', VariableType.Function, BuiltinFunction("__intern_math_degrees__", None, builtin_math_degrees)),
+            ('__intern_math_dist__', VariableType.Function, BuiltinFunction("__intern_math_dist__", None, builtin_math_dist)),
+            ('__intern_math_erf__', VariableType.Function, BuiltinFunction("__intern_math_erf__", None, builtin_math_erf)),
+            ('__intern_math_erfc__', VariableType.Function, BuiltinFunction("__intern_math_erfc__", None, builtin_math_erfc)),
+            ('__intern_math_exp__', VariableType.Function, BuiltinFunction("__intern_math_exp__", None, builtin_math_exp)),
+            ('__intern_math_factorial__', VariableType.Function, BuiltinFunction("__intern_math_factorial__", None, builtin_math_factorial)),
+            ('__intern_math_floor__', VariableType.Function, BuiltinFunction("__intern_math_floor__", None, builtin_math_floor)),
+            ('__intern_math_fmod__', VariableType.Function, BuiltinFunction("__intern_math_fmod__", None, builtin_math_fmod)),
+            ('__intern_math_frexp__', VariableType.Function, BuiltinFunction("__intern_math_frexp__", None, builtin_math_frexp)),
+            ('__intern_math_fsum__', VariableType.Function, BuiltinFunction("__intern_math_fsum__", None, builtin_math_fsum)),
+            ('__intern_math_gamma__', VariableType.Function, BuiltinFunction("__intern_math_gamma__", None, builtin_math_gamma)),
+            ('__intern_math_gcd__', VariableType.Function, BuiltinFunction("__intern_math_gcd__", None, builtin_math_gcd)),
+            ('__intern_math_hypot__', VariableType.Function, BuiltinFunction("__intern_math_hypot__", None, builtin_math_hypot)),
+            ('__intern_math_isclose__', VariableType.Function, BuiltinFunction("__intern_math_isclose__", None, builtin_math_isclose)),
+            ('__intern_math_isfinite__', VariableType.Function, BuiltinFunction("__intern_math_isfinite__", None, builtin_math_isfinite)),
+            ('__intern_math_isinf__', VariableType.Function, BuiltinFunction("__intern_math_isinf__", None, builtin_math_isinf)),
+            ('__intern_math_isnan__', VariableType.Function, BuiltinFunction("__intern_math_isnan__", None, builtin_math_isnan)),
+            ('__intern_math_isqrt__', VariableType.Function, BuiltinFunction("__intern_math_isqrt__", None, builtin_math_isqrt)),
+            ('__intern_math_ldexp__', VariableType.Function, BuiltinFunction("__intern_math_ldexp__", None, builtin_math_ldexp)),
+            ('__intern_math_lgamma__', VariableType.Function, BuiltinFunction("__intern_math_lgamma__", None, builtin_math_lgamma)),
+            ('__intern_math_log__', VariableType.Function, BuiltinFunction("__intern_math_log__", None, builtin_math_log)),
+            ('__intern_math_pow__', VariableType.Function, BuiltinFunction("__intern_math_pow__", None, builtin_math_pow)),
+            ('__intern_math_prod__', VariableType.Function, BuiltinFunction("__intern_math_prod__", None, builtin_math_prod)),
+            ('__intern_math_radians__', VariableType.Function, BuiltinFunction("__intern_math_radians__", None, builtin_math_radians)),
+            ('__intern_math_remainder__', VariableType.Function, BuiltinFunction("__intern_math_remainder__", None, builtin_math_remainder)),
+            ('__intern_math_sin__', VariableType.Function, BuiltinFunction("__intern_math_sin__", None, builtin_math_sin)),
+            ('__intern_math_sinh__', VariableType.Function, BuiltinFunction("__intern_math_sinh__", None, builtin_math_sinh)),
+            ('__intern_math_tan__', VariableType.Function, BuiltinFunction("__intern_math_tan__", None, builtin_math_tan)),
+            ('__intern_math_tanh__', VariableType.Function, BuiltinFunction("__intern_math_tanh__", None, builtin_math_tanh)),
+            ('__intern_math_trunc__', VariableType.Function, BuiltinFunction("__intern_math_trunc__", None, builtin_math_trunc)),
             ('__intern_print__', VariableType.Function, BuiltinFunction("__intern_print__", None, builtin_printn)),
             ('__intern_console_write__', VariableType.Function, BuiltinFunction("__intern_console_write__", None, builtin_console_write)),
             ('__intern_print_color__', VariableType.Function, BuiltinFunction("__intern_print_color__", None, builtin_print_color)),
             ('__intern_type_compare__', VariableType.Function, BuiltinFunction("__intern_type_compare__", None, builtin_type_compare)),
             ('__intern_default_compare__', VariableType.Function, BuiltinFunction("__intern_default_compare__", None, builtin_default_compare)),
             ('__intern_int_negate__', VariableType.Function, BuiltinFunction("__intern_int_negate__", None, builtin_int_negate)),
+            ('__intern_int_bitnot__', VariableType.Function, BuiltinFunction("__intern_int_bitnot__", None, builtin_int_bitnot)),
             ('__intern_varinfo__', VariableType.Function, BuiltinFunction("__intern_varinfo__", None, builtin_varinfo)),
             ('__intern_exit__', VariableType.Function, BuiltinFunction("__intern_exit__", None, builtin_exit)),
             ('__intern_to_int__', VariableType.Function, BuiltinFunction("__intern_to_int__", None, builtin_to_int)),
@@ -64,6 +100,15 @@ class Globals:
 			('__intern_str_replace__', VariableType.Function, BuiltinFunction("__intern_str_replace__", None, builtin_str_replace)),
 			('__intern_str_tolower__', VariableType.Function, BuiltinFunction("__intern_str_tolower__", None, builtin_str_tolower)),
 			('__intern_str_toupper__', VariableType.Function, BuiltinFunction("__intern_str_toupper__", None, builtin_str_toupper)),
+            ('__intern_str_totitle__', VariableType.Function, BuiltinFunction("__intern_str_totitle__", None, builtin_str_totitle)),
+
+            ('__intern_regex_search__', VariableType.Function, BuiltinFunction("__intern_regex_search__", None, builtin_regex_search)),
+            
+            ('__intern_regex_match_end__', VariableType.Function, BuiltinFunction("__intern_regex_match_end__", None, builtin_regex_match_end)),
+            ('__intern_regex_match_group__', VariableType.Function, BuiltinFunction("__intern_regex_match_group__", None, builtin_regex_match_group)),
+            ('__intern_regex_match_groupdict__', VariableType.Function, BuiltinFunction("__intern_regex_match_groupdict__", None, builtin_regex_match_groupdict)),
+            ('__intern_regex_match_start__', VariableType.Function, BuiltinFunction("__intern_regex_match_start__", None, builtin_regex_match_start)),
+            ('__intern_regex_match_groupdict__', VariableType.Function, BuiltinFunction("__intern_regex_match_groupdict__", None, builtin_regex_match_groups)),
 
             ('__intern_base64_b64encode__', VariableType.Function, BuiltinFunction("__intern_base64_b64encode__", None, builtin_base64_b64encode)),
             ('__intern_base64_b64decode__', VariableType.Function, BuiltinFunction("__intern_base64_b64decode__", None, builtin_base64_b64decode)),
@@ -81,7 +126,6 @@ class Globals:
             ('__intern_base64_b85decode__', VariableType.Function, BuiltinFunction("__intern_base64_b85decode__", None, builtin_base64_b85decode)),
             ('__intern_base64_encodebytes__', VariableType.Function, BuiltinFunction("__intern_base64_encodebytes__", None, builtin_base64_encodebytes)),
             ('__intern_base64_decodebytes__', VariableType.Function, BuiltinFunction("__intern_base64_decodebytes__", None, builtin_base64_decodebytes)),
-
             ('__intern_str_base64_encode__', VariableType.Function, BuiltinFunction("__intern_str_base64_encode__", None, builtin_str_base64_encode)),
             ('__intern_str_base64_decode__', VariableType.Function, BuiltinFunction("__intern_str_base64_decode__", None, builtin_str_base64_decode)),
             ('__intern_base64_a64encode__', VariableType.Function, BuiltinFunction("__intern_base64_a64encode__", None, builtin_base64_a64encode)),
@@ -90,6 +134,18 @@ class Globals:
             ('__intern_base64_a32decode__', VariableType.Function, BuiltinFunction("__intern_base64_a32decode__", None, builtin_base64_a32decode)),
             ('__intern_base64_a16encode__', VariableType.Function, BuiltinFunction("__intern_base64_a16encode__", None, builtin_base64_a16encode)),
             ('__intern_base64_a16decode__', VariableType.Function, BuiltinFunction("__intern_base64_a16decode__", None, builtin_base64_a16decode)),
+
+            ('__intern_cryptography_fernet_generate_key__', VariableType.Function, BuiltinFunction("__intern_cryptography_fernet_generate_key__", None, builtin_cryptography_fernet_generate_key)),
+            ('__intern_cryptography_fernet_encrypt__', VariableType.Function, BuiltinFunction("__intern_cryptography_fernet_encrypt__", None, builtin_cryptography_fernet_encrypt)),
+            ('__intern_cryptography_fernet_decrypt__', VariableType.Function, BuiltinFunction("__intern_cryptography_fernet_decrypt__", None, builtin_cryptography_fernet_decrypt)),
+
+            ('__intern_requests_get__', VariableType.Function, BuiltinFunction("__intern_requests_get__", None, builtin_requests_get)),
+            ('__intern_requests_post__', VariableType.Function, BuiltinFunction("__intern_requests_post__", None, builtin_requests_post)),
+            ('__intern_requests_put__', VariableType.Function, BuiltinFunction("__intern_requests_put__", None, builtin_requests_put)),
+            ('__intern_requests_head__', VariableType.Function, BuiltinFunction("__intern_requests_head__", None, builtin_requests_head)),
+            ('__intern_requests_delete__', VariableType.Function, BuiltinFunction("__intern_requests_delete__", None, builtin_requests_delete)),
+            ('__intern_requests_patch__', VariableType.Function, BuiltinFunction("__intern_requests_patch__", None, builtin_requests_patch)),
+            ('__intern_requests_request__', VariableType.Function, BuiltinFunction("__intern_requests_request__", None, builtin_requests_request)),
 
             ('__intern_eval__', VariableType.Function, BuiltinFunction("__intern_eval__", None, builtin_eval)),
 
@@ -271,22 +327,32 @@ class Globals:
             ('__intern_int_add__', VariableType.Function, BuiltinFunction("__intern_int_add__", None, builtin_int_add)),
             ('__intern_int_sub__', VariableType.Function, BuiltinFunction("__intern_int_sub__", None, builtin_int_sub)),
             ('__intern_int_mul__', VariableType.Function, BuiltinFunction("__intern_int_mul__", None, builtin_int_mul)),
+            ('__intern_int_expon__', VariableType.Function, BuiltinFunction("__intern_int_expon__", None, builtin_int_expon)),
             ('__intern_int_div__', VariableType.Function, BuiltinFunction("__intern_int_div__", None, builtin_int_div)),
             ('__intern_int_mod__', VariableType.Function, BuiltinFunction("__intern_int_mod__", None, builtin_int_mod)),
             ('__intern_int_bitor__', VariableType.Function, BuiltinFunction("__intern_int_bitor__", None, builtin_int_bitor)),
             ('__intern_int_bitand__', VariableType.Function, BuiltinFunction("__intern_int_bitand__", None, builtin_int_bitand)),
             ('__intern_int_bitxor__', VariableType.Function, BuiltinFunction("__intern_int_bitxor__", None, builtin_int_bitxor)),
+            ('__intern_int_bitshiftleft__', VariableType.Function, BuiltinFunction("__intern_int_bitshiftleft__", None, builtin_int_bitshiftleft)),
+            ('__intern_int_bitshiftright__', VariableType.Function, BuiltinFunction("__intern_int_bitshiftright__", None, builtin_int_bitshiftright)),
 
             ('__intern_float_add__', VariableType.Function, BuiltinFunction("__intern_float_add__", None, builtin_float_add)),
             ('__intern_float_sub__', VariableType.Function, BuiltinFunction("__intern_float_sub__", None, builtin_float_sub)),
             ('__intern_float_mul__', VariableType.Function, BuiltinFunction("__intern_float_mul__", None, builtin_float_mul)),
+            ('__intern_float_expon__', VariableType.Function, BuiltinFunction("__intern_float_expon__", None, builtin_float_expon)),
             ('__intern_float_div__', VariableType.Function, BuiltinFunction("__intern_float_div__", None, builtin_float_div)),
             ('__intern_float_mod__', VariableType.Function, BuiltinFunction("__intern_float_mod__", None, builtin_float_mod)),
+            ('__intern_float_bitshiftleft__', VariableType.Function, BuiltinFunction("__intern_float_bitshiftleft__", None, builtin_float_bitshiftleft)),
+            ('__intern_float_bitshiftright__', VariableType.Function, BuiltinFunction("__intern_float_bitshiftright__", None, builtin_float_bitshiftright)),
 
             ('__intern_time_sleep__', VariableType.Function, BuiltinFunction("__intern_time_sleep__", None, builtin_time_sleep)),
             ('__intern_time_now__',   VariableType.Function, BuiltinFunction("__intern_time_now__", None, builtin_time_now)),
 
-            ('__intern_macro_expand__', VariableType.Function, BuiltinFunction("__intern_macro_expand__", None, builtin_macro_expand))
+            ('__intern_exception_raise__', VariableType.Function, BuiltinFunction("__intern_exception_raise__", None, builtin_exception_raise)),
+
+            ('__intern_macro_expand__', VariableType.Function, BuiltinFunction("__intern_macro_expand__", None, builtin_macro_expand)),
+            
+            ('__intern_import_python__', VariableType.Function, BuiltinFunction("__intern_import_python__", None, lambda arguments, self=self : exec((("from " + str(arguments.arguments[0].extract_value()).replace(".py", "").replace("/", ".") + " import *;") if str(arguments.arguments[0].extract_value()).endswith(".py") else (str(arguments.arguments[0].extract_value()) + ";\n")) + "self.variables.append(('" + str(arguments.arguments[1].extract_value()) + "', VariableType.Function, BuiltinFunction('" + str(arguments.arguments[1].extract_value()) + "', None, " + (str(arguments.arguments[2].extract_value()) if len(arguments.arguments) > 2 else str(arguments.arguments[1].extract_value())) + "))); self.apply_to_scope(arguments.interpreter.current_scope);") or BasicValue(None)))
         ]
 
     def vartype_to_typeobject(self, vartype):
@@ -301,11 +367,12 @@ class Globals:
 
     def apply_to_scope(self, scope):
         for (name, vtype, value) in self.variables:
-            var_type = vtype
+            if name not in scope.variables:
+                var_type = vtype
 
-            type_object = self.vartype_to_typeobject(var_type)
+                type_object = self.vartype_to_typeobject(var_type)
 
-            scope.declare_variable(name, type_object)
+                scope.declare_variable(name, type_object)
 
-            var = scope.find_variable_value(name)
-            var.assign_value(value)
+                var = scope.find_variable_value(name)
+                var.assign_value(value)

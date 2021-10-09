@@ -3,7 +3,6 @@
 import os
 from ParaCode import ParaCode
 from parse.parser import Parser
-from examples.embed import example_embed
 
 import sys
 

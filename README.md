@@ -25,17 +25,21 @@ Later I plan to rewrite ParaCode in C/C++ for better speed, efficiency. I plan t
 
 [arrays](https://replit.com/@DaRubyMiner360/ParaCode-Rewrite#doc/40_arrays.md) - Array operations
 
+[dictionary](https://replit.com/@DaRubyMiner360/ParaCode-Rewrite#doc/41_dictionary.md) - Dictionary operations
+
 [iterators](https://replit.com/@DaRubyMiner360/ParaCode-Rewrite#doc/50_iterators.md) - Building custom iterator objects
 
 [random](https://replit.com/@DaRubyMiner360/ParaCode-Rewrite#doc/55_random.md) - Random number generation
 
 [modules](https://replit.com/@DaRubyMiner360/ParaCode-Rewrite#doc/60_modules.md) - Modules
 
+[packages](https://replit.com/@DaRubyMiner360/ParaCode-Rewrite#doc/61_packages.md) - Packages
+
 [console](https://replit.com/@DaRubyMiner360/ParaCode-Rewrite#doc/70_console.md) - Console input and output
 
 [files](https://replit.com/@DaRubyMiner360/ParaCode-Rewrite#doc/80_files.md) - File reading and writing
 
-[json](https://replit.com/@DaRubyMiner360/ParaCode-Rewrite#doc/81_json.md) - File reading and writing
+[json](https://replit.com/@DaRubyMiner360/ParaCode-Rewrite#doc/81_json.md) - JSON reading and writing
 
 
 ### Examples
@@ -54,6 +58,8 @@ Later I plan to rewrite ParaCode in C/C++ for better speed, efficiency. I plan t
 
 [pythagorean theorem calculator](https://replit.com/@DaRubyMiner360/ParaCode-Rewrite#examples/pythagorean.para)
 
+[rule110](https://replit.com/@DaRubyMiner360/ParaCode-Rewrite#examples/rule110.para)
+
 Be sure to check out our TicTacToe example!
 Start the REPL by running `main.py` and call `tictactoe();` to try it out!
 
@@ -62,3 +68,5 @@ To update ParaCode, run the `update.sh` file. On most operating systems this can
 sh update.sh
 ```
 Or, to install and update ParaCode, run everything from `update.sh`.
+
+You can find the [Changelog](https://replit.com/@DaRubyMiner360/ParaCode-Rewrite#CHANGELOG.md) here.

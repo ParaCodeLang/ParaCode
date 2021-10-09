@@ -1,6 +1,6 @@
 package main
 
-// go build -o PCPM -ldflags "-s -w" main.go
+// go build -o PCPM -ldflags "-s -w" main.go ; chmod +x PCPM
 
 import (
   "fmt"
@@ -20,8 +20,8 @@ func later_version(a string, b string) string {
   for i := range sa {
     ia, _ := strconv.Atoi(sa[i])
     ib, _ := strconv.Atoi(sb[i])
-    if(ia > ib){ return a }
-    if(ib > ia){ return b }
+    if (ia > ib) { return a }
+    if (ib > ia) { return b }
   }
   
   return a
@@ -35,19 +35,33 @@ func main() {
     os.Exit(1)
   }
 
-  if os.Args[1] != "install" && os.Args[1] != "get" && os.Args[1] != "update" && os.Args[1] != "remove" && os.Args[1] != "uninstall" && os.Args[1] != "publish" {
+  if os.Args[1] != "install" && os.Args[1] != "get" && os.Args[1] != "update" && os.Args[1] != "remove" && os.Args[1] != "uninstall" && os.Args[1] != "publish" && os.Args[1] != "list" {
     fmt.Println("Invalid option " + os.Args[1] + "!")
     os.Exit(1)
   }
 
   if os.Args[1] == "publish" {
     if len(os.Args) != 4 {
-      fmt.Println("Invalid number of arguments for command \"publish\"!")
+      fmt.Println("Invalid number of arguments for command 'publish'!")
       os.Exit(1)
     }
+  } else if os.Args[1] == "list" {
+      files, _ := ioutil.ReadDir("./pkg_data/")
+      any := false
+      for i, f := range files {
+        if f.IsDir() {
+          any = true
+          fmt.Println("Package " + fmt.Sprint(i + 1) + ": " + f.Name())
+        }
+      }
+      if !any {
+        fmt.Println("No packages are installed!")
+        os.Exit(1)
+      }
+      os.Exit(0)
   } else {
     if len(os.Args) != 3 {
-      fmt.Println("Invalid number of arguments for command \"" + os.Args[1] + "\"!")
+      fmt.Println("Invalid number of arguments for command '" + os.Args[1] + "'!")
       os.Exit(1)
     }
   }
@@ -122,6 +136,7 @@ func main() {
   resp, _ := http.Get("https://paracode-rewrite-cdn.darubyminer360.repl.co/package/" + packagename)
   if resp.StatusCode == 404 {
     fmt.Println("That package does not exist!")
+    os.Remove("./pkg_data/" + packagename)
     os.Exit(1)
   }
 

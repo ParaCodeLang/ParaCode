@@ -1,0 +1,38 @@
+let raise = Func.extend({
+    instance = {
+        func __call__(self, _args) {
+            let args = _args.from(1);
+            
+            let classnames = [];
+            let current = args[0].type();
+            while current != Exception {
+                classnames.append(current.to_str());
+                current = current.type();
+            }
+            classnames.append("Exception");
+            if args.len() > 1 {
+                return __intern_exception_raise__(args[1], args[0].message, classnames);
+            }
+            else {
+                return __intern_exception_raise__(args[0].type().name, args[0].message, classnames);
+            }
+        }
+    }
+}).new();
+
+
+let Exception = Type.extend({
+    name = 'Exception'
+
+    instance = {
+        message = ''
+
+        func raise(self) {
+            return raise(self);
+        }
+    }
+
+    func __construct__(self, _message) {
+        self.message = _message;
+    }
+});

@@ -1,0 +1,13 @@
+let TypeError = Exception.extend({
+    name = 'TypeError'
+
+    instance = {
+        func raise(self) {
+            return raise(self, "Type Error");
+        }
+    }
+
+    func __construct__(self, _message) {
+        self.message = _message;
+    }
+});

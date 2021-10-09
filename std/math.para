@@ -1,4 +1,10 @@
 let math = {
+    e = __intern_math_e__()
+    inf = __intern_math_inf__()
+    nan = __intern_math_nan__()
+    pi = __intern_math_pi__()
+    tau = __intern_math_tau__()
+    
     func max(_, a: num, b: num) {
         return __intern_math_max__(a, b);
     }
@@ -30,7 +36,141 @@ let math = {
         }
         return x2;
     }
+
     func sqrt(self, x) {
         return math.sqrtf(x.to_float());
+    }
+
+    func abs(self, x: num) {
+        let result = x;
+        if result < 0 {
+            result = -1 * result;
+        }
+        return result;
+    }
+
+    func degrees(_, x: num) {
+        return __intern_math_degrees__(x);
+    }
+    
+    func dist(_, x: num, y: num) {
+        return __intern_math_dist__(x, y);
+    }
+    
+    func erf(_, x: num) {
+        return __intern_math_erf__(x);
+    }
+    
+    func erfc(_, x: num) {
+        return __intern_math_erfc__(x);
+    }
+
+    func exp(_, x: num) {
+        return __intern_math_exp__(x);
+    }
+    
+    func factorial(_, x: num) {
+        return __intern_math_factorial__(x);
+    }
+    
+    func floor(_, x: num) {
+        return __intern_math_floor__(x);
+    }
+    
+    func fmod(_, x: num, y: num) {
+        return __intern_math_fmod__(x, y);
+    }
+    
+    func frexp(_, x: num) {
+        return __intern_math_frexp__(x);
+    }
+    
+    func fsum(_, x: iterable) {
+        return __intern_math_fsum__(x);
+    }
+    
+    func gamma(_, x: num) {
+        return __intern_math_gamma__(x);
+    }
+    
+    func gcd(_, x: num, y: num) {
+        return __intern_math_gcd__(x, y);
+    }
+    
+    func hypot(_, parendicular: num, base: num) {
+        return __intern_math_hypot__(parendicular, base);
+    }
+    
+    func isclose(_, x: num, y: num) {
+        return __intern_math_isclose__(x, y);
+    }
+    
+    func isfinite(_, x: num) {
+        return __intern_math_isfinite__(x);
+    }
+    
+    func isinf(_, x: num) {
+        return __intern_math_isinf__(x);
+    }
+    
+    func isnan(_, x: num) {
+        return __intern_math_isnan__(x);
+    }
+    
+    func isqrt(_, x: num) {
+        return __intern_math_isqrt__(x);
+    }
+    
+    func ldexp(_, x: num) {
+        return __intern_math_ldexp__(x);
+    }
+    
+    func lgamma(_, x: num) {
+        return __intern_math_lgamma__(x);
+    }
+    
+    log = Func.extend({
+        instance = {
+            func __call__(self, _args) {
+                let args = _args.from(1);
+                return __intern_math_log__(*args);
+            }
+        }
+    }).new()
+    
+    func pow(_, x: num, y: num) {
+        return __intern_math_pow__(x, y);
+    }
+    
+    func prod(_, x) {
+        return __intern_math_prod__(x);
+    }
+    
+    func radians(_, x: num) {
+        return __intern_math_radians__(x);
+    }
+    
+    func remainder(_, x: num, y: num) {
+        return __intern_math_remainder__(x, y);
+    }
+    
+    func sin(_, x: num) {
+        return __intern_math_sin__(x);
+    }
+    
+    func sinh(_, x: num) {
+        return __intern_math_sinh__(x);
+    }
+    
+    func tan(_, x: num) {
+        return __intern_math_tan__(x);
+    }
+    
+    func tanh(_, x: num) {
+        return __intern_math_tanh__(x);
+    }
+    
+    func trunc(_, x: num) {
+        return __intern_math_trunc__(x);
     }
 };

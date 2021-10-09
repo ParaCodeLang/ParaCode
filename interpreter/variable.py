@@ -8,6 +8,7 @@ class VariableType(Enum):
     Auto     = 'auto'
     Int      = 'int'
     String   = 'str'
+    Dict     = 'dict'
     Any      = 'any'
     Function = 'func'
     Type     = 'type'

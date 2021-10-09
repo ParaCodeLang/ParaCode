@@ -15,6 +15,8 @@ Type.patch({
     }
 });
 
+let pyimport = __intern_import_python__;
+
 
 import "std/types/null.para";
 import "std/types/num.para";
@@ -26,49 +28,52 @@ import "std/types/func.para";
 import "std/types/iterable.para";
 import "std/types/array.para";
 import "std/types/dict.para";
+import "std/types/caseinsensitivedict.para";
 import "std/types/str.para";
 import "std/types/range.para";
 import "std/types/macro.para";
 
-import "std/types/tk/tk.para";
-
-import "std/types/math/vectors/vectors.para";
-import "std/types/math/matrix/matrix3.para";
-import "std/types/math/matrix/matrix4.para";
+import "std/types/exceptions/exception.para";
+import "std/types/exceptions/argumenterror.para";
+import "std/types/exceptions/doesnotexisterror.para";
+import "std/types/exceptions/macroexpansionerror.para";
+import "std/types/exceptions/multipledefinitionerror.para";
+import "std/types/exceptions/typeerror.para";
 
 // Type aliases
-let object = Object;
-let float = Float;
-let type = Type;
-let array = Array;
+let object                     =    Object;
+let float                      =    Float;
+let type                       =    Type;
 
-let dict = Dict;
-let Dictionary = Dict;
-let dictionary = Dict;
-
-let num = Num;
-let number = Num;
-let Number = Num;
-
-let int = Int;
-let Integer = Int;
-let integer = Int;
-
-let str = Str;
-let String = Str;
-let string = Str;
-
-let bool = Bool;
-let Boolean = Bool;
-let boolean = Bool;
-
-let Function = Func;
-let function = Func;
-
-let matrix3 = Matrix3;
-let Mat3 = Matrix3;
-let mat3 = Matrix3;
-
-let matrix4 = Matrix4;
-let Mat4 = Matrix4;
-let mat4 = Matrix4;
+let array                      =    Array;
+let Arr                        =    Array;
+let arr                        =    Array;
+                                    
+let dict                       =    Dict;
+let Dictionary                 =    Dict;
+let dictionary                 =    Dict;
+                                    
+let caseinsensitivedict        =    CaseInsensitiveDict;
+let CaseInsensitiveDictionary  =    CaseInsensitiveDict;
+let caseinsensitivedictionary  =    CaseInsensitiveDict;
+let InsensitiveDictionary      =    CaseInsensitiveDict;
+let insensitivedictionary      =    CaseInsensitiveDict;
+                                    
+let num                        =    Num;
+let number                     =    Num;
+let Number                     =    Num;
+                                    
+let int                        =    Int;
+let Integer                    =    Int;
+let integer                    =    Int;
+                                    
+let str                        =    Str;
+let String                     =    Str;
+let string                     =    Str;
+                                    
+let bool                       =    Bool;
+let Boolean                    =    Bool;
+let boolean                    =    Bool;
+                                    
+let Function                   =    Func;
+let function                   =    Func;

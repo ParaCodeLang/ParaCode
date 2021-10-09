@@ -21,6 +21,13 @@ def builtin_int_mul(arguments):
     
     return BasicValue(int(lhs * rhs))
 
+def builtin_int_expon(arguments):
+    interpreter = arguments.interpreter
+    lhs = arguments.arguments[0].extract_value()
+    rhs = arguments.arguments[1].extract_value()
+    
+    return BasicValue(int(lhs ** rhs))
+
 def builtin_int_div(arguments):
     interpreter = arguments.interpreter
     lhs = arguments.arguments[0].extract_value()
@@ -55,6 +62,18 @@ def builtin_int_mod(arguments):
     
     return BasicValue(int(lhs % rhs))
 
+def builtin_int_bitshiftleft(arguments):
+    lhs = arguments.arguments[0].extract_value()
+    rhs = arguments.arguments[1].extract_value()
+    
+    return BasicValue(int(lhs << rhs))
+
+def builtin_int_bitshiftright(arguments):
+    lhs = arguments.arguments[0].extract_value()
+    rhs = arguments.arguments[1].extract_value()
+    
+    return BasicValue(int(lhs >> rhs))
+
 from interpreter.basic_value import BasicValue
 
 def builtin_float_add(arguments):
@@ -78,6 +97,13 @@ def builtin_float_mul(arguments):
     
     return BasicValue(float(lhs * rhs))
 
+def builtin_float_expon(arguments):
+    interpreter = arguments.interpreter
+    lhs = arguments.arguments[0].extract_value()
+    rhs = arguments.arguments[1].extract_value()
+    
+    return BasicValue(float(lhs ** rhs))
+
 def builtin_float_div(arguments):
     interpreter = arguments.interpreter
     lhs = arguments.arguments[0].extract_value()
@@ -90,3 +116,15 @@ def builtin_float_mod(arguments):
     rhs = arguments.arguments[1].extract_value()
     
     return BasicValue(float(lhs % rhs))
+
+def builtin_float_bitshiftleft(arguments):
+    lhs = arguments.arguments[0].extract_value()
+    rhs = arguments.arguments[1].extract_value()
+    
+    return BasicValue(float(lhs << rhs))
+
+def builtin_float_bitshiftright(arguments):
+    lhs = arguments.arguments[0].extract_value()
+    rhs = arguments.arguments[1].extract_value()
+    
+    return BasicValue(float(lhs >> rhs))

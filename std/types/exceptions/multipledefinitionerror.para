@@ -1,0 +1,13 @@
+let MultipleDefinitionError = Exception.extend({
+    name = 'MultipleDefinitionError'
+
+    instance = {
+        func raise(self) {
+            return raise(self, "MultipleDefinition Error");
+        }
+    }
+
+    func __construct__(self, _message) {
+        self.message = _message;
+    }
+});
