@@ -8,4 +8,5 @@
 *.bat
 *.spec
 .env
+.breakpoints
 PCPM
