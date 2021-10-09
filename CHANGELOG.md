@@ -9,6 +9,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Complete regex support
 - Better interfacing with python code from ParaCode
 
+## [2.0.1] - 2021-10-9
+### Changed
+- Moved PCPM code to it's own repository (https://github.com/DaRubyMiner360/PCPM)
+
 ## [2.0.0] - 2021-10-9
 ### Added
 - Standard library written largely in ParaCode itself
@@ -33,5 +37,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Security
 - PCPM package uploading doesn't require a login
 
-[Unreleased]: https://github.com/DaRubyMiner360/ParaCode/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/DaRubyMiner360/ParaCode/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/DaRubyMiner360/ParaCode/releases/tag/v2.0.1
 [2.0.0]: https://github.com/DaRubyMiner360/ParaCode/releases/tag/v2.0.0
