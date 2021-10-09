@@ -21,7 +21,8 @@ class Parser():
             'while': self.parse_while,
             'for': self.parse_for,
             'macro': self.parse_macro,
-            'mixin': self.parse_mixin
+            'mixin': self.parse_mixin,
+            'try': self.parse_try,
         }
 
     @property
@@ -135,7 +136,7 @@ class Parser():
     def import_file(self, filename, filename_token=None):
         try:
             fp = open(filename, 'r')
-            if not filename.endswith(".para") and not filename.endswith(".para/") and not filename.endswith(".paracode") and not filename.endswith(".paracode/"):
+            if not filename.endswith(".para") and not filename.endswith(".paracode"):
               self.error('source file \'{}\'s file extension (\'{}\') is not a valid ParaCode extension'.format(filename, "." + filename.split(".")[-1]))
               fp.close()
               return None
@@ -446,7 +447,7 @@ class Parser():
                 if rhs.type in (NodeType.FunctionExpression, NodeType.Macro):
                     return node
             
-            if node.type in (NodeType.IfStatement, NodeType.While, NodeType.For, NodeType.Mixin):
+            if node.type in (NodeType.IfStatement, NodeType.Try, NodeType.While, NodeType.For, NodeType.Mixin):
                 return node
         else:
             node = self.parse_expression()
@@ -737,6 +738,73 @@ class Parser():
                 else_block = self.parse_if_statement()
         
         return NodeIfStatement(expr, block, else_block, if_token)
+
+    def parse_try(self):
+        # eat `try`
+        try_token = self.current_token
+        if self.eat(TokenType.Keyword) is None:
+            return None
+
+        block = self.parse_block_statement()
+
+        if block is None:
+            return None
+
+        catch_block = []
+        
+        token = self.current_token
+        expr = []
+        variable = []
+
+        else_block = None
+        finally_block = None
+
+        while token.type == TokenType.Keyword and Keywords(token.value) == Keywords.Catch:
+            # eat catch
+            self.eat(TokenType.Keyword)
+
+            if self.current_token.type == TokenType.LBracket:
+                values = []
+                while self.current_token.type != TokenType.RBracket:
+                    if self.current_token.type != TokenType.Comma and self.current_token.type != TokenType.LBracket:
+                        values.append(NodeString(self.current_token))
+                    self.eat(self.current_token.type)
+                self.eat(self.current_token.type)
+                expr.append(values)
+
+                if self.current_token.type == TokenType.Identifier:
+                    e = self.parse_expression()
+                    print(e)
+            elif self.current_token.type == TokenType.LBrace:
+                expr.append(NodeString(LexerToken("Exception")))
+            elif self.current_token.type == TokenType.Identifier:
+                expr.append(self.parse_expression())
+
+                if self.current_token.type == TokenType.Identifier:
+                    e = self.parse_expression()
+                    val_node = NodeAssign(NodeVariable(e.token), expr[-1])
+                    type_node = NodeVariable(LexerToken(e.token.value, TokenType.Identifier))
+                    n = NodeDeclare(type_node, e.token, val_node)
+                    variable.append(n)
+
+            catch_block.append(self.parse_block_statement())
+            token = self.current_token
+        if token.type == TokenType.Keyword and Keywords(token.value) == Keywords.Else:
+            # eat else
+            self.eat(TokenType.Keyword)
+
+            else_block = self.parse_block_statement()
+            
+            token = self.current_token
+        if token.type == TokenType.Keyword and Keywords(token.value) == Keywords.Finally:
+            # eat finally
+            self.eat(TokenType.Keyword)
+
+            finally_block = self.parse_block_statement()
+            
+            token = self.current_token
+        
+        return NodeTryCatch(block, catch_block, expr, else_block, finally_block, try_token, variable)
     
     def parse_factor(self):
         # handles value or (x ± x)
@@ -752,6 +820,11 @@ class Parser():
         # handle '!'
         elif token.type == TokenType.Not:
             self.eat(TokenType.Not)
+            node = NodeUnaryOp(token, self.parse_factor())
+
+        # handle '~'
+        elif token.type == TokenType.BitwiseNot:
+            self.eat(TokenType.BitwiseNot)
             node = NodeUnaryOp(token, self.parse_factor())
             
         elif token.type == TokenType.Number:
@@ -814,7 +887,11 @@ class Parser():
         
         multiop_types = (
             TokenType.PlusEquals, TokenType.MinusEquals, 
-            TokenType.MultiplyEquals, TokenType.DivideEquals
+            TokenType.MultiplyEquals, TokenType.DivideEquals,
+            TokenType.ModulusEquals,
+            TokenType.BitwiseOrEquals, TokenType.BitwiseAndEquals,
+            TokenType.BitwiseXorEquals,
+            TokenType.BitwiseLShiftEquals, TokenType.BitwiseRShiftEquals
         )
         
         expected_types = (
@@ -826,7 +903,9 @@ class Parser():
             TokenType.Spaceship,
             TokenType.Arrow,
             TokenType.LessThan, TokenType.GreaterThan,
-            TokenType.LessThanEqual, TokenType.GreaterThanEqual
+            TokenType.LessThanEqual, TokenType.GreaterThanEqual,
+            TokenType.BitwiseLShift, TokenType.BitwiseRShift,
+            TokenType.Exponentiation
         ) + multiop_types
 
         while self.current_token.type in expected_types:

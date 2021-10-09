@@ -1,0 +1,13 @@
+let MacroExpansionError = Exception.extend({
+    name = 'MacroExpansionError'
+
+    instance = {
+        func raise(self) {
+            return raise(self, "Macro Expansion Error");
+        }
+    }
+
+    func __construct__(self, _message) {
+        self.message = _message;
+    }
+});

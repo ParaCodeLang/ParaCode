@@ -5,7 +5,7 @@ Object.patch({
 
     func __and__(self, other) {
         if !self {
-        return self;
+            return self;
         }
 
         return other;
@@ -13,7 +13,7 @@ Object.patch({
 
     func __or__(self, other) {
         if self {
-        return self;
+            return self;
         }
 
         return other;

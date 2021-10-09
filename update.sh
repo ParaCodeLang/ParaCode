@@ -19,6 +19,7 @@ unzip temp.zip
 rm temp.zip
 
 rm ParaCode-rewrite/README.md
+rm ParaCode-rewrite/CHANGELOG.md
 rm ParaCode-rewrite/LICENSE
 rm ParaCode-rewrite/.replit
 mv ParaCode-rewrite/* .

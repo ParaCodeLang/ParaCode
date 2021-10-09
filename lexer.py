@@ -14,6 +14,9 @@ class Keywords(Enum):
     In = 'in'
     Macro = 'macro'
     Mixin = 'mixin'
+    Try = 'try'
+    Catch = 'catch'
+    Finally = 'finally'
 
 class TokenType(Enum):
     NoneToken = auto()
@@ -27,6 +30,7 @@ class TokenType(Enum):
     Plus = '+'
     Minus = '-'
     Multiply = '*'
+    Exponentiation = '**'
     Divide = '/'
     Equals = '='
     Semicolon = ';'
@@ -47,6 +51,8 @@ class TokenType(Enum):
     BitwiseAnd = '&'
     BitwiseXor = '^'
     BitwiseNot = '~'
+    BitwiseLShift = '<<'
+    BitwiseRShift = '>>'
     
     Compare = '=='
     NotCompare = '!='
@@ -58,9 +64,12 @@ class TokenType(Enum):
     MinusEquals = '-='
     MultiplyEquals = '*='
     DivideEquals = '/='
-    
-    BitwiseLShift = auto()
-    BitwiseRShift = auto()
+    ModulusEquals = '%='
+    BitwiseOrEquals = '|='
+    BitwiseAndEquals = '&='
+    BitwiseXorEquals = '^='
+    BitwiseLShiftEquals = '<<='
+    BitwiseRShiftEquals = '>>='
     
     Identifier = auto()
     Number = auto()
@@ -162,11 +171,12 @@ class Lexer():
     def lex(self):
         splitables = "(){}[];:+-*/=.,!|&~<>^%"
         multichar_splitables = [
-            '<=>',
+            '**', '<=>', '<<=', '>>=',
+            '|=', '&=', '^=',
             '==', '!=', '<=', '>=',
             '+=', '-=', '*=', '/=',
-            '==', '!=', '->',
-            '&&', '||'
+            '%=', '==', '!=', '->',
+            '&&', '||', '<<', '>>'
         ]
     
         escape_chars = {
@@ -177,6 +187,7 @@ class Lexer():
             'a': '\a',
             'r': '\r',
             'f': '\f',
+            's': '\s',
             '033': '\033',
             '\\': '\\',
             '\'': '\'',
@@ -200,7 +211,7 @@ class Lexer():
 
             
             # multiline comments
-            if self.peek_char(0) == '#' or (self.peek_char(0) == '/' and self.peek_char(1) == '/') or (self.peek_char(0) == '/' and self.peek_char(1) == '*'):
+            if string_type == None and (self.peek_char(0) == '#' or (self.peek_char(0) == '/' and self.peek_char(1) == '/') or (self.peek_char(0) == '/' and self.peek_char(1) == '*')):
                 self.read_char()
                 if self.peek_char(-1) == '#' and self.peek_char(0) == '*':
                     # multiline comment

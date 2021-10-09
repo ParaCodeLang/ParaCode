@@ -25,13 +25,13 @@ let Macro = Type.extend({
         self._method(*(args.from(1)));
 
         return {
-        data = self._src_data
-        func expand(self) {
-            return __intern_macro_expand__(self.data);
-        }
-        func __call__(self, args) {
-            return self.expand();
-        }
+            data = self._src_data
+            func expand(self) {
+                return __intern_macro_expand__(self.data);
+            }
+            func __call__(self, args) {
+                return self.expand();
+            }
         };
     }
 });

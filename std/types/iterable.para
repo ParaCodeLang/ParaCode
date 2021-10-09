@@ -8,9 +8,9 @@ let Iterable = Type.extend({
         let res = null;
 
         while index != end {
-        res = fn(index);
+            res = fn(index);
 
-        index += step;
+            index += step;
         }
 
         return res;

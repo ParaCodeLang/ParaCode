@@ -1,0 +1,22 @@
+let boardCap = 100;
+let rule = 110;
+
+let board = [];
+for i in Range.new(0, boardCap) {
+    board.append(0);
+}
+
+board[boardCap - 2] = 1;
+
+for i in Range.new(0, boardCap - 2) {
+    for j in Range.new(0, boardCap - 2) {
+        print(" *"[board[j]], "");
+    }
+    print();
+
+    let pattern = (board[0] << 1) | board[1];
+    for j in Range.new(0, boardCap - 1) {
+        pattern = ((pattern << 1) & 7) | board[j + 1];
+        board[j] = (rule >> pattern) & 1;
+    }
+}

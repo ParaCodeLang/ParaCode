@@ -1,0 +1,6 @@
+import "std/types/math/vector2.para";
+import "std/types/math/vector3.para";
+import "std/types/math/vector4.para";
+import "std/types/math/intvector2.para";
+import "std/types/math/intvector3.para";
+import "std/types/math/intvector4.para";

@@ -25,8 +25,36 @@ class Repl:
     def __init__(self, paraCode):
         self._walkthrough_messages = self.load_walkthrough_messages()
 
-        self.welcome_message = """
-            ----- P a r a C o d e -----
+        color = LogColor.Default
+        if paraCode.release_stage == "alpha":
+            color = "\033[95m"
+        elif paraCode.release_stage == "beta":
+            color = "\033[34m"
+        elif paraCode.release_stage == "development":
+            color = "\033[96m"
+        elif paraCode.release_stage == "stable":
+            color = "\033[92m"
+        self.welcome_message = f"""
+{"----- P a r a C o d e -----".center(os.get_terminal_size().columns).rstrip()}
+{color + (paraCode.release_stage.upper() + " v" + paraCode.version).center(os.get_terminal_size().columns).rstrip() + LogColor.Default}
+"""
+
+        try:
+            from requests import get
+            latest_version = get("https://api.github.com/repos/DaRubyMiner360/ParaCode/releases/latest")
+            if "tag_name" not in latest_version.json() or latest_version.json()["tag_name"] < paraCode.version:
+                # Using unstable and/or development/beta version
+                self.welcome_message += LogColor.Warning + """
+You are using a possibly unstable version! If something doesn't work correctly, that is probably why.""" + LogColor.Default
+            elif latest_version.json()["tag_name"] > paraCode.version:
+                # Update available
+                self.welcome_message += LogColor.Warning + """
+Version {} is available to update to! Download it from GitHub for new features and bug fixes.""".format(latest_version.json()["tag_name"]) + LogColor.Default
+        except:
+            # Error occured (connection failed, couldn't find any releases, etc.)
+            pass
+
+        self.welcome_message += """
 
         Let's get started!
         To learn more about ParaCode,

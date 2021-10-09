@@ -2,9 +2,17 @@ from enum import Enum, auto
 from util import LogColor
 
 class InterpreterError(Exception):
-    pass
+    def __init__(self, m, node=None, type=None, message=None, cont=False, name=None, classnames=None):
+        super().__init__(m)
+        self.node = node
+        self.type = type
+        self.message = message
+        self.cont = cont
+        self.name = name
+        self.classnames = classnames
 
 class ErrorType(Enum):
+    Exception = auto()
     Syntax = auto()
     DoesNotExist = auto()
     TypeError = auto()
@@ -13,11 +21,12 @@ class ErrorType(Enum):
     MacroExpansionError = auto()
 
 class Error():
-    def __init__(self, type, location, message, filename):
+    def __init__(self, type, location, message, filename, name=None):
         self.type = type
         self.filename = filename
         self.message = message
         self.location = location
+        self.name = name
 
     @property
     def location_filename(self):
@@ -42,6 +51,8 @@ class Error():
 
     def __repr__(self):
         nstr = f"{self.location_filename}:{self.location_row}:{self.location_col}: {LogColor.Error}{self.type.name} error:{LogColor.Default}"
+        if self.type == ErrorType.Exception:
+            nstr = f"{self.location_filename}:{self.location_row}:{self.location_col}: {LogColor.Error}{self.name}:{LogColor.Default}"
         return f"{LogColor.Bold}{nstr}{LogColor.Default} {self.message}"
     __str__ = __repr__
         
@@ -61,4 +72,3 @@ class ErrorList():
         
     def get_errors(self):
         return self.errors
-

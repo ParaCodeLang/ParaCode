@@ -1,7 +1,10 @@
 import os
 import sys
+import math
 import json
+import re
 import base64
+import requests
 
 from interpreter.typing.basic_type import BasicType
 from interpreter.basic_object import BasicObject
@@ -70,19 +73,27 @@ def builtin_console_write(arguments):
     interpreter = arguments.interpreter
     node = arguments.node
 
-    for arg in arguments.arguments:
-        _print_object(interpreter, node, arg, end='')
+    if len(arguments.arguments) > 1:
+        _print_object(interpreter, node, arguments.arguments[0].extract_value(), end=arguments.arguments[1].extract_value())
+    elif len(arguments.arguments) > 0:
+        _print_object(interpreter, node, arguments.arguments[0].extract_value(), end='')
+    else:
+        _print_object(interpreter, node, "", end='')
 
-    return BasicValue(len(arguments.arguments))
+    return BasicValue(None)
 
 def builtin_printn(arguments):
     interpreter = arguments.interpreter
     node = arguments.node
 
-    for arg in arguments.arguments:
-        _print_object(interpreter, node, arg)
+    if len(arguments.arguments) > 1:
+        _print_object(interpreter, node, arguments.arguments[0].extract_value(), end=arguments.arguments[1].extract_value())
+    elif len(arguments.arguments) > 0:
+        _print_object(interpreter, node, arguments.arguments[0].extract_value())
+    else:
+        _print_object(interpreter, node, "")
 
-    return BasicValue(len(arguments.arguments))
+    return BasicValue(None)
 
 def builtin_print_color(arguments):
     color = arguments.arguments[0].extract_value()
@@ -101,10 +112,13 @@ def builtin_print_color(arguments):
 
 def builtin_exit(arguments):
     interpreter = arguments.interpreter
-    node        = arguments.node
-    return_code = arguments.arguments[0]
+    node = arguments.node
     
-    exit(return_code)
+    if len(arguments.arguments) > 0:
+        return_code = arguments.arguments[0].extract_value()
+        exit(return_code)
+    else:
+        exit()
     
     return BasicValue(0)
 
@@ -141,6 +155,13 @@ def builtin_int_negate(arguments):
     target = arguments.arguments[0].extract_value()
 
     return BasicValue(int(not target))
+
+def builtin_int_bitnot(arguments):
+    interpreter = arguments.interpreter
+    node = arguments.node
+    target = arguments.arguments[0].extract_value()
+
+    return BasicValue(~target)
 
 def builtin_to_int(arguments):
     return BasicValue(int(arguments.arguments[0].extract_value()))
@@ -283,6 +304,85 @@ def builtin_str_toupper(arguments):
     result = value.upper()
     
     return BasicValue(result)
+
+def builtin_str_totitle(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = str(arguments.arguments[0].extract_value())
+    result = value.title()
+    
+    return BasicValue(result)
+
+def builtin_regex_search(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    regex = arguments.arguments[0].extract_value()
+    inputstr = arguments.arguments[1].extract_value()
+    x = re.search(regex, inputstr)
+
+    return BasicValue([x.pos, x.endpos, [[list(x.re.groupindex.keys()), list(x.re.groupindex.values())], x.re.groups, x.re.flags, x.re.pattern], x.string, x.lastgroup, x.lastindex])
+
+def builtin_regex_match_end(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    regex = arguments.arguments[0].extract_value()
+    inputstr = arguments.arguments[1].extract_value()
+    x = re.search(regex, inputstr)
+    
+    return BasicValue(x.end())
+
+def builtin_regex_match_group(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    regex = arguments.arguments[0].extract_value()
+    inputstr = arguments.arguments[1].extract_value()
+    x = re.search(regex, inputstr)
+    
+    return BasicValue(x.group())
+
+def builtin_regex_match_groupdict(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    regex = arguments.arguments[0].extract_value()
+    inputstr = arguments.arguments[1].extract_value()
+    x = re.search(regex, inputstr)
+    
+    return BasicValue([list(x.groupdict().keys()), list(x.groupdict().values())])
+
+def builtin_regex_match_span(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    regex = arguments.arguments[0].extract_value()
+    inputstr = arguments.arguments[1].extract_value()
+    x = re.search(regex, inputstr)
+    
+    return BasicValue(list(x.span()))
+
+def builtin_regex_match_groups(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    regex = arguments.arguments[0].extract_value()
+    inputstr = arguments.arguments[1].extract_value()
+    x = re.search(regex, inputstr)
+    
+    return BasicValue(list(x.groups()))
+
+def builtin_regex_match_start(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    regex = arguments.arguments[0].extract_value()
+    inputstr = arguments.arguments[1].extract_value()
+    x = re.search(regex, inputstr)
+    
+    return BasicValue(x.start())
 
 def builtin_base64_b64encode(arguments):
     interpreter = arguments.interpreter
@@ -501,6 +601,266 @@ def builtin_str_base64_decode(arguments):
     result = value.decode(encoding)
     
     return BasicValue(result)
+
+def builtin_cryptography_fernet_generate_key(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    from cryptography.fernet import Fernet
+    
+    key = Fernet.generate_key()
+    return BasicValue(key.decode(json.detect_encoding(key)))
+
+def builtin_cryptography_fernet_encrypt(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+    
+    inputStr = bytes(str(arguments.arguments[0].extract_value()), encoding='utf8')
+    key = bytes(str(arguments.arguments[1].extract_value()), encoding='utf8')
+
+    from cryptography.fernet import Fernet
+
+    f = Fernet(key)
+    
+    encrypted = f.encrypt(inputStr)
+    return BasicValue(encrypted.decode(json.detect_encoding(encrypted)))
+
+def builtin_cryptography_fernet_decrypt(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+    
+    token = bytes(str(arguments.arguments[0].extract_value()), encoding='utf8')
+    key = bytes(str(arguments.arguments[1].extract_value()), encoding='utf8')
+
+    from cryptography.fernet import Fernet
+
+    f = Fernet(key)
+    
+    decrypted = f.decrypt(token)
+    return BasicValue(decoded.decode(json.detect_encoding(decrypted)))
+
+def response_to_list(x):
+    result = [x.url, x.text, x.status_code, [x.request.body, [list(x.request.headers.keys()), list(x.request.headers.values())], [list(x.request.hooks.keys()), list(x.request.hooks.values())], x.request.method, x.request.path_url, x.request.url], x.reason, int(x.ok), x.next, [list(x.links.keys()), list(x.links.values())], int(x.is_redirect), int(x.is_permanent_redirect), [], [list(x.headers.keys()), list(x.headers.values())], x.encoding, [int(x.elapsed.days / 7), int(x.elapsed.days % 7), int(int(x.elapsed.seconds / 60) / 60), int(int(x.elapsed.seconds / 60) % 60), int(int(x.elapsed.seconds % 60) % 60), int(x.elapsed.microseconds / 1000), int(x.elapsed.microseconds % 1000)], x.content.decode(json.detect_encoding(x.content)), x.apparent_encoding]
+    
+    for r in x.history:
+        result[10].append(response_to_list(r))
+
+    return result
+
+def builtin_requests_get(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    if len(arguments.arguments) > 10:
+        return BasicValue(response_to_list(requests.get(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value(), arguments.arguments[10].extract_value())))
+    elif len(arguments.arguments) > 9:
+        return BasicValue(response_to_list(requests.get(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value())))
+    elif len(arguments.arguments) > 8:
+        return BasicValue(response_to_list(requests.get(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value())))
+    elif len(arguments.arguments) > 7:
+        return BasicValue(response_to_list(requests.get(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value())))
+    elif len(arguments.arguments) > 6:
+        return BasicValue(response_to_list(requests.get(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value())))
+    elif len(arguments.arguments) > 5:
+        return BasicValue(response_to_list(requests.get(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value())))
+    elif len(arguments.arguments) > 4:
+        return BasicValue(response_to_list(requests.get(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value())))
+    elif len(arguments.arguments) > 3:
+        return BasicValue(response_to_list(requests.get(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]])))
+    elif len(arguments.arguments) > 2:
+        return BasicValue(response_to_list(requests.get(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value())))
+    elif len(arguments.arguments) > 1:
+        return BasicValue(response_to_list(requests.get(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())))
+    elif len(arguments.arguments) > 0:
+        return BasicValue(response_to_list(requests.get(arguments.arguments[0].extract_value())))
+    
+    return BasicValue(None)
+
+def builtin_requests_post(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+    
+    if len(arguments.arguments) > 12:
+        return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value(), arguments.arguments[10].extract_value(), arguments.arguments[11].extract_value(), arguments.arguments[12].extract_value())))
+    elif len(arguments.arguments) > 11:
+        return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value(), arguments.arguments[10].extract_value(), arguments.arguments[11].extract_value())))
+    elif len(arguments.arguments) > 10:
+        return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value(), arguments.arguments[10].extract_value())))
+    elif len(arguments.arguments) > 9:
+        return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value())))
+    elif len(arguments.arguments) > 8:
+        return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value())))
+    elif len(arguments.arguments) > 7:
+        return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value())))
+    elif len(arguments.arguments) > 6:
+        return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value())))
+    elif len(arguments.arguments) > 5:
+        return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value())))
+    elif len(arguments.arguments) > 4:
+        return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value())))
+    elif len(arguments.arguments) > 3:
+        return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]])))
+    elif len(arguments.arguments) > 2:
+        return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value())))
+    elif len(arguments.arguments) > 1:
+        return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())))
+    elif len(arguments.arguments) > 0:
+        return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value())))
+    
+    return BasicValue(None)
+
+def builtin_requests_put(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+    
+    if len(arguments.arguments) > 12:
+        return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value(), arguments.arguments[10].extract_value(), arguments.arguments[11].extract_value(), arguments.arguments[12].extract_value())))
+    elif len(arguments.arguments) > 11:
+        return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value(), arguments.arguments[10].extract_value(), arguments.arguments[11].extract_value())))
+    elif len(arguments.arguments) > 10:
+        return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value(), arguments.arguments[10].extract_value())))
+    elif len(arguments.arguments) > 9:
+        return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value())))
+    elif len(arguments.arguments) > 8:
+        return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value())))
+    elif len(arguments.arguments) > 7:
+        return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value())))
+    elif len(arguments.arguments) > 6:
+        return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value())))
+    elif len(arguments.arguments) > 5:
+        return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value())))
+    elif len(arguments.arguments) > 4:
+        return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value())))
+    elif len(arguments.arguments) > 3:
+        return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]])))
+    elif len(arguments.arguments) > 2:
+        return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value())))
+    elif len(arguments.arguments) > 1:
+        return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())))
+    elif len(arguments.arguments) > 0:
+        return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value())))
+    
+    return BasicValue(None)
+
+def builtin_requests_head(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+    
+    if len(arguments.arguments) > 9:
+        return BasicValue(response_to_list(requests.head(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value())))
+    elif len(arguments.arguments) > 8:
+        return BasicValue(response_to_list(requests.head(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value())))
+    elif len(arguments.arguments) > 7:
+        return BasicValue(response_to_list(requests.head(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value())))
+    elif len(arguments.arguments) > 6:
+        return BasicValue(response_to_list(requests.head(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value())))
+    elif len(arguments.arguments) > 5:
+        return BasicValue(response_to_list(requests.head(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value())))
+    elif len(arguments.arguments) > 4:
+        return BasicValue(response_to_list(requests.head(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value())))
+    elif len(arguments.arguments) > 3:
+        return BasicValue(response_to_list(requests.head(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]])))
+    elif len(arguments.arguments) > 2:
+        return BasicValue(response_to_list(requests.head(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value())))
+    elif len(arguments.arguments) > 1:
+        return BasicValue(response_to_list(requests.head(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())))
+    elif len(arguments.arguments) > 0:
+        return BasicValue(response_to_list(requests.head(arguments.arguments[0].extract_value())))
+    
+    return BasicValue(None)
+
+def builtin_requests_delete(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    if len(arguments.arguments) > 9:
+        return BasicValue(response_to_list(requests.delete(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value())))
+    elif len(arguments.arguments) > 8:
+        return BasicValue(response_to_list(requests.delete(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value())))
+    elif len(arguments.arguments) > 7:
+        return BasicValue(response_to_list(requests.delete(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value())))
+    elif len(arguments.arguments) > 6:
+        return BasicValue(response_to_list(requests.delete(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value())))
+    elif len(arguments.arguments) > 5:
+        return BasicValue(response_to_list(requests.delete(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value())))
+    elif len(arguments.arguments) > 4:
+        return BasicValue(response_to_list(requests.delete(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value())))
+    elif len(arguments.arguments) > 3:
+        return BasicValue(response_to_list(requests.delete(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]])))
+    elif len(arguments.arguments) > 2:
+        return BasicValue(response_to_list(requests.delete(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value())))
+    elif len(arguments.arguments) > 1:
+        return BasicValue(response_to_list(requests.delete(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())))
+    elif len(arguments.arguments) > 0:
+        return BasicValue(response_to_list(requests.delete(arguments.arguments[0].extract_value())))
+    
+    return BasicValue(None)
+
+def builtin_requests_patch(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+    
+    if len(arguments.arguments) > 12:
+        return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value(), arguments.arguments[10].extract_value(), arguments.arguments[11].extract_value(), arguments.arguments[12].extract_value())))
+    elif len(arguments.arguments) > 11:
+        return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value(), arguments.arguments[10].extract_value(), arguments.arguments[11].extract_value())))
+    elif len(arguments.arguments) > 10:
+        return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value(), arguments.arguments[10].extract_value())))
+    elif len(arguments.arguments) > 9:
+        return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value())))
+    elif len(arguments.arguments) > 8:
+        return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value())))
+    elif len(arguments.arguments) > 7:
+        return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value())))
+    elif len(arguments.arguments) > 6:
+        return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value())))
+    elif len(arguments.arguments) > 5:
+        return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value())))
+    elif len(arguments.arguments) > 4:
+        return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value())))
+    elif len(arguments.arguments) > 3:
+        return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]])))
+    elif len(arguments.arguments) > 2:
+        return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value())))
+    elif len(arguments.arguments) > 1:
+        return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())))
+    elif len(arguments.arguments) > 0:
+        return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value())))
+    
+    return BasicValue(None)
+
+def builtin_requests_request(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+    
+    if len(arguments.arguments) > 12:
+        return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value(), arguments.arguments[10].extract_value(), arguments.arguments[11].extract_value(), arguments.arguments[12].extract_value())))
+    elif len(arguments.arguments) > 11:
+        return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value(), arguments.arguments[10].extract_value(), arguments.arguments[11].extract_value())))
+    elif len(arguments.arguments) > 10:
+        return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value(), arguments.arguments[10].extract_value())))
+    elif len(arguments.arguments) > 9:
+        return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value(), arguments.arguments[9].extract_value())))
+    elif len(arguments.arguments) > 8:
+        return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value(), arguments.arguments[8].extract_value())))
+    elif len(arguments.arguments) > 7:
+        return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value(), arguments.arguments[7].extract_value())))
+    elif len(arguments.arguments) > 6:
+        return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value(), arguments.arguments[6].extract_value())))
+    elif len(arguments.arguments) > 5:
+        return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value(), arguments.arguments[5].extract_value())))
+    elif len(arguments.arguments) > 4:
+        return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value())))
+    elif len(arguments.arguments) > 3:
+        return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]])))
+    elif len(arguments.arguments) > 2:
+        return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value())))
+    elif len(arguments.arguments) > 1:
+        return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())))
+    elif len(arguments.arguments) > 0:
+        return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value())))
+    
+    return BasicValue(None)
 
 def builtin_eval(arguments):
     interpreter = arguments.interpreter
@@ -1727,6 +2087,21 @@ def builtin_func_call(arguments):
 
     return basic_value_resp
 
+def builtin_math_e(arguments):
+    return BasicValue(math.e)
+
+def builtin_math_inf(arguments):
+    return BasicValue(math.inf)
+
+def builtin_math_nan(arguments):
+    return BasicValue(math.nan)
+
+def builtin_math_pi(arguments):
+    return BasicValue(math.pi)
+
+def builtin_math_tau(arguments):
+    return BasicValue(math.tau)
+
 def builtin_math_max(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
@@ -1756,6 +2131,121 @@ def builtin_math_min(arguments):
     min_value = min(values)
 
     return BasicValue(min_value)
+
+def builtin_math_degrees(arguments):
+    return BasicValue(math.degrees(float(str(arguments.arguments[0]))))
+
+def builtin_math_dist(arguments):
+    return BasicValue(math.dist(float(str(arguments.arguments[0])), float(str(arguments.arguments[1]))))
+
+def builtin_math_erf(arguments):
+    return BasicValue(math.erf(float(str(arguments.arguments[0]))))
+
+def builtin_math_erfc(arguments):
+    return BasicValue(math.erfc(float(str(arguments.arguments[0]))))
+
+def builtin_math_exp(arguments):
+    return BasicValue(math.exp(float(str(arguments.arguments[0]))))
+
+def builtin_math_factorial(arguments):
+    return BasicValue(math.factorial(float(str(arguments.arguments[0]))))
+
+def builtin_math_floor(arguments):
+    return BasicValue(math.floor(float(str(arguments.arguments[0]))))
+
+def builtin_math_fmod(arguments):
+    return BasicValue(math.fmod(float(str(arguments.arguments[0])), float(str(arguments.arguments[1]))))
+
+def builtin_math_frexp(arguments):
+    return BasicValue(math.frexp(float(str(arguments.arguments[0]))))
+
+def builtin_math_fsum(arguments):
+    return BasicValue(math.fsum(list(arguments.arguments[0])))
+
+def builtin_math_gamma(arguments):
+    return BasicValue(math.gamma(float(str(arguments.arguments[0]))))
+
+def builtin_math_gcd(arguments):
+    return BasicValue(math.gcd(float(str(arguments.arguments[0])), float(str(arguments.arguments[1]))))
+
+def builtin_math_hypot(arguments):
+    return BasicValue(math.hypot(float(str(arguments.arguments[0])), float(str(arguments.arguments[1]))))
+
+def builtin_math_isclose(arguments):
+    return BasicValue(math.isclose(float(str(arguments.arguments[0])), float(str(arguments.arguments[1]))))
+
+def builtin_math_isfinite(arguments):
+    return BasicValue(math.isfinite(float(str(arguments.arguments[0]))))
+
+def builtin_math_isinf(arguments):
+    return BasicValue(math.isinf(float(str(arguments.arguments[0]))))
+
+def builtin_math_isnan(arguments):
+    return BasicValue(math.isnan(float(str(arguments.arguments[0]))))
+
+def builtin_math_isqrt(arguments):
+    return BasicValue(math.isqrt(float(str(arguments.arguments[0]))))
+
+def builtin_math_ldexp(arguments):
+    return BasicValue(math.ldexp(float(str(arguments.arguments[0]))))
+
+def builtin_math_lgamma(arguments):
+    return BasicValue(math.lgamma(float(str(arguments.arguments[0]))))
+
+def builtin_math_log(arguments):
+    if len(arguments.arguments) > 1:
+        return BasicValue(math.log(float(str(arguments.arguments[0])), float(str(arguments.arguments[1]))))
+    return BasicValue(math.log(float(str(arguments.arguments[0]))))
+
+def builtin_math_pow(arguments):
+    return BasicValue(math.pow(float(str(arguments.arguments[0])), float(str(arguments.arguments[0]))))
+
+def builtin_math_prod(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+    node = arguments.node
+    
+    values = []
+
+    for arg in list(arguments.arguments[0].extract_value()):
+        values.append(arg.extract_value())
+
+    return BasicValue(math.prod(values))
+
+def builtin_math_radians(arguments):
+    return BasicValue(math.radians(float(str(arguments.arguments[0]))))
+
+def builtin_math_remainder(arguments):
+    return BasicValue(math.remainder(float(str(arguments.arguments[0])), float(str(arguments.arguments[1]))))
+
+def builtin_math_sin(arguments):
+    return BasicValue(math.sin(float(str(arguments.arguments[0]))))
+
+def builtin_math_sinh(arguments):
+    return BasicValue(math.sinh(float(str(arguments.arguments[0]))))
+
+def builtin_math_tan(arguments):
+    return BasicValue(math.tan(float(str(arguments.arguments[0]))))
+
+def builtin_math_tanh(arguments):
+    return BasicValue(math.tanh(float(str(arguments.arguments[0]))))
+
+def builtin_math_trunc(arguments):
+    return BasicValue(math.trunc(float(str(arguments.arguments[0]))))
+
+def builtin_exception_raise(arguments):
+    from lexer import Lexer
+    from parse.parser import Parser
+
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+    name = str(arguments.arguments[0].extract_value())
+    message = arguments.arguments[1].extract_value()
+    classnames = list(arguments.arguments[2].extract_value())
+
+    interpreter.error(arguments.node, ErrorType.Exception, message, False, name, classnames)
+
+    return BasicValue(None)
 
 def builtin_macro_expand(arguments):
     from lexer import Lexer

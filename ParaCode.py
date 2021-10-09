@@ -15,6 +15,10 @@ class ParaCode():
     data = ""
     initialized = False
 
+    # Language Info
+    version = "2.0.0"
+    release_stage = "stable"
+
     def __init__(self):
         ParaCode.instance = self
 
@@ -75,8 +79,8 @@ class ParaCode():
         return self.eval(data=data)
         
     def call_function(self, function_name, arguments=[]):
-        if not self.initialized:
-          self.eval()
+        # if not self.initialized:
+        #   self.eval()
         if self.interpreter == None:
             raise Exception("ParaCode not initialized! please run ")
         if type(arguments) != list:
@@ -87,3 +91,4 @@ class ParaCode():
     def repl(self):
         repl = Repl(self)
         repl.loop()
+        

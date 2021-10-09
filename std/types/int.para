@@ -8,6 +8,10 @@ let Int = Num.extend({
             return __intern_int_negate__(self._value);
         }
 
+        func __bitnot__(self) {
+            return __intern_int_bitnot__(self._value);
+        }
+
         func __bool__(self) {
             return !!self._value;
         }
@@ -51,6 +55,10 @@ let Int = Num.extend({
         return __intern_int_mul__(self._value, other._value);
     }
 
+    func __expon__(self, other: num) {
+        return __intern_int_expon__(self._value, other._value);
+    }
+
     func __div__(self, other: num) {     
         return __intern_int_div__(self._value, other._value);
     }
@@ -69,5 +77,13 @@ let Int = Num.extend({
 
     func __bitxor__(self, other: int) {
         return __intern_int_bitxor__(self._value, other._value);
+    }
+
+    func __bitshiftleft__(self, other: int) {
+        return __intern_int_bitshiftleft__(self._value, other._value);
+    }
+
+    func __bitshiftright__(self, other: int) {
+        return __intern_int_bitshiftright__(self._value, other._value);
     }
 });

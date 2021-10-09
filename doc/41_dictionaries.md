@@ -42,7 +42,7 @@ names.containskey('Buddy'); // true
 
 names.append(['Tiffany', 'Jones']); // names is now {'Jeffrey': 'Williams', 'Sam': 'Johnson', 'Buddy': 'White', 'Tiffany': 'Jones'}
 
-names | [['Sam', 'Johnson'], ['Tyler', 'Scotts']]; // returns {'Jeffrey': 'Williams', 'Sam': 'Johnson', 'Buddy': 'White', 'Tyler': 'Scotts'}
+names | Dict.new(['Sam', 'Johnson'], ['Tyler', 'Scotts']); // returns {'Jeffrey': 'Williams', 'Sam': 'Johnson', 'Buddy': 'White', 'Tyler': 'Scotts'}
 
-names & [['Sam', 'Johnson'], ['Tyler', 'Scotts']]; // returns {'Sam': 'Johnson'}
+names & Dict.new(['Sam', 'Johnson'], ['Tyler', 'Scotts']); // returns {'Sam': 'Johnson'}
 ```

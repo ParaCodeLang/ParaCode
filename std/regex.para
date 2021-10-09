@@ -1,0 +1,297 @@
+let _end = Func.extend({
+    instance = {
+        inst
+
+        func __call__(self, _args) {
+            let args = _args.from(1);
+            return __intern_regex_match_end__(self.inst.re.pattern, self.inst.string, *args);
+        }
+    }
+
+    func __construct__(self, _inst) {
+        self.inst = _inst;
+
+        return self;
+    }
+});
+
+//////let _expand = Func.extend({
+//////    instance = {
+//////        inst
+//////
+//////        func __call__(self, _args) {
+//////            let args = _args.from(1);
+//////            return __intern_regex_match_expand__(self.inst.re.pattern, self.inst.string, *args);
+//////        }
+//////    }
+//////
+//////    func __construct__(self, _inst) {
+//////        self.inst = _inst;
+//////
+//////        return self;
+//////    }
+//////});
+
+let _group = Func.extend({
+    instance = {
+        inst
+
+        func __call__(self, _args) {
+            let args = _args.from(1);
+            return __intern_regex_match_group__(self.inst.re.pattern, self.inst.string, *args);
+        }
+    }
+
+    func __construct__(self, _inst) {
+        self.inst = _inst;
+
+        return self;
+    }
+});
+
+let _groupdict = Func.extend({
+    instance = {
+        inst
+
+        func __call__(self, _args) {
+            let args = _args.from(1);
+            return __intern_regex_match_groupdict__(self.inst.re.pattern, self.inst.string, *args);
+        }
+    }
+
+    func __construct__(self, _inst) {
+        self.inst = _inst;
+
+        return self;
+    }
+});
+
+let _span = Func.extend({
+    instance = {
+        inst
+
+        func __call__(self, _args) {
+            let args = _args.from(1);
+            return __intern_regex_match_span__(self.inst.re.pattern, self.inst.string, *args);
+        }
+    }
+
+    func __construct__(self, _inst) {
+        self.inst = _inst;
+
+        return self;
+    }
+});
+
+let _groups = Func.extend({
+    instance = {
+        inst
+
+        func __call__(self, _args) {
+            let args = _args.from(1);
+            return __intern_regex_match_groups__(self.inst.re.pattern, self.inst.string, *args);
+        }
+    }
+
+    func __construct__(self, _inst) {
+        self.inst = _inst;
+
+        return self;
+    }
+});
+
+let _start = Func.extend({
+    instance = {
+        inst
+
+        func __call__(self, _args) {
+            let args = _args.from(1);
+            return __intern_regex_match_start__(self.inst.re.pattern, self.inst.string, *args);
+        }
+    }
+
+    func __construct__(self, _inst) {
+        self.inst = _inst;
+
+        return self;
+    }
+});
+
+
+
+let regex = Type.extend({
+    name = 'Regex'
+
+    func search(_, re, input) {
+        let x = __intern_regex_search__(re, input);
+        return Match.new(x[0], x[1], x[2], x[3], x[4], x[5]);
+    }
+});
+
+let Pattern = Type.extend({
+    name = 'Pattern'
+    
+    instance = {
+        groupindex
+        groups
+        flags
+        pattern
+
+        ////findall = Func.extend({
+        ////    instance = {
+        ////        func __call__(self, _args) {
+        ////            let args = _args.from(1);
+        ////            return __intern_regex_pattern_findall__(*args);
+        ////        }
+        ////    }
+        ////}).new()
+
+        ////////scanner = Func.extend({
+        ////////    instance = {
+        ////////        func __call__(self, _args) {
+        ////////            let args = _args.from(1);
+        ////////            return __intern_regex_pattern_scanner__(*args);
+        ////////        }
+        ////////    }
+        ////////}).new()
+
+        ////subn = Func.extend({
+        ////    instance = {
+        ////        func __call__(self, _args) {
+        ////            let args = _args.from(1);
+        ////            return __intern_regex_pattern_subn__(*args);
+        ////        }
+        ////    }
+        ////}).new()
+
+        ////////finditer = Func.extend({
+        ////////    instance = {
+        ////////        func __call__(self, _args) {
+        ////////            let args = _args.from(1);
+        ////////            return __intern_regex_pattern_finditer__(*args);
+        ////////        }
+        ////////    }
+        ////////}).new()
+
+        ////search = Func.extend({
+        ////    instance = {
+        ////        func __call__(self, _args) {
+        ////            let args = _args.from(1);
+        ////            return __intern_regex_pattern_search__(*args);
+        ////        }
+        ////    }
+        ////}).new()
+
+        ////match = Func.extend({
+        ////    instance = {
+        ////        func __call__(self, _args) {
+        ////            let args = _args.from(1);
+        ////            return __intern_regex_pattern_match__(*args);
+        ////        }
+        ////    }
+        ////}).new()
+
+        ////split = Func.extend({
+        ////    instance = {
+        ////        func __call__(self, _args) {
+        ////            let args = _args.from(1);
+        ////            return __intern_regex_pattern_split__(*args);
+        ////        }
+        ////    }
+        ////}).new()
+
+        ////fullmatch = Func.extend({
+        ////    instance = {
+        ////        func __call__(self, _args) {
+        ////            let args = _args.from(1);
+        ////            return __intern_regex_pattern_fullmatch__(*args);
+        ////        }
+        ////    }
+        ////}).new()
+
+        ////sub = Func.extend({
+        ////    instance = {
+        ////        func __call__(self, _args) {
+        ////            let args = _args.from(1);
+        ////            return __intern_regex_pattern_sub__(*args);
+        ////        }
+        ////    }
+        ////}).new()
+
+        func to_str(self) {
+            return "Pattern(" + self.pattern + ")";
+        }
+    }
+
+    func __construct__(self, _groupindex, _groups, _flags, _pattern) {
+        if _groupindex.type() == Dict {
+            self.groupindex = _groupindex;
+        }
+        else {
+            self.groupindex = Dict.new(_groupindex[0], _groupindex[1]);
+        }
+        
+        self.groups = _groups;
+        self.flags = _flags;
+        self.pattern = _pattern;
+
+        return self;
+    }
+});
+
+let Match = Type.extend({
+    name = 'Match'
+    
+    instance = {
+        pos
+        endpos
+        re
+        string
+        lastgroup
+        //regs
+        lastindex
+
+        end
+        //expand
+        group
+        groupdict
+        span
+        groups
+        start
+
+        func to_str(self) {
+            return "Match(span: " + self.span() + ", match: " + self.group() + ")";
+        }
+    }
+
+    func __construct__(self, _pos, _endpos, _re, _string, _lastgroup, _lastindex) {
+        self.pos = _pos;
+        self.endpos = _endpos;
+
+        if re.type() == Pattern {
+            self.re = _re;
+        }
+        else {
+            self.re = Pattern.new(_re[0], _re[1], _re[2], _re[3]);
+        }
+        
+        self.string = _string;
+        self.lastgroup = _lastgroup;
+        //self.regs = _regs;
+        self.lastindex = _lastindex;
+
+        self.end = _end.new(self);
+        //self.expand = _expand.new(self);
+        self.group = _group.new(self);
+        self.groupdict = _groupdict.new(self);
+        self.span = _span.new(self);
+        self.groups = _groups.new(self);
+        self.start = _start.new(self);
+
+        return self;
+    }
+});
+
+//import "std/regex.para";
+//let txt = "The rain in Spain";
+//let x = regex.search("\\bS\\w+", txt);

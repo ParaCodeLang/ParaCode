@@ -1,0 +1,129 @@
+let IntVector4 = Num.extend({
+    name = 'IntVector4'
+
+    zero
+    one
+    neone
+    up
+    down
+    right
+    left
+    foward
+    backward
+
+    instance = {
+        x = 0
+        y = 0
+        z = 0
+        w = 0
+
+        func __eql__(self, other) {
+            if other.type() != self.type() {
+                return 0;
+            }
+
+            let same = self.x == other.x;
+            same = same && self.y == other.y;
+            same = same && self.z == other.z;
+            same = same && self.w == other.w;
+            return same;
+        }
+
+        func to_str(self) {
+            return "[" + self.x.to_str() + ", " + self.y.to_str() + ", " + self.z.to_str() + ", " + self.w.to_str() + "]";
+        }
+
+        func to_array(self) {
+            return [self.x, self.y, self.z, self.w];
+        }
+
+        func getX(self) {
+            return self.x;
+        }
+
+        func getY(self) {
+            return self.y;
+        }
+
+        func getZ(self) {
+            return self.z;
+        }
+
+        func getW(self) {
+            return self.w;
+        }
+    }
+
+    func __construct__(self, _x, _y, _z, _w) {
+        if _x != null && _y == null && _z == null && _w == null {
+            self.x = __intern_to_int__(_x);
+            self.y = __intern_to_int__(_x);
+            self.z = __intern_to_int__(_x);
+            self.w = __intern_to_int__(_x);
+
+            return self;
+        }
+        else {
+            if _x == null {
+                self.x = 0;
+                self.y = 0;
+                self.z = 0;
+                self.w = 0;
+
+                return self;
+            }
+            else {
+                self.x = __intern_to_int__(_x);
+                self.y = __intern_to_int__(_y);
+                self.z = __intern_to_int__(_z);
+                self.w = __intern_to_int__(_w);
+
+                return self;
+            }
+        }
+    }
+
+    // Operator methods
+    func __add__(self, other) {
+        let vec = IntVector4.new(self.x + other.x, self.y + other.y, self.z + other.z, self.w + other.w);
+        return vec;
+    }
+
+    func __sub__(self, other) {
+        let vec = IntVector4.new(self.x - other.x, self.y - other.y, self.z - other.z, self.w - other.w);
+        return vec;
+    }
+    
+    func __mul__(self, other) {
+        let vec = IntVector4.new(self.x * other.x, self.y * other.y, self.z * other.z, self.w * other.w);
+        return vec;
+    }
+
+    func __div__(self, other) {     
+        let vec = IntVector4.new(self.x / other.x, self.y / other.y, self.z / other.z, self.w / other.w);
+        return vec;
+    }
+    
+    func __mod__(self, other) {
+        let vec = IntVector4.new(self.x % other.x, self.y % other.y, self.z % other.z, self.w % other.w);
+        return vec;
+    }
+});
+
+IntVector4.zero = IntVector4.new(0, 0, 0, 0);
+IntVector4.one = IntVector4.new(0, 0, 0, 0);
+IntVector4.neone = IntVector4.new(-1, -1, -1, -1);
+IntVector4.up = IntVector4.new(0, 1, 0, 0);
+IntVector4.down = IntVector4.new(0, -1, 0, 0);
+IntVector4.right = IntVector4.new(1, 0, 0, 0);
+IntVector4.left = IntVector4.new(-1, 0, 0, 0);
+IntVector4.foward = IntVector4.new(0, 0, 1, 0);
+IntVector4.backward = IntVector4.new(0, 0, -1, 0);
+
+let intvector4 = IntVector4;
+let IVector4 = IntVector4;
+let ivector4 = IntVector4;
+let IntVec4 = IntVector4;
+let intvec4 = IntVector4;
+let IVec4 = IntVector4;
+let ivec4 = IntVector4;

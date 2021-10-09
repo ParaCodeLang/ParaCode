@@ -44,12 +44,11 @@ let Float = Num.extend({
     }
 
     // Operator methods
-    
     func __add__(self, other) {
         return __intern_float_add__(self._value, other._value);
     }
 
-    func __sub__(self, other) {     
+    func __sub__(self, other) {
         return __intern_float_sub__(self._value, other._value);
     }
     
@@ -57,11 +56,23 @@ let Float = Num.extend({
         return __intern_float_mul__(self._value, other._value);
     }
 
-    func __div__(self, other) {     
+    func __expon__(self, other) {
+        return __intern_float_expon__(self._value, other._value);
+    }
+
+    func __div__(self, other) {
         return __intern_float_div__(self._value, other._value);
     }
     
     func __mod__(self, other) {
         return __intern_float_mod__(self._value, other._value);
+    }
+
+    func __bitshiftleft__(self, other) {
+        return __intern_float_bitshiftleft__(self._value, other._value);
+    }
+    
+    func __bitshiftright__(self, other) {
+        return __intern_float_bitshiftleft__(self._value, other._value);
     }
 });

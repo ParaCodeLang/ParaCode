@@ -1,12 +1,3 @@
 {
-  "files": {
-    "interpreter/env/builtins.py": [
-      {
-        "id": "9f98d1ad-f7d9-47e0-b397-4693b1af0ec4",
-        "line": 531,
-        "version": 3942,
-        "index": 15827
-      }
-    ]
-  }
+  "files": {}
 }
