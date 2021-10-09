@@ -16,7 +16,7 @@ class ParaCode():
     initialized = False
 
     # Language Info
-    version = "2.0.0"
+    version = "2.0.1"
     release_stage = "stable"
 
     def __init__(self):
