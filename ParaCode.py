@@ -34,10 +34,8 @@ class ParaCode():
                 return None
             debug_name = filename
             self.data = self.file.read()
-        
         elif data != None:
             self.data = data
-        
         else:
             self.data = ""
 
@@ -75,6 +73,7 @@ class ParaCode():
 
     def eval_file(self, filename):
         return self.eval(filename=filename)
+
     def eval_data(self, data):
         return self.eval(data=data)
         

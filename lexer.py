@@ -210,7 +210,7 @@ class Lexer():
                 continue
 
             
-            # multiline comments
+            # comments
             if string_type == None and (self.peek_char(0) == '#' or (self.peek_char(0) == '/' and self.peek_char(1) == '/') or (self.peek_char(0) == '/' and self.peek_char(1) == '*')):
                 self.read_char()
                 if self.peek_char(-1) == '#' and self.peek_char(0) == '*':
@@ -218,31 +218,46 @@ class Lexer():
                     
                     # skip '*' character
                     self.read_char()
+
                     # read until '*#'
                     while (self.read_char() != '*' and self.peek_char(1) != '#'):
-                        pass
-                        
+                        # EOF
+                        if self.peek_char(0) == '':
+                            break
+                                            
                     # skip '*#' characters
-                    self.read_char(1)
+                    self.read_char(2)
+                    
+                    # end by pushing the token and skipping any whitespace afterwards
+                    if self.token_data != '':
+                        self.push_token()
+                    self.skip_whitespace()
                 elif self.peek_char(-1) == '/' and self.peek_char(0) == '*':
                     # multiline comment
                     
                     # skip '*' character
                     self.read_char()
+
                     # read until '*/'
                     while (self.read_char() != '*' and self.peek_char(1) != '/'):
-                        pass
+                        # EOF
+                        if self.peek_char(0) == '':
+                            break
                         
                     # skip '*/' characters
-                    self.read_char(1)
+                    self.read_char(2)
+                    
+                    # end by pushing the token and skipping any whitespace afterwards
+                    if self.token_data != '':
+                        self.push_token()
+                    self.skip_whitespace()
                 else:
                     while self.read_char() != '\n':
                         # EOF
                         if self.peek_char(0) == '':
                             break
-                        
-                # skip any whitespace after comment
-                self.skip_whitespace()
+                    # skip any whitespace after comment
+                    self.skip_whitespace()
                 continue
                 
             # encountered whitespace and not in string, push token
