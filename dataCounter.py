@@ -3,17 +3,13 @@ import sys
 import os
 
 rcmd = "( find ./ -name '*.%s' -print0 | xargs -0 cat ) | wc -l"
-types = ['c', 'cpp', 'h', 'hpp', 'py', 'para', 'paracode', 'go', 'sh']
+types = ['c', 'cpp', 'h', 'hpp', 'py', 'para', 'paracode', 'sh']
 
 if len(sys.argv) > 1:
     if sys.argv[1].lower() == "lines":
         rcmd = "( find ./ -name '*.%s' -print0 | xargs -0 cat ) | wc -l"
     elif sys.argv[1].lower() == "words":
         rcmd = "( find ./ -name '*.%s' -print0 | xargs -0 cat ) | wc -w"
-    elif sys.argv[1].lower() == "chars":
-        rcmd = "( find ./ -name '*.%s' -print0 | xargs -0 cat ) | wc -m"
-    elif sys.argv[1].lower() == "bytes":
-        rcmd = "( find ./ -name '*.%s' -print0 | xargs -0 cat ) | wc -c"
     elif sys.argv[1].lower() == "maxlinelength" or sys.argv[1].lower() == "max-line-length" or sys.argv[1].lower() == "mll":
         rcmd = "( find ./ -name '*.%s' -print0 | xargs -0 cat ) | wc -L"
     
@@ -30,8 +26,6 @@ if len(sys.argv) > 2:
         types = ['para', 'paracode']
     elif sys.argv[2].lower() == "main":
         types = ['c', 'cpp', 'h', 'hpp', 'py', 'para', 'paracode']
-    elif sys.argv[2].lower() == "go":
-        types = ['go']
     elif sys.argv[2].lower() == "sh":
         types = ['sh']
 
