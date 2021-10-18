@@ -148,6 +148,18 @@ class Interpreter():
             funstr = '__div__'
         elif node.token.type == TokenType.Modulus:
             funstr = '__mod__'
+        elif node.token.type == TokenType.LessThan:
+            funstr = '__lt__'
+        elif node.token.type == TokenType.LessThanEqual:
+            funstr = '__lte__'
+        elif node.token.type == TokenType.GreaterThan:
+            funstr = '__gt__'
+        elif node.token.type == TokenType.GreaterThanEqual:
+            funstr = '__gte__'
+        elif node.token.type == TokenType.Compare:
+            funstr = '__eql__'
+        elif node.token.type == TokenType.NotCompare:
+            funstr = '__noteql__'
         elif node.token.type == TokenType.And:
             funstr = '__and__'
         elif node.token.type == TokenType.Or:
@@ -164,18 +176,6 @@ class Interpreter():
             funstr = '__bitshiftright__'
         elif node.token.type == TokenType.Spaceship:
             funstr = '__compare__'
-        elif node.token.type == TokenType.LessThan:
-            funstr = '__lt__'
-        elif node.token.type == TokenType.LessThanEqual:
-            funstr = '__lte__'
-        elif node.token.type == TokenType.GreaterThan:
-            funstr = '__gt__'
-        elif node.token.type == TokenType.GreaterThanEqual:
-            funstr = '__gte__'
-        elif node.token.type == TokenType.Compare:
-            funstr = '__eql__'
-        elif node.token.type == TokenType.NotCompare:
-            funstr = '__noteql__'
             
         member_access_call_node = NodeCall(
             NodeMemberExpression(

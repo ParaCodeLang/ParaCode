@@ -48,8 +48,9 @@ class Repl:
 You are using a possibly unstable version! If something doesn't work correctly, that is probably why.""" + LogColor.Default
             elif latest_version.json()["tag_name"] > paraCode.version:
                 # Update available
+                import datetime
                 self.welcome_message += LogColor.Warning + """
-Version {} is available to update to! Download it from GitHub for new features and bug fixes.""".format(latest_version.json()["tag_name"]) + LogColor.Default
+Version {} is available to update to! It was released {}. Download it from GitHub for new features and bug fixes.""".format(latest_version.json()["tag_name"], "on " + datetime.datetime.strptime(latest_version.json()["published_at"], "%Y-%m-%dT%H:%M:%SZ").strftime('%A %b %d, %Y at %X')) + LogColor.Default
         except:
             # Error occured (connection failed, couldn't find any releases, etc.)
             pass
@@ -127,7 +128,7 @@ Version {} is available to update to! Download it from GitHub for new features a
         line = input('>>> ')
 
         trimmed = line.strip()
-        if os.path.isfile(trimmed) and (trimmed.endswith(".para") or trimmed.endswith(".para/") or trimmed.endswith(".paracode") or trimmed.endswith(".paracode/")):
+        if os.path.isfile(trimmed) and (trimmed.endswith(".para") or trimmed.endswith(".paracode")):
             self.paraCode.eval_file(trimmed)
             
             return
@@ -143,12 +144,12 @@ Version {} is available to update to! Download it from GitHub for new features a
                                        self._walkthrough_messages))))
             return
 
-        (brace_counter, bracket_counter, paren_counter) = self.count_continuation_tokens(line)
+        (brace_counter, bracket_counter, paren_counter, comment_type) = self.count_continuation_tokens(line)
 
-        while brace_counter > 0 or bracket_counter > 0 or paren_counter > 0:
+        while brace_counter > 0 or bracket_counter > 0 or paren_counter > 0 or comment_type:
             next_line = input('... ')
             line += next_line + '\n'
-            (brace_counter, bracket_counter, paren_counter) = self.count_continuation_tokens(line)
+            (brace_counter, bracket_counter, paren_counter, comment_type) = self.count_continuation_tokens(line)
 
         (line_ast, error_list) = self.parse_line(line)
 
@@ -190,18 +191,48 @@ Version {} is available to update to! Download it from GitHub for new features a
         bracket_counter = 0
         paren_counter = 0
 
+        started_comment_char = ""
+        comment_type = ""
+
         for ch in line:
-            if ch == '{':
+            if ch == '/' and comment_type == "":
+                if started_comment_char != "/":
+                    started_comment_char = "/"
+                else:
+                    started_comment_char = ""
+                    comment_type = "slash_slash"
+            elif ch == '*' and started_comment_char == "/":
+                started_comment_char = ""
+                comment_type = "slash_asterisk"
+            elif ch == '#' and comment_type == "" and started_comment_char != "#":
+                started_comment_char = "#"
+                comment_type = "hashtag"
+            elif ch == '*' and started_comment_char == "#":
+                started_comment_char = ""
+                comment_type = "hashtag_asterisk"
+            elif ch == '*' and started_comment_char == "":
+                started_comment_char = "*"
+            elif ch == '/' and started_comment_char == "*" and comment_type == "slash_asterisk":
+                started_comment_char = ""
+                comment_type = ""
+            elif ch == '#' and started_comment_char == "*" and comment_type == "hashtag_asterisk":
+                started_comment_char = ""
+                comment_type = ""
+
+            elif ch == '{' and comment_type == "":
                 brace_counter += 1
-            elif ch == '}':
+            elif ch == '}' and comment_type == "":
                 brace_counter -= 1
-            elif ch == '(':
+            elif ch == '(' and comment_type == "":
                 paren_counter += 1
-            elif ch == ')':
+            elif ch == ')' and comment_type == "":
                 paren_counter -= 1
-            elif ch == '[':
+            elif ch == '[' and comment_type == "":
                 bracket_counter += 1
-            elif ch == ']':
+            elif ch == ']' and comment_type == "":
                 bracket_counter -= 1
 
-        return (brace_counter, bracket_counter, paren_counter)
+        if comment_type == "slash_slash" or comment_type == "hashtag":
+            comment_type = ""
+
+        return (brace_counter, bracket_counter, paren_counter, comment_type)

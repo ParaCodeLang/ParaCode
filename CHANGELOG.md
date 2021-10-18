@@ -1,17 +1,21 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 - Support for variables in the `catch` statement
 - Complete requests HTTP library
 - Complete regex support
 - Better interfacing with python code from ParaCode
+- Easy use of default parameters in functions
 
-## [2.0.1] - 2021-10-9
-### Changed
-- Moved PCPM code to it's own repository (https://github.com/DaRubyMiner360/PCPM)
+## [2.0.1] - 2021-10-18
+### Fixed
+- Fixed what happens when using `||` and `&&` if you had an expression after the operators. If you ran `"A" == "A" || "A" == "B"`, it would interpret it as `("A" == "A" || "A") == "B"`, so it would return false instead of true.
+- Fixed multiline comments not working correctly when used in certain places
+- Fixed multiline comments breaking the repl
 
 ## [2.0.0] - 2021-10-9
 ### Added
@@ -37,6 +41,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Security
 - PCPM package uploading doesn't require a login
 
-[Unreleased]: https://github.com/DaRubyMiner360/ParaCode/compare/v2.0.1...HEAD
-[2.0.1]: https://github.com/DaRubyMiner360/ParaCode/releases/tag/v2.0.1
-[2.0.0]: https://github.com/DaRubyMiner360/ParaCode/releases/tag/v2.0.0
+[Unreleased]: https://github.com/DaRubyMiner360/ParaCode/compare/2.0.1...HEAD
+[2.0.1]: https://github.com/DaRubyMiner360/ParaCode/compare/2.0.0...2.0.1
+[2.0.0]: https://github.com/DaRubyMiner360/ParaCode/releases/tag/2.0.0

@@ -897,13 +897,13 @@ class Parser():
         expected_types = (
             TokenType.Equals,
             TokenType.Plus, TokenType.Minus, TokenType.Modulus,
-            TokenType.BitwiseOr, TokenType.BitwiseAnd, TokenType.BitwiseXor,
-            TokenType.And, TokenType.Or,
             TokenType.Compare, TokenType.NotCompare,
             TokenType.Spaceship,
             TokenType.Arrow,
             TokenType.LessThan, TokenType.GreaterThan,
             TokenType.LessThanEqual, TokenType.GreaterThanEqual,
+            TokenType.BitwiseOr, TokenType.BitwiseAnd, TokenType.BitwiseXor,
+            TokenType.And, TokenType.Or,
             TokenType.BitwiseLShift, TokenType.BitwiseRShift,
             TokenType.Exponentiation
         ) + multiop_types
@@ -930,9 +930,13 @@ class Parser():
                 assign_node.value = value_node
                 node = assign_node
                 continue
-                
+
             if token.type in expected_types:
                 self.eat()
+                
+            if (token.type == TokenType.Or or token.type == TokenType.And) and self.peek_token().type in expected_types:
+                node = NodeBinOp(left=node, token=token, right=self.parse_expression())
+                continue
                 
             node = NodeBinOp(left=node, token=token, right=self.parse_term())
         return node
