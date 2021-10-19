@@ -8,8 +8,8 @@ types = ['c', 'cpp', 'h', 'hpp', 'py', 'para', 'paracode', 'sh']
 if len(sys.argv) > 1:
     if sys.argv[1].lower() == "lines":
         rcmd = "( find ./ -name '*.%s' -print0 | xargs -0 cat ) | wc -l"
-    elif sys.argv[1].lower() == "words":
-        rcmd = "( find ./ -name '*.%s' -print0 | xargs -0 cat ) | wc -w"
+    elif sys.argv[1].lower() == "chars":
+        rcmd = "( find ./ -name '*.%s' -print0 | xargs -0 cat ) | wc -c"
     elif sys.argv[1].lower() == "maxlinelength" or sys.argv[1].lower() == "max-line-length" or sys.argv[1].lower() == "mll":
         rcmd = "( find ./ -name '*.%s' -print0 | xargs -0 cat ) | wc -L"
     
