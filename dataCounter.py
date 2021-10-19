@@ -1,17 +1,22 @@
 import subprocess
 import sys
-import os
 
-rcmd = "( find ./ -name '*.%s' -print0 | xargs -0 cat ) | wc -l"
+rcmd = "( find ./ -type d -name .git -prune -o -name '*.%s' -print0 | xargs -0 cat ) | wc {}"
 types = ['c', 'cpp', 'h', 'hpp', 'py', 'para', 'paracode', 'sh']
 
 if len(sys.argv) > 1:
     if sys.argv[1].lower() == "lines":
-        rcmd = "( find ./ -name '*.%s' -print0 | xargs -0 cat ) | wc -l"
+        rcmd = rcmd.format("-l")
     elif sys.argv[1].lower() == "chars":
-        rcmd = "( find ./ -name '*.%s' -print0 | xargs -0 cat ) | wc -c"
+        rcmd = rcmd.format("-c")
     elif sys.argv[1].lower() == "maxlinelength" or sys.argv[1].lower() == "max-line-length" or sys.argv[1].lower() == "mll":
-        rcmd = "( find ./ -name '*.%s' -print0 | xargs -0 cat ) | wc -L"
+        rcmd = rcmd.format("-L")
+    elif sys.argv[1].lower() == "files":
+        rcmd = "( find ./ -type d -name .git -prune -o -name '*.%s' -print ) | wc -l"
+    else:
+        rcmd = rcmd.format("-l")
+else:
+    rcmd = rcmd.format("-l")
     
 if len(sys.argv) > 2:
     if sys.argv[2].lower() == "c":
@@ -31,18 +36,9 @@ if len(sys.argv) > 2:
 
 sum = 0
 for el in types:
-    if len(sys.argv) > 1 and sys.argv[1].lower() != "files":
-        cmd = rcmd % (el)
-        p = subprocess.Popen([cmd],stdout=subprocess.PIPE,shell=True)
-        out = int(p.stdout.read().strip())
-        print("*.%s: %s" % (el, out))
-        sum += out
-    else:
-        out = 0
-        for root, dirs, files in os.walk(os.path.dirname(os.path.realpath(__file__))):
-            for file in files:
-                if file.endswith("." + el):
-                    out += 1
-        print("*.%s: %s" % (el, out))
-        sum += out
+    cmd = rcmd % (el)
+    p = subprocess.Popen([cmd],stdout=subprocess.PIPE,shell=True)
+    out = int(p.stdout.read().strip())
+    print("*.%s: %s" % (el, out))
+    sum += out
 print("sum: %d" % (sum))
