@@ -10,11 +10,11 @@ let tk = Type.extend({
 
         func setWindowTitle(self, title) {
             self.windowTitle = title;
-            return io.evaluate(self.variableName + '.title("' + title + '")');
+            return io.pyeval(self.variableName + '.title("' + title + '")');
         }
 
         func mainloop(self) {
-            return io.evaluate(self.variableName + '.mainloop()');
+            return io.pyeval(self.variableName + '.mainloop()');
         }
 
         func bind(self, ev, fun) {
@@ -39,7 +39,7 @@ let tk = Type.extend({
                 + '   paraCode.data = data\n'
                 + self.variableName + '.bind("' + ev + '", run)';
             print(code);
-            return io.evaluate(code);
+            return io.pyeval(code);
         }
 
         addLabel
@@ -51,7 +51,7 @@ let tk = Type.extend({
 
     func __construct__(self, name) {
         self.variableName = name;
-        io.evaluate('import tkinter as tk; ' + self.variableName + ' = tk.Tk()');
+        io.pyeval('import tkinter as tk; ' + self.variableName + ' = tk.Tk()');
 
         self.setWindowTitle(name);
         self.addLabel = label.new(self);
@@ -87,12 +87,12 @@ let Frame = Type.extend({
 
         func setWidth(self, width) {
             self.width = width;
-            return io.evaluate(self.variableName + '.config(width=' + width + ')');
+            return io.pyeval(self.variableName + '.config(width=' + width + ')');
         }
 
         func setHeight(self, height) {
             self.height = height;
-            return io.evaluate(self.variableName + '.config(height=' + height + ')');
+            return io.pyeval(self.variableName + '.config(height=' + height + ')');
         }
 
         func setSize(self, width, height) {
@@ -101,7 +101,7 @@ let Frame = Type.extend({
         }
 
         func bind(self, ev, fun) {
-            return io.evaluate('from ParaCode import ParaCode\n'
+            return io.pyeval('from ParaCode import ParaCode\n'
                 + 'def run(event):\n'
                 + '   paraCode = ParaCode()\n'
                 + '   paraCode.eval_data(' + fun + '(event.char, event.type)' + ')\n'
@@ -140,43 +140,7 @@ let frame = Func.extend({
 
         func __call__(self, _args) {
             let args = _args.from(1);
-            let width;
-            let height;
-            let bgColor;
-            let fgColor;
-            let master = self.tk1.variableName;
-            let code = 'import tkinter as tk; ' + text + ' = tk.Frame(';
-            if args.len() > 0 {
-                master = args[0];
-                code += ', master=' + master;
-            }
-            if args.len() > 1 {
-                width = args[1];
-                code += ', width=' + width;
-            }
-            if args.len() > 2 {
-                height = args[2];
-                code += ', height=' + height;
-            }
-            if args.len() > 3 {
-                bgColor = args[3];
-                code += ', bg="' + bgColor + '"';
-            }
-            if args.len() > 4 {
-                fgColor = args[4];
-                code += ', fg="' + fgColor + '"';
-            }
-            code += ')';
-            let index = 1;
-            for frame in self.tk1.frames {
-                index += 1;
-            }
-            let fr = Frame.new('frame' + index.to_str());
-            fr.tk1 = self.tk1;
-            fr.master = master;
-            self.tk1.frame[text] = fr;
-            io.evaluate(code);
-            return fr;
+            
         }
     }
 
@@ -197,11 +161,11 @@ let Label = Type.extend({
 
         func setText(self, text) {
             self.text = text;
-            return io.evaluate(self.variableName + '.config(text="' + text + '")');
+            return io.pyeval(self.variableName + '.config(text="' + text + '")');
         }
 
         func bind(self, ev, fun) {
-            return io.evaluate('from ParaCode import ParaCode; paraCode = ParaCode(); ' + self.variableName + '.bind("' + ev + '", lambda fun: paraCode.eval_data(' + fun + '(event.char, event.type)' + '))');
+            return io.pyeval('from ParaCode import ParaCode; paraCode = ParaCode(); ' + self.variableName + '.bind("' + ev + '", lambda fun: paraCode.eval_data(' + fun + '(event.char, event.type)' + '))');
         }
 
         pack
@@ -252,7 +216,7 @@ let label = Func.extend({
             lb.tk1 = self.tk1;
             lb.master = master;
             self.tk1.labels[text] = lb;
-            io.evaluate(code);
+            io.pyeval(code);
             return lb;
         }
     }
@@ -276,17 +240,17 @@ let Button = Type.extend({
 
         func setText(self, text) {
             self.text = text;
-            return io.evaluate(self.variableName + '.config(text="' + text + '")');
+            return io.pyeval(self.variableName + '.config(text="' + text + '")');
         }
 
         func setWidth(self, width) {
             self.width = width;
-            return io.evaluate(self.variableName + '.config(width=' + width + ')');
+            return io.pyeval(self.variableName + '.config(width=' + width + ')');
         }
 
         func setHeight(self, height) {
             self.height = height;
-            return io.evaluate(self.variableName + '.config(height=' + height + ')');
+            return io.pyeval(self.variableName + '.config(height=' + height + ')');
         }
 
         func setSize(self, width, height) {
@@ -295,7 +259,7 @@ let Button = Type.extend({
         }
 
         func bind(self, ev, fun) {
-            return io.evaluate('from ParaCode import ParaCode; paraCode = ParaCode(); ' + self.variableName + '.bind("' + ev + '", lambda fun: paraCode.eval_data(' + fun + '(event.char, event.type)' + '))');
+            return io.pyeval('from ParaCode import ParaCode; paraCode = ParaCode(); ' + self.variableName + '.bind("' + ev + '", lambda fun: paraCode.eval_data(' + fun + '(event.char, event.type)' + '))');
         }
 
         pack
@@ -354,7 +318,7 @@ let button = Func.extend({
             b.tk1 = self.tk1;
             b.master = master;
             self.tk1.buttons[text] = b;
-            io.evaluate(code);
+            io.pyeval(code);
             return b;
         }
     }
@@ -378,17 +342,17 @@ let Entry = Type.extend({
 
         func setText(self, text) {
             self.text = text;
-            return io.evaluate(self.variableName + '.config(text="' + text + '")');
+            return io.pyeval(self.variableName + '.config(text="' + text + '")');
         }
 
         func setWidth(self, width) {
             self.width = width;
-            return io.evaluate(self.variableName + '.config(width=' + width + ')');
+            return io.pyeval(self.variableName + '.config(width=' + width + ')');
         }
 
         func setHeight(self, height) {
             self.height = height;
-            return io.evaluate(self.variableName + '.config(height=' + height + ')');
+            return io.pyeval(self.variableName + '.config(height=' + height + ')');
         }
 
         func setSize(self, width, height) {
@@ -397,7 +361,7 @@ let Entry = Type.extend({
         }
 
         func bind(self, ev, fun) {
-            return io.evaluate('from ParaCode import ParaCode; paraCode = ParaCode(); ' + self.variableName + '.bind("' + ev + '", lambda fun: paraCode.eval_data(' + fun + '(event.char, event.type)' + '))');
+            return io.pyeval('from ParaCode import ParaCode; paraCode = ParaCode(); ' + self.variableName + '.bind("' + ev + '", lambda fun: paraCode.eval_data(' + fun + '(event.char, event.type)' + '))');
         }
 
         get
@@ -462,7 +426,7 @@ let entry = Func.extend({
             ent.tk1 = self.tk1;
             ent.master = master;
             self.tk1.entries = self.tk1.entries.append([text1, ent]);
-            io.evaluate(code);
+            io.pyeval(code);
             return ent;
         }
     }
@@ -486,17 +450,17 @@ let Text = Type.extend({
 
         func setText(self, text) {
             self.text = text;
-            return io.evaluate(self.variableName + '.config(text="' + text + '")');
+            return io.pyeval(self.variableName + '.config(text="' + text + '")');
         }
 
         func setWidth(self, width) {
             self.width = width;
-            return io.evaluate(self.variableName + '.config(width=' + width + ')');
+            return io.pyeval(self.variableName + '.config(width=' + width + ')');
         }
 
         func setHeight(self, height) {
             self.height = height;
-            return io.evaluate(self.variableName + '.config(height=' + height + ')');
+            return io.pyeval(self.variableName + '.config(height=' + height + ')');
         }
 
         func setSize(self, width, height) {
@@ -505,7 +469,7 @@ let Text = Type.extend({
         }
 
         func bind(self, ev, fun) {
-            return io.evaluate('from ParaCode import ParaCode; paraCode = ParaCode(); ' + self.variableName + '.bind("' + ev + '", lambda fun: paraCode.eval_data(' + fun + '(event.char, event.type)' + '))');
+            return io.pyeval('from ParaCode import ParaCode; paraCode = ParaCode(); ' + self.variableName + '.bind("' + ev + '", lambda fun: paraCode.eval_data(' + fun + '(event.char, event.type)' + '))');
         }
 
         get
@@ -570,7 +534,7 @@ let text = Func.extend({
             tex.tk1 = self.tk1;
             tex.master = master;
             self.tk1.texts = self.tk1.texts.append([text1, tex]);
-            io.evaluate(code);
+            io.pyeval(code);
             return tex;
         }
     }
@@ -595,7 +559,7 @@ let doGet = Func.extend({
                 code += index.to_str();
             }
             code += ')';
-            return io.evaluate(code);
+            return io.pyeval(code);
         }
     }
 
@@ -633,7 +597,7 @@ let doDelete = Func.extend({
                 }
             }
             code += ')';
-            return io.evaluate(code);
+            return io.pyeval(code);
         }
     }
 
@@ -663,7 +627,7 @@ let doInsert = Func.extend({
             code += text;
             code += '"';
             code += ')';
-            return io.evaluate(code);
+            return io.pyeval(code);
         }
     }
 
@@ -692,7 +656,7 @@ let doPack = Func.extend({
                 code += ', pady=' + padY;
             }
             code += ')';
-            return io.evaluate(code);
+            return io.pyeval(code);
         }
     }
 
@@ -730,7 +694,7 @@ let doPlace = Func.extend({
                 code += ', sticky="' + sticky + '"';
             }
             code += ')';
-            return io.evaluate(code);
+            return io.pyeval(code);
         }
     }
 
@@ -753,7 +717,7 @@ let doGrid = Func.extend({
             code += 'row="' + row + '"';
             code += ', column="' + column + '"';
             code += ')';
-            return io.evaluate(code);
+            return io.pyeval(code);
         }
     }
 
@@ -773,7 +737,7 @@ let doDestroy = Func.extend({
             let row = args[0];
             let column = args[1];
             let code = 'import tkinter as tk; ' + self.tk1.variableName + '.destroy()';
-            return io.evaluate(code);
+            return io.pyeval(code);
         }
     }
 

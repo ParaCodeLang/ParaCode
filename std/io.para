@@ -1,22 +1,10 @@
 let io = Type.extend({
-    evaluate = Func.extend({
-        instance = {
-            func __call__(self, _args) {
-                let args = _args.from(1);
-                return __intern_eval__(*args);
-            }
-        }
-    }).new()
+    func pyeval(self, *args) {
+        return __intern_pyeval__(*args);
+    }
 });
 
 import "std/io/file.para";
 import "std/io/console.para";
 
-let print = Func.extend({
-    instance = {
-        func __call__(self, _args) {
-            let args = _args.from(1);
-            return __intern_print__(*args);
-        }
-    }
-}).new();
+let print = io.write;

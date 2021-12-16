@@ -6,10 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Support for variables in the `catch` statement
+- More errors
 - Complete requests HTTP library
-- Complete regex support
 - Better interfacing with python code from ParaCode
+- The ability to use keyword arguments when calling a function
+- **kwargs (Keyword Arguments)
+
+## [2.1.0] - CURRENTLY UNRELEASED
+### Added
 - Easy use of default parameters in functions
+- *args (Non-Keyword Arguments)
+- Complete regex support
 
 ## [2.0.1] - 2021-10-18
 ### Fixed
@@ -41,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - PCPM package uploading doesn't require a login
 
-[Unreleased]: https://github.com/DaRubyMiner360/ParaCode/compare/2.0.1...HEAD
+[Unreleased]: https://github.com/DaRubyMiner360/ParaCode/compare/2.1.0...HEAD
+[2.1.0]: https://github.com/DaRubyMiner360/ParaCode/compare/2.0.1...2.1.0
 [2.0.1]: https://github.com/DaRubyMiner360/ParaCode/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/DaRubyMiner360/ParaCode/releases/tag/2.0.0

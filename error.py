@@ -2,7 +2,7 @@ from enum import Enum, auto
 from util import LogColor
 
 class InterpreterError(Exception):
-    def __init__(self, m, node=None, type=None, message=None, cont=False, name=None, classnames=None):
+    def __init__(self, m, node=None, type=None, message=None, cont=False, name=None, classnames=None, object=None):
         super().__init__(m)
         self.node = node
         self.type = type
@@ -10,6 +10,7 @@ class InterpreterError(Exception):
         self.cont = cont
         self.name = name
         self.classnames = classnames
+        self.object = object
 
 class ErrorType(Enum):
     Exception = auto()
@@ -21,7 +22,7 @@ class ErrorType(Enum):
     MacroExpansionError = auto()
 
 class Error():
-    def __init__(self, type, location, message, filename, name=None):
+    def __init__(self, type, location, message, filename, name="Exception"):
         self.type = type
         self.filename = filename
         self.message = message
@@ -50,9 +51,10 @@ class Error():
         return self.location[0]
 
     def __repr__(self):
-        nstr = f"{self.location_filename}:{self.location_row}:{self.location_col}: {LogColor.Error}{self.type.name} error:{LogColor.Default}"
-        if self.type == ErrorType.Exception:
-            nstr = f"{self.location_filename}:{self.location_row}:{self.location_col}: {LogColor.Error}{self.name}:{LogColor.Default}"
+        nstr = f"{self.location_filename}:{self.location_row}:{self.location_col}: {LogColor.Error}{self.name}:{LogColor.Default}"
+        # nstr = f"{self.location_filename}:{self.location_row}:{self.location_col}: {LogColor.Error}{self.type.name} error:{LogColor.Default}"
+        # if self.type == ErrorType.Exception:
+        #     nstr = f"{self.location_filename}:{self.location_row}:{self.location_col}: {LogColor.Error}{self.name}:{LogColor.Default}"
         return f"{LogColor.Bold}{nstr}{LogColor.Default} {self.message}"
     __str__ = __repr__
         

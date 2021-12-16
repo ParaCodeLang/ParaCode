@@ -50,41 +50,44 @@ class Interpreter():
 
         return self.current_scope
 
-    def error(self, node, type, message, cont=False, name=None, classnames=None):
-        if type == ErrorType.Syntax:
-            name = "Syntax Error"
-            classnames = ["Exception", "SyntaxError"]
-        elif type == ErrorType.DoesNotExist:
-            name = "DoesNotExist Error"
-            classnames = ["Exception", "DoesNotExistError"]
-        elif type == ErrorType.TypeError:
-            name = "Type Error"
-            classnames = ["Exception", "TypeError"]
-        elif type == ErrorType.MultipleDefinition:
-            name = "MultipleDefinition Error"
-            classnames = ["Exception", "MultipleDefinitionError"]
-        elif type == ErrorType.ArgumentError:
-            name = "Argument Error"
-            classnames = ["Exception", "Argument Error"]
-        elif type == ErrorType.MacroExpansionError:
-            name = "Macro Expansion Error"
-            classnames = ["Exception", "MacroExpansionError"]
+    def error(self, node, type, message, cont=False, name=None, classnames=None, object=None):
+        if name is None and classnames is None:
+            if type == ErrorType.Syntax:
+                name = "Syntax Error"
+                classnames = ["Exception", "SyntaxError"]
+            elif type == ErrorType.DoesNotExist:
+                name = "DoesNotExist Error"
+                classnames = ["Exception", "DoesNotExistError"]
+            elif type == ErrorType.TypeError:
+                name = "Type Error"
+                classnames = ["Exception", "TypeError"]
+            elif type == ErrorType.MultipleDefinition:
+                name = "Multiple Definition Error"
+                classnames = ["Exception", "MultipleDefinitionError"]
+            elif type == ErrorType.ArgumentError:
+                name = "Argument Error"
+                classnames = ["Exception", "Argument Error"]
+            elif type == ErrorType.MacroExpansionError:
+                name = "Macro Expansion Error"
+                classnames = ["Exception", "MacroExpansionError"]
+            else:
+                name = "Exception"
+                classnames = ["Exception"]
 
-        
         location = None
 
         if node is not None:
             location = node.location
 
         if not cont and self.in_try:
-            raise InterpreterError('Interpreter error', node, type, message, cont, name, classnames)
+            raise InterpreterError('Interpreter error', node, type, message, cont, name, classnames, object)
 
         err = Error(type, location, message, self.source_location.filename, name)
         self.error_list.push_error(err)
         self.error_list.print_errors()
 
         if cont or not self.in_try:
-            raise InterpreterError('Interpreter error', node, type, message, cont, name, classnames)
+            raise InterpreterError('Interpreter error', node, type, message, cont, name, classnames, object)
         
     def visit(self, node):
         if isinstance(node, BasicValue):
@@ -137,7 +140,6 @@ class Interpreter():
         
         if node.token.type == TokenType.Plus:
             funstr = '__add__'
-            # return BasicValue(left.value + right.value)
         elif node.token.type == TokenType.Minus:
             funstr = '__sub__'
         elif node.token.type == TokenType.Multiply:
@@ -196,11 +198,13 @@ class Interpreter():
     def visit_Declare(self, node):
         type_node_value = None
 
+        if isinstance(node, NodeSplatArgument):
+            node = NodeDeclare(None, node.token, NodeNone(node.token))
         if node.type_node is not None:
             type_node_value = self.visit(node.type_node)
 
         if self.current_scope.find_variable_info(node.name.value, limit=True) != None:
-            self.error(node, ErrorType.MultipleDefinition, "multiple definition of '{}'".format(node.name.value), False)
+            self.error(node, ErrorType.MultipleDefinition, "multiple definition of '{}'".format(node.name.value))
    
         self.current_scope.declare_variable(node.name.value, type_node_value)
         val = self.visit(node.value)
@@ -243,10 +247,10 @@ class Interpreter():
 
     def assignment_typecheck(self, node, type_object, assignment_value):
         if type_object is None:
-            self.error(node, ErrorType.TypeError, 'Set with decltype but decltype resolved to None', False)
+            self.error(node, ErrorType.TypeError, 'Set with decltype but decltype resolved to None')
             return False
         elif not isinstance(type_object, BasicType):
-            self.error(node, ErrorType.TypeError, '{} is not a valid type object and cannot be used as a declaration type'.format(type_object), False)
+            self.error(node, ErrorType.TypeError, '{} is not a valid type object and cannot be used as a declaration type'.format(type_object))
             return False
         else:
             assignment_type = BasicValue(assignment_value).lookup_type(self.global_scope)
@@ -255,17 +259,17 @@ class Interpreter():
                 assignment_type = assignment_value.parent
 
             if assignment_type is None:
-                self.error(node, ErrorType.TypeError, 'Assignment requires type {} but could not resolve a runtime type of assignment value'.format(type_object), False)
+                self.error(node, ErrorType.TypeError, 'Assignment requires type {} but could not resolve a runtime type of assignment value'.format(type_object))
                 return None
             if isinstance(assignment_type, BasicValue):
                 assignment_type = assignment_type.extract_value()
 
             if not isinstance(assignment_type, BasicType):
-                self.error(node, ErrorType.TypeError, '{} is not a valid runtime type object'.format(assignment_type), False)
+                self.error(node, ErrorType.TypeError, '{} is not a valid runtime type object'.format(assignment_type))
                 return False
     
             if not type_object.compare_type(assignment_type):
-                self.error(node, ErrorType.TypeError, 'Attempted to assign <{}> to a value of type <{}>'.format(type_object.friendly_typename, assignment_type.friendly_typename), False)
+                self.error(node, ErrorType.TypeError, 'Attempted to assign <{}> to a value of type <{}>'.format(type_object.friendly_typename, assignment_type.friendly_typename))
                 return False
 
         return True
@@ -290,7 +294,7 @@ class Interpreter():
             (target, member) = self.walk_member_expression(node.lhs)
 
             if not isinstance(target, BasicObject):
-                self.error(node, ErrorType.TypeError, 'member expression not assignable', False)
+                self.error(node, ErrorType.TypeError, 'member expression not assignable')
                 return None
 
             target_type = target.parent
@@ -315,23 +319,20 @@ class Interpreter():
             return self.visit(member_access_call_node)
 
         else:
-            self.error(node, ErrorType.TypeError, 'cannot assign {}'.format(node.lhs), False)
+            self.error(node, ErrorType.TypeError, 'cannot assign {}'.format(node.lhs))
 
             return None
             
     def collect_args(self, node):
         collected_args = []
         for arg in node.argument_list.arguments:
-                arg_visited = self.visit(arg)
-                
-                #if arg.type == NodeType.SplatArgument:
-                #    print("encountered splat: {}".format(arg_visited))
+            arg_visited = self.visit(arg)
 
-                if type(arg_visited) == list:
-                    for arg in arg_visited:
-                        collected_args.append(arg)
-                else:
-                    collected_args.append(arg_visited)
+            if type(arg_visited) == list:
+                for arg in arg_visited:
+                    collected_args.append(arg)
+            else:
+                collected_args.append(arg_visited)
 
         return collected_args
 
@@ -394,9 +395,8 @@ class Interpreter():
         else:
             target = self.visit(node.lhs)
         return_value = 0
-
+        
         if target is not None:
-
             if isinstance(target, BuiltinFunction):
                 collected_args = self.collect_args(node)
                 
@@ -417,21 +417,77 @@ class Interpreter():
 
                 expected_arg_count = len(target.argument_list.arguments)
                 given_arg_count = len(collected_args)
+                original_given_arg_count = given_arg_count
 
-                if expected_arg_count != given_arg_count:
-                    self.error(node, ErrorType.ArgumentError, 'method expected {} arguments, {} given'.format(expected_arg_count, given_arg_count), False)
+                if isinstance(target.argument_list.arguments[-1], NodeSplatArgument):
+                    if given_arg_count > 0:
+                        new_collected_args = []
+                        for i in range(0, given_arg_count):
+                            if i < expected_arg_count - 1:
+                                new_collected_args.append(collected_args[i])
+                            elif i == expected_arg_count - 1:
+                                new_collected_args.append([])
+                                try:
+                                    value = BasicValue(eval(collected_args[i]))
+                                except:
+                                    value = BasicValue(eval(str(BasicType(collected_args[i]))))
+                                new_collected_args[expected_arg_count - 1].append(value)
+                            elif i > expected_arg_count - 1:
+                                try:
+                                    value = BasicValue(eval(collected_args[i]))
+                                except:
+                                    value = BasicValue(eval(str(BasicType(collected_args[i]))))
+                                new_collected_args[expected_arg_count - 1].append(value)
+                        amount = len(new_collected_args)
+                        for i in range(0, expected_arg_count):
+                            if i > amount - 1:
+                                new_collected_args.append([])
+                        collected_args = new_collected_args
+                        if not isinstance(collected_args[-1], BasicObject) and not isinstance(collected_args[-1], BasicValue) and not isinstance(collected_args[-1], BasicType):
+                            try:
+                                value = BasicValue(eval(collected_args[-1]))
+                            except:
+                                value = BasicValue(eval(str(BasicType(collected_args[-1]))))
+                        else:
+                            value = collected_args[-1]
+                        collected_args[-1] = value
+                        given_arg_count = len(collected_args)
+                    else:
+                        collected_args.append(BasicValue([]))
+                        given_arg_count = len(collected_args)
+                elif expected_arg_count < given_arg_count:
+                    self.error(node, ErrorType.ArgumentError, 'method expected {} arguments, {} given'.format(expected_arg_count, original_given_arg_count))
+                    return None
+                for i in range(0, expected_arg_count):
+                    if i >= given_arg_count:
+                        if isinstance(target.argument_list.arguments[i], NodeSplatArgument):
+                            arg = NodeDeclare(None, target.argument_list.arguments[i].token, NodeNone(target.argument_list.arguments[i].token))
+                        else:
+                            arg = target.argument_list.arguments[i]
+                        if not isinstance(arg.value, NodeNone):
+                            try:
+                                value = BasicValue(eval(target.argument_list.arguments[i].value.value.token.value))
+                            except:
+                                value = BasicValue(eval(str(BasicType(target.argument_list.arguments[i].value.value.token.value))))
+                            collected_args.append(value)
+                            given_arg_count += 1
+                if expected_arg_count > given_arg_count:
+                    self.error(node, ErrorType.ArgumentError, 'method expected {} arguments, {} given'.format(expected_arg_count, given_arg_count))
                     return None
 
                 # typecheck args
                 for i in range(0, expected_arg_count):
-                    target_arg = target.argument_list.arguments[i]
+                    if isinstance(target.argument_list.arguments[i], NodeSplatArgument):
+                        target_arg = NodeDeclare(None, target.argument_list.arguments[i].token, NodeNone(target.argument_list.arguments[i].token))
+                    else:
+                        target_arg = target.argument_list.arguments[i]
                     call_arg = collected_args[i]
 
                     type_node = target_arg.type_node
 
                     if type_node is not None:
                         decltype = self.visit(type_node)
-
+                        
                         self.assignment_typecheck(target_arg, decltype, call_arg)
 
                 # push arguments to stack
@@ -445,7 +501,7 @@ class Interpreter():
                 result = self.stack.pop()
 
                 if not isinstance(result, BasicValue):
-                    self.error(node, ErrorType.TypeError, 'expected method to return an instance of BasicValue, got {}'.format(result), False)
+                    self.error(node, ErrorType.TypeError, 'expected method to return an instance of BasicValue, got {}'.format(result))
                     return None
 
                 return result
@@ -471,12 +527,12 @@ class Interpreter():
                 )
                 return self.visit(member_access_call_node)
 
-        self.error(node, ErrorType.TypeError, 'invalid call: {} is not callable'.format(target), False)
+        self.error(node, ErrorType.TypeError, 'invalid call: {} is not callable'.format(target))
 
     def walk_variable(self, node):
         var = self.current_scope.find_variable_info(node.value)
         if var is None:
-            self.error(node, ErrorType.DoesNotExist, "Referencing undefined variable '{}'".format(node.value), False)
+            self.error(node, ErrorType.DoesNotExist, "Referencing undefined variable '{}'".format(node.value))
             return None
 
         return var
@@ -505,13 +561,13 @@ class Interpreter():
         result = self.visit(member_access_call_node)
 
         if result is None:
-            self.error(node, ErrorType.TypeError, 'cannot check if object {} is truthy'.format(node), False)
+            self.error(node, ErrorType.TypeError, 'cannot check if object {} is truthy'.format(node))
             return None
 
         int_result = result.extract_value()
 
         if type(int_result) != int:
-            self.error(node, ErrorType.TypeError, 'expected __bool__ call to return an int'.format(node), False)
+            self.error(node, ErrorType.TypeError, 'expected __bool__ call to return an int'.format(node))
             return None
 
         return int_result != 0
@@ -529,10 +585,14 @@ class Interpreter():
 
     def visit_Try(self, node):
         if node.catch_block is not None and node.catch_block != [] and node.else_block is None and node.finally_block is None:
+            print("AA")
             try:
                 self.in_try = True
                 return self.visit_Block(node.block)
             except InterpreterError as e:
+                if e.type == ErrorType.Syntax:
+                    self.in_try = False
+                    return self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
                 self.in_try = True
                 found = False
                 for i in range(len(node.catch_block)):
@@ -554,7 +614,18 @@ class Interpreter():
                                         found = True
                                         self.visit_Block(node.catch_block[i])
                         elif type(node.expr[i].token.value) == str:
+                            print("AAA")
+                            # print(node.expr[i].token.value)
+                            # print(e.object.members["message"])
+                            # print(node.expr[i + 1].token.value)
                             if node.expr[i].token.value in e.classnames:
+                                if node.variable[i] is not None:
+                                    node.variable[i].type_node.token.value = node.expr[i].token.value
+                                    # print(node.variable[i].value)
+                                    # node.variable[i].value.token.token.value = e.object
+                                    # print(node.variable[i].value)
+                                    self.visit_Declare(node.variable[i])
+                                    
                                 if i == len(node.catch_block) - 1:
                                     self.in_try = True
                                     return self.visit_Block(node.catch_block[i])
@@ -562,14 +633,18 @@ class Interpreter():
                                     found = True
                                     self.visit_Block(node.catch_block[i])
                             elif i == len(node.catch_block) - 1 and not found:
-                                self.error(e.node, e.type, e.message, True, e.name, e.classnames)
+                                self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
                         elif i == len(node.catch_block) - 1 and not found:
-                            self.error(e.node, e.type, e.message, True, e.name, e.classnames)
+                            self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
         elif node.catch_block is not None and node.catch_block != [] and node.else_block is None and node.finally_block is not None:
+            print("B")
             try:
                 self.in_try = True
                 self.visit_Block(node.block)
             except InterpreterError as e:
+                if e.type == ErrorType.Syntax:
+                    self.in_try = False
+                    return self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
                 self.in_try = True
                 found = False
                 for i in range(len(node.catch_block)):
@@ -599,17 +674,21 @@ class Interpreter():
                                     found = True
                                     self.visit_Block(node.catch_block[i])
                             elif i == len(node.catch_block) - 1 and not found:
-                                self.error(e.node, e.type, e.message, True, e.name, e.classnames)
+                                self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
                         elif i == len(node.catch_block) - 1 and not found:
-                            self.error(e.node, e.type, e.message, True, e.name, e.classnames)
+                            self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
             finally:
                 self.in_try = True
                 return self.visit_Block(node.finally_block)
         elif (node.catch_block is not None and node.catch_block != []) and node.else_block is not None and node.finally_block is None:
+            print("C")
             try:
                 self.in_try = True
                 self.visit_Block(node.block)
             except InterpreterError as e:
+                if e.type == ErrorType.Syntax:
+                    self.in_try = False
+                    return self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
                 self.in_try = True
                 found = False
                 for i in range(len(node.catch_block)):
@@ -639,21 +718,26 @@ class Interpreter():
                                     found = True
                                     self.visit_Block(node.catch_block[i])
                             elif i == len(node.catch_block) - 1 and not found:
-                                self.error(e.node, e.type, e.message, True, e.name, e.classnames)
+                                self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
                         elif i == len(node.catch_block) - 1 and not found:
-                            self.error(e.node, e.type, e.message, True, e.name, e.classnames)
+                            self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
             else:
                 self.in_try = True
                 return self.visit_Block(node.else_block)
         elif (node.catch_block is not None and node.catch_block != []) and node.else_block is not None and node.finally_block is not None:
+            # BasicObject(parent=None, members={'raise': AstNode[FunctionExpression, AstNode[Block, LexerToken[Type:TokenType.Keyword, Value:'return']]], 'message': 'A'})
             try:
                 self.in_try = True
                 self.visit_Block(node.block)
             except InterpreterError as e:
+                if e.type == ErrorType.Syntax:
+                    self.in_try = False
+                    return self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
                 self.in_try = True
                 found = False
                 for i in range(len(node.catch_block)):
                     if node.expr[i] is None:
+                        print("AB")
                         if i == len(node.catch_block) - 1:
                             self.in_try = True
                             return self.visit_Block(node.catch_block[i])
@@ -662,6 +746,7 @@ class Interpreter():
                             self.visit_Block(node.catch_block[i])
                     else:
                         if type(node.expr[i]) == list:
+                            print("B")
                             for value in node.expr[i]:
                                 if value.token.value in e.classnames:
                                     if i == len(node.catch_block) - 1:
@@ -670,52 +755,55 @@ class Interpreter():
                                     else:
                                         found = True
                                         self.visit_Block(node.catch_block[i])
-
-                                        # type_node_value = None
-
-                                        # if node.type_node is not None:
-                                        #     type_node_value = self.visit(node.type_node)
-
-                                        # if self.current_scope.find_variable_info(node.variable[i].name.value, limit=True) != None:
-                                        #     self.error(node, ErrorType.MultipleDefinition, "multiple definition of '{}'".format(node.variable[i].name.value), False)
-                                
-                                        # self.current_scope.declare_variable(node.variable[i].name.value, type_node_value)
-                                        # # AstNode[Assign, AstNode[String, LexerToken[Type:TokenType.String, Value:''TypeError'']]]
-                                        # self.visit(node.variable[i].value)
                         elif type(node.expr[i].token.value) == str:
+                            print("C")
                             if node.expr[i].token.value in e.classnames:
+                                print("CA")
                                 if i == len(node.catch_block) - 1:
+                                    print("CAA")
                                     self.in_try = True
                                     return self.visit_Block(node.catch_block[i])
                                 else:
+                                    print("CAB")
+                                    # print(node)
                                     found = True
                                     self.visit_Block(node.catch_block[i])
                             elif i == len(node.catch_block) - 1 and not found:
-                                self.error(e.node, e.type, e.message, True, e.name, e.classnames)
+                                print("CB")
+                                self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
                         elif i == len(node.catch_block) - 1 and not found:
-                            self.error(e.node, e.type, e.message, True, e.name, e.classnames)
+                            print("D")
+                            self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
             else:
                 self.visit_Block(node.else_block)
             finally:
                 self.in_try = True
                 return self.visit_Block(node.finally_block)
         elif (node.catch_block is None or node.catch_block == []) and node.else_block is not None and node.finally_block is None:
+            print("E")
             try:
                 self.in_try = True
                 return self.visit_Block(node.block)
             except InterpreterError as e:
+                if e.type == ErrorType.Syntax:
+                    self.in_try = False
+                    return self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
                 self.in_try = True
-                self.error(e.node, e.type, e.message, True, e.name, e.classnames)
+                self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
             else:
                 self.in_try = True
                 return self.visit_Block(node.else_block)
         elif (node.catch_block is None or node.catch_block == []) and node.else_block is None and node.finally_block is not None:
+            print("F")
             try:
                 self.in_try = True
                 return self.visit_Block(node.block)
             except InterpreterError as e:
+                if e.type == ErrorType.Syntax:
+                    self.in_try = False
+                    return self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
                 self.in_try = True
-                self.error(e.node, e.type, e.message, True, e.name, e.classnames)
+                self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
             finally:
                 self.in_try = True
                 return self.visit_Block(node.else_block)
@@ -724,8 +812,11 @@ class Interpreter():
                 self.in_try = True
                 return self.visit_Block(node.block)
             except InterpreterError as e:
+                if e.type == ErrorType.Syntax:
+                    self.in_try = False
+                    return self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
                 self.in_try = True
-                self.error(e.node, e.type, e.message, True, e.name, e.classnames)
+                self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
             else:
                 self.in_try = True
                 return self.visit_Block(node.else_block)
@@ -737,8 +828,11 @@ class Interpreter():
                 self.in_try = True
                 return self.visit_Block(node.block)
             except InterpreterError as e:
+                if e.type == ErrorType.Syntax:
+                    self.in_try = False
+                    return self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
                 self.in_try = True
-                self.error(e.node, e.type, e.message, True, e.name, e.classnames)
+                self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
             
     def visit_While(self, node):
         truthy_result = self.check_object_truthy(node.expr)
@@ -780,17 +874,17 @@ class Interpreter():
         value = self.visit(node.expr)
 
         if value is None:
-            self.error(node, ErrorType.TypeError, 'cannot perform splat operation: value is null', False)
+            self.error(node, ErrorType.TypeError, 'cannot perform splat operation: value is null')
             return None
 
         if not isinstance(value, BasicValue):
-            self.error(node, ErrorType.TypeError, 'cannot perform splat operation: value is not a BasicValue', False)
+            self.error(node, ErrorType.TypeError, 'cannot perform splat operation: value is not a BasicValue')
             return None
 
         extracted_value = value.extract_value()
 
         if not isinstance(extracted_value, list):
-            self.error(node, ErrorType.TypeError, 'cannot perform splat operation: value must be an array', False)
+            self.error(node, ErrorType.TypeError, 'cannot perform splat operation: value must be an array')
             return None
 
         args = []
@@ -813,6 +907,8 @@ class Interpreter():
             if isinstance(value, AstNode):
                 value = self.visit(value)
 
+            if isinstance(argument, NodeSplatArgument):
+                argument = NodeDeclare(None, argument.token, NodeNone(argument.token))
             self.current_scope.set_variable(argument.name.value, value)
 
     def visit_FunctionExpression(self, node):
@@ -829,7 +925,7 @@ class Interpreter():
         ast = parser.parse()
 
         if len(parser.error_list.errors) > 0:
-            self.error(node, ErrorType.MacroExpansionError, 'Macro expansion failed:\n{}'.format('\t'.join(map(lambda x: str(x), parser.error_list.errors))), False)
+            self.error(node, ErrorType.MacroExpansionError, 'Macro expansion failed:\n{}'.format('\t'.join(map(lambda x: str(x), parser.error_list.errors))))
             return None
 
         last_value = None
@@ -840,11 +936,10 @@ class Interpreter():
         return BasicValue(last_value).extract_basicvalue()
 
     def call_builtin_function(self, fun, this_object, arguments, node):
-
         basic_value_result = fun.call(BuiltinFunctionArguments(interpreter=self, this_object=this_object, arguments=arguments, node=node))
 
         if not isinstance(basic_value_result, BasicValue):
-            self.error(node, ErrorType.TypeError, 'expected method {} to return an instance of BasicValue, got {}'.format(fun, basic_value_result), False)
+            self.error(node, ErrorType.TypeError, 'expected method {} to return an instance of BasicValue, got {}'.format(fun, basic_value_result))
             return None
 
         return basic_value_result
@@ -862,13 +957,12 @@ class Interpreter():
             last_child = None
             for child in node.block.children:
                 last_child = child
-                if type(child) == NodeFunctionReturn:
+                if isinstance(child, NodeFunctionReturn):
                     break
 
             # no return statement, push return code 0 to the stack
             if type(last_child) != NodeFunctionReturn:
                 self.stack.push(BasicValue(0)) # should just be null or something
-                
         except ReturnJump:
             # exit all enclosed scopes until the current scope
             # is equal to the same one we opened at the start of the function
@@ -912,7 +1006,7 @@ class Interpreter():
             target_type_object = target.lookup_type(self.global_scope).extract_basicvalue()
 
             if target_type_object is None:
-                self.error(node, ErrorType.TypeError, 'invalid member access: target {} is not a BasicObject'.format(target), False)
+                self.error(node, ErrorType.TypeError, 'invalid member access: target {} is not a BasicObject'.format(target))
                 return None
 
             # for a string this would basically mean:
@@ -926,7 +1020,7 @@ class Interpreter():
         target = self.visit(node.lhs)
 
         # if target is None:
-        #     self.error(node, ErrorType.TypeError, 'invalid member access: {} has no member {}'.format(target, node.identifier), False)
+        #     self.error(node, ErrorType.TypeError, 'invalid member access: {} has no member {}'.format(target, node.identifier))
         #     return None
 
         target = self.basic_value_to_object(node, target)
@@ -934,7 +1028,7 @@ class Interpreter():
         member = target.lookup_member(node.identifier.value)
 
         if member is None:
-            self.error(node, ErrorType.TypeError, '{} has no direct or inherited member `{}`'.format(obj_to_string(self, node, target), node.identifier.value), False)
+            self.error(node, ErrorType.TypeError, '{} has no direct or inherited member `{}`'.format(obj_to_string(self, node, target), node.identifier.value))
 
         return (target, member)
 

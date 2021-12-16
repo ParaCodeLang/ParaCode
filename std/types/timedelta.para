@@ -6,15 +6,6 @@ let TimeDelta = Type.extend({
         seconds = 0
         microseconds = 0
 
-        //min = Func.extend({
-        //    instance = {
-        //        func __call__(self, _args) {
-        //            let args = _args.from(1);
-        //            return __intern_timedelta_min__();
-        //        }
-        //    }
-        //}).new()
-
         func to_str(self) {
             return "TimeDelta(" + self.days + ", " + self.seconds + ", " + self.microseconds + ")";
         }

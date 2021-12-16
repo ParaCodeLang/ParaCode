@@ -16,8 +16,8 @@ class ParaCode():
     initialized = False
 
     # Language Info
-    version = "2.0.1"
-    release_stage = "stable"
+    version = "2.1.0"
+    release_stage = "development"
 
     def __init__(self):
         ParaCode.instance = self
@@ -59,7 +59,6 @@ class ParaCode():
 
         return_code = None
         if interpret:
-
             # init interpreter and visit nodes
             self.interpreter = Interpreter(source_loc)
 

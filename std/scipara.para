@@ -1,4 +1,4 @@
-io.evaluate("import os\ntry:\n    import scipy\nexcept ImportError:\n    os.system('pip install numpy scipy matplotlib ipython jupyter pandas sympy nose')");
+io.pyeval("import os\ntry:\n    import scipy\nexcept ImportError:\n    os.system('pip install numpy scipy matplotlib ipython jupyter pandas sympy nose')");
 
 let SciPara: type = Type.extend({
     instance = {

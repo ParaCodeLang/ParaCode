@@ -12,9 +12,9 @@ from interpreter.basic_value import BasicValue
 from interpreter.function import BuiltinFunction
 from interpreter.env.builtin.arith import *
 from interpreter.env.builtin.time import *
-from parse.node import NodeFunctionExpression, NodeCall, NodeArgumentList, NodeMemberExpression, NodeNone
+from parse.node import NodeFunctionExpression, NodeCall, NodeArgumentList, NodeMemberExpression, NodeNone, NodeSplatArgument
 from error import ErrorType
-from util import LogColor
+from util import LogColor, fixiter
 
 def obj_to_string(interpreter, node, obj):
     obj_str = str(obj)
@@ -73,12 +73,7 @@ def builtin_console_write(arguments):
     interpreter = arguments.interpreter
     node = arguments.node
 
-    if len(arguments.arguments) > 1:
-        _print_object(interpreter, node, arguments.arguments[0].extract_value(), end=arguments.arguments[1].extract_value())
-    elif len(arguments.arguments) > 0:
-        _print_object(interpreter, node, arguments.arguments[0].extract_value(), end='')
-    else:
-        _print_object(interpreter, node, "", end='')
+    _print_object(interpreter, node, arguments.arguments[0].extract_value(), end=arguments.arguments[1].extract_value())
 
     return BasicValue(None)
 
@@ -86,12 +81,7 @@ def builtin_printn(arguments):
     interpreter = arguments.interpreter
     node = arguments.node
 
-    if len(arguments.arguments) > 1:
-        _print_object(interpreter, node, arguments.arguments[0].extract_value(), end=arguments.arguments[1].extract_value())
-    elif len(arguments.arguments) > 0:
-        _print_object(interpreter, node, arguments.arguments[0].extract_value())
-    else:
-        _print_object(interpreter, node, "")
+    _print_object(interpreter, node, arguments.arguments[0].extract_value(), end=arguments.arguments[1].extract_value())
 
     return BasicValue(None)
 
@@ -107,20 +97,16 @@ def builtin_print_color(arguments):
         print(f"{LogColor.Info}", end="")
     elif color == 4:
         print(f"{LogColor.Bold}", end="")
-    return BasicValue(0)
+    return BasicValue(None)
     
 
 def builtin_exit(arguments):
     interpreter = arguments.interpreter
     node = arguments.node
     
-    if len(arguments.arguments) > 0:
-        return_code = arguments.arguments[0].extract_value()
-        exit(return_code)
-    else:
-        exit()
+    exit(arguments.arguments[0].extract_value())
     
-    return BasicValue(0)
+    return BasicValue(None)
 
 def builtin_type_compare(arguments):
     interpreter = arguments.interpreter
@@ -170,7 +156,7 @@ def builtin_to_float(arguments):
     return BasicValue(float(arguments.arguments[0].extract_value()))
 
 def builtin_str_len(arguments):
-    return BasicValue(len(str(arguments.arguments[0].extract_value())))
+    return BasicValue(len(arguments.arguments[0].extract_value()))
 
 def builtin_array_len(arguments):
     return BasicValue(len(arguments.arguments[0].extract_value()))
@@ -273,7 +259,7 @@ def builtin_str_replace(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     toReplace = str(arguments.arguments[1].extract_value())
     replaceWith = str(arguments.arguments[2].extract_value())
 		
@@ -291,7 +277,7 @@ def builtin_str_tolower(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = value.lower()
     
     return BasicValue(result)
@@ -300,7 +286,7 @@ def builtin_str_toupper(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = value.upper()
     
     return BasicValue(result)
@@ -309,86 +295,365 @@ def builtin_str_totitle(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = value.title()
     
     return BasicValue(result)
+
+def builtin_regex_compile(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    pattern = arguments.arguments[0].extract_value()
+    flags = arguments.arguments[1].extract_value()
+    x = re.compile(pattern, flags)
+
+    return BasicValue([[list(x.groupindex.keys()), list(x.groupindex.values())], x.groups, x.flags, x.pattern])
 
 def builtin_regex_search(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    regex = arguments.arguments[0].extract_value()
-    inputstr = arguments.arguments[1].extract_value()
-    x = re.search(regex, inputstr)
+    pattern = arguments.arguments[0].extract_value()
+    string = arguments.arguments[1].extract_value()
+    flags = arguments.arguments[2].extract_value()
+    x = re.search(pattern, string, flags)
 
-    return BasicValue([x.pos, x.endpos, [[list(x.re.groupindex.keys()), list(x.re.groupindex.values())], x.re.groups, x.re.flags, x.re.pattern], x.string, x.lastgroup, x.lastindex])
+    regs = list(x.regs)
+    for i in range(len(regs)):
+        regs[i] = list(regs[i])
+    return BasicValue([x.pos, x.endpos, [[list(x.re.groupindex.keys()), list(x.re.groupindex.values())], x.re.groups, x.re.flags, x.re.pattern], x.string, x.lastgroup, regs, x.lastindex])
+
+def builtin_regex_match(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    pattern = arguments.arguments[0].extract_value()
+    string = arguments.arguments[1].extract_value()
+    flags = arguments.arguments[2].extract_value()
+    x = re.match(pattern, string, flags)
+
+    regs = list(x.regs)
+    for i in range(len(regs)):
+        regs[i] = list(regs[i])
+    return BasicValue([x.pos, x.endpos, [[list(x.re.groupindex.keys()), list(x.re.groupindex.values())], x.re.groups, x.re.flags, x.re.pattern], x.string, x.lastgroup, regs, x.lastindex])
+
+def builtin_regex_fullmatch(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    pattern = arguments.arguments[0].extract_value()
+    string = arguments.arguments[1].extract_value()
+    flags = arguments.arguments[2].extract_value()
+    x = re.fullmatch(pattern, string, flags)
+
+    regs = list(x.regs)
+    for i in range(len(regs)):
+        regs[i] = list(regs[i])
+    return BasicValue([x.pos, x.endpos, [[list(x.re.groupindex.keys()), list(x.re.groupindex.values())], x.re.groups, x.re.flags, x.re.pattern], x.string, x.lastgroup, regs, x.lastindex])
+
+def builtin_regex_split(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    pattern = arguments.arguments[0].extract_value()
+    string = arguments.arguments[1].extract_value()
+    maxsplit = arguments.arguments[2].extract_value()
+    flags = arguments.arguments[3].extract_value()
+    x = re.split(pattern, string, maxsplit, flags)
+
+    return fixiter(x)
+
+def builtin_regex_findall(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    pattern = arguments.arguments[0].extract_value()
+    string = arguments.arguments[1].extract_value()
+    flags = arguments.arguments[2].extract_value()
+    x = re.findall(pattern, string, flags)
+
+    return fixiter(x)
+
+def builtin_regex_finditer(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    pattern = arguments.arguments[0].extract_value()
+    string = arguments.arguments[1].extract_value()
+    flags = arguments.arguments[2].extract_value()
+    x = re.finditer(pattern, string, flags)
+
+    for i in range(len(x)):
+        regs = list(x[i].regs)
+        for j in range(len(regs)):
+            regs[j] = list(regs[j])
+        x[i] = [x[i].pos, x[i].endpos, [[list(x[i].re.groupindex.keys()), list(x[i].re.groupindex.values())], x[i].re.groups, x[i].re.flags, x[i].re.pattern], x[i].string, x[i].lastgroup, regs, x[i].lastindex]
+    
+    return fixiter(x)
+
+def builtin_regex_sub(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    pattern = arguments.arguments[0].extract_value()
+    repl = arguments.arguments[1].extract_value()
+    string = arguments.arguments[2].extract_value()
+    count = arguments.arguments[3].extract_value()
+    flags = arguments.arguments[4].extract_value()
+    x = re.sub(pattern, repl, string, count, flags)
+
+    if type(x) != str:
+        regs = list(x.regs)
+        for i in range(len(regs)):
+            regs[i] = list(regs[i])
+        return BasicValue([x.pos, x.endpos, [[list(x.re.groupindex.keys()), list(x.re.groupindex.values())], x.re.groups, x.re.flags, x.re.pattern], x.string, x.lastgroup, regs, x.lastindex])
+    else:
+        return BasicValue(x)
+
+def builtin_regex_subn(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    pattern = arguments.arguments[0].extract_value()
+    repl = arguments.arguments[1].extract_value()
+    string = arguments.arguments[2].extract_value()
+    count = arguments.arguments[3].extract_value()
+    flags = arguments.arguments[4].extract_value()
+    x = re.subn(pattern, repl, string, count, flags)
+
+    return fixiter(x)
+
+def builtin_regex_escape(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    pattern = arguments.arguments[0].extract_value()
+    x = re.escape(pattern)
+
+    return BasicValue(x)
+
+def builtin_regex_purge(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    re.purge()
+    return BasicValue(None)
 
 def builtin_regex_match_end(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    regex = arguments.arguments[0].extract_value()
-    inputstr = arguments.arguments[1].extract_value()
-    x = re.search(regex, inputstr)
-    
+    args = arguments.arguments[0].extract_value()
+    pattern = args[0].extract_value()
+    flags = args[1].extract_value()
+    x = re.search(pattern, string, flags)
+
+    if arguments.arguments[1].extract_value() is not None:
+        return BasicValue(x.end(arguments.arguments[1].extract_value()))
     return BasicValue(x.end())
 
 def builtin_regex_match_group(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    regex = arguments.arguments[0].extract_value()
-    inputstr = arguments.arguments[1].extract_value()
-    x = re.search(regex, inputstr)
-    
+    args = arguments.arguments[0].extract_value()
+    pattern = args[0].extract_value()
+    flags = args[1].extract_value()
+    x = re.search(pattern, string, flags)
+
+    if arguments.arguments[1].extract_value() is not None and arguments.arguments[1].extract_value() != []:
+        return BasicValue(x.group(*tuple(arguments.arguments[1].extract_value())))
     return BasicValue(x.group())
 
 def builtin_regex_match_groupdict(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    regex = arguments.arguments[0].extract_value()
-    inputstr = arguments.arguments[1].extract_value()
-    x = re.search(regex, inputstr)
-    
+    args = arguments.arguments[0].extract_value()
+    pattern = args[0].extract_value()
+    flags = args[1].extract_value()
+    x = re.search(pattern, string, flags)
+
+    if arguments.arguments[1].extract_value() is not None:
+        [list(x.groupdict(arguments.arguments[1].extract_value()).keys()), list(x.groupdict(arguments.arguments[1].extract_value()).values())]
     return BasicValue([list(x.groupdict().keys()), list(x.groupdict().values())])
 
 def builtin_regex_match_span(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    regex = arguments.arguments[0].extract_value()
-    inputstr = arguments.arguments[1].extract_value()
-    x = re.search(regex, inputstr)
-    
+    args = arguments.arguments[0].extract_value()
+    pattern = args[0].extract_value()
+    flags = args[1].extract_value()
+    x = re.search(pattern, string, flags)
+
+    if arguments.arguments[1].extract_value() is not None:
+        return BasicValue(list(x.span(arguments.arguments[1].extract_value())))
     return BasicValue(list(x.span()))
 
 def builtin_regex_match_groups(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    regex = arguments.arguments[0].extract_value()
-    inputstr = arguments.arguments[1].extract_value()
-    x = re.search(regex, inputstr)
+    args = arguments.arguments[0].extract_value()
+    pattern = args[0].extract_value()
+    flags = args[1].extract_value()
+    x = re.search(pattern, string, flags)
     
+    if arguments.arguments[1].extract_value() is not None:
+        return BasicValue(x.groups(arguments.arguments[1].extract_value()))
     return BasicValue(list(x.groups()))
 
 def builtin_regex_match_start(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    regex = arguments.arguments[0].extract_value()
-    inputstr = arguments.arguments[1].extract_value()
-    x = re.search(regex, inputstr)
-    
+    args = arguments.arguments[0].extract_value()
+    pattern = args[0].extract_value()
+    flags = args[1].extract_value()
+    x = re.search(pattern, string, flags)
+
+    if arguments.arguments[1].extract_value() is not None:
+        return BasicValue(x.start(arguments.arguments[1].extract_value()))
     return BasicValue(x.start())
+
+def builtin_regex_match_expand(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    args = arguments.arguments[0].extract_value()
+    pattern = args[0].extract_value()
+    flags = args[1].extract_value()
+    x = re.search(pattern, string, flags)
+
+    return BasicValue(x.expand(arguments.arguments[1].extract_value()))
+
+def builtin_regex_pattern_search(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    args = arguments.arguments[0].extract_value()
+    pattern = args[0].extract_value()
+    flags = args[1].extract_value()
+    x1 = re.compile(pattern, flags)
+
+    x = x1.re.search(arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), arguments.arguments[3].extract_value())
+    regs = list(x.regs)
+    for i in range(len(regs)):
+        regs[i] = list(regs[i])
+    return BasicValue([x.pos, x.endpos, [[list(x.re.groupindex.keys()), list(x.re.groupindex.values())], x.re.groups, x.re.flags, x.re.pattern], x.string, x.lastgroup, regs, x.lastindex])
+
+def builtin_regex_pattern_match(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    args = arguments.arguments[0].extract_value()
+    pattern = args[0].extract_value()
+    flags = args[1].extract_value()
+    x1 = re.compile(pattern, flags)
+
+    x = x1.re.match(arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), arguments.arguments[3].extract_value())
+    regs = list(x.regs)
+    for i in range(len(regs)):
+        regs[i] = list(regs[i])
+    return BasicValue([x.pos, x.endpos, [[list(x.re.groupindex.keys()), list(x.re.groupindex.values())], x.re.groups, x.re.flags, x.re.pattern], x.string, x.lastgroup, regs, x.lastindex])
+
+def builtin_regex_pattern_fullmatch(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    args = arguments.arguments[0].extract_value()
+    pattern = args[0].extract_value()
+    flags = args[1].extract_value()
+    x1 = re.compile(pattern, flags)
+
+    x = x1.re.fullmatch(arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), arguments.arguments[3].extract_value())
+    regs = list(x.regs)
+    for i in range(len(regs)):
+        regs[i] = list(regs[i])
+    return BasicValue([x.pos, x.endpos, [[list(x.re.groupindex.keys()), list(x.re.groupindex.values())], x.re.groups, x.re.flags, x.re.pattern], x.string, x.lastgroup, regs, x.lastindex])
+
+def builtin_regex_pattern_split(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    args = arguments.arguments[0].extract_value()
+    pattern = args[0].extract_value()
+    flags = args[1].extract_value()
+    x1 = re.compile(pattern, flags)
+
+    x = x1.re.split(arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value())
+    regs = list(x.regs)
+    for i in range(len(regs)):
+        regs[i] = list(regs[i])
+    return BasicValue([x.pos, x.endpos, [[list(x.re.groupindex.keys()), list(x.re.groupindex.values())], x.re.groups, x.re.flags, x.re.pattern], x.string, x.lastgroup, regs, x.lastindex])
+
+def builtin_regex_pattern_findall(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    args = arguments.arguments[0].extract_value()
+    pattern = args[0].extract_value()
+    flags = args[1].extract_value()
+    x1 = re.compile(pattern, flags)
+
+    x = x1.re.findall(arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), arguments.arguments[3].extract_value())
+    regs = list(x.regs)
+    for i in range(len(regs)):
+        regs[i] = list(regs[i])
+    return BasicValue([x.pos, x.endpos, [[list(x.re.groupindex.keys()), list(x.re.groupindex.values())], x.re.groups, x.re.flags, x.re.pattern], x.string, x.lastgroup, regs, x.lastindex])
+
+def builtin_regex_pattern_finditer(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    args = arguments.arguments[0].extract_value()
+    pattern = args[0].extract_value()
+    flags = args[1].extract_value()
+    x1 = re.compile(pattern, flags)
+
+    x = x1.re.finditer(arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), arguments.arguments[3].extract_value())
+    regs = list(x.regs)
+    for i in range(len(regs)):
+        regs[i] = list(regs[i])
+    return BasicValue([x.pos, x.endpos, [[list(x.re.groupindex.keys()), list(x.re.groupindex.values())], x.re.groups, x.re.flags, x.re.pattern], x.string, x.lastgroup, regs, x.lastindex])
+
+def builtin_regex_pattern_sub(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    args = arguments.arguments[0].extract_value()
+    pattern = args[0].extract_value()
+    flags = args[1].extract_value()
+    x1 = re.compile(pattern, flags)
+
+    x = x1.re.sub(arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), arguments.arguments[3].extract_value())
+    regs = list(x.regs)
+    for i in range(len(regs)):
+        regs[i] = list(regs[i])
+    return BasicValue([x.pos, x.endpos, [[list(x.re.groupindex.keys()), list(x.re.groupindex.values())], x.re.groups, x.re.flags, x.re.pattern], x.string, x.lastgroup, regs, x.lastindex])
+
+def builtin_regex_pattern_subn(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    args = arguments.arguments[0].extract_value()
+    pattern = args[0].extract_value()
+    flags = args[1].extract_value()
+    x1 = re.compile(pattern, flags)
+
+    x = x1.re.subn(arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), arguments.arguments[3].extract_value())
+    regs = list(x.regs)
+    for i in range(len(regs)):
+        regs[i] = list(regs[i])
+    return BasicValue([x.pos, x.endpos, [[list(x.re.groupindex.keys()), list(x.re.groupindex.values())], x.re.groups, x.re.flags, x.re.pattern], x.string, x.lastgroup, regs, x.lastindex])
 
 def builtin_base64_b64encode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.b64encode(value)
     
     return BasicValue(result)
@@ -397,7 +662,7 @@ def builtin_base64_b64decode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.b64decode(value)
     
     return BasicValue(result)
@@ -406,7 +671,7 @@ def builtin_base64_standard_b64encode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.standard_b64encode(value)
     
     return BasicValue(result)
@@ -415,7 +680,7 @@ def builtin_base64_standard_b64decode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.standard_b64decode(value)
     
     return BasicValue(result)
@@ -424,7 +689,7 @@ def builtin_base64_urlsafe_b64encode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.urlsafe_b64encode(value)
     
     return BasicValue(result)
@@ -433,7 +698,7 @@ def builtin_base64_urlsafe_b64decode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.urlsafe_b64decode(value)
     
     return BasicValue(result)
@@ -442,7 +707,7 @@ def builtin_base64_b32encode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.b32encode(value)
     
     return BasicValue(result)
@@ -451,7 +716,7 @@ def builtin_base64_b32decode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.b32decode(value)
     
     return BasicValue(result)
@@ -460,7 +725,7 @@ def builtin_base64_b16encode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.b16encode(value)
     
     return BasicValue(result)
@@ -469,7 +734,7 @@ def builtin_base64_b16decode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.b16decode(value)
     
     return BasicValue(result)
@@ -478,7 +743,7 @@ def builtin_base64_a85encode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.a85encode(value)
     
     return BasicValue(result)
@@ -487,7 +752,7 @@ def builtin_base64_a85decode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.a85decode(value)
     
     return BasicValue(result)
@@ -496,7 +761,7 @@ def builtin_base64_b85encode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.b85encode(value)
     
     return BasicValue(result)
@@ -505,7 +770,7 @@ def builtin_base64_b85decode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.b85decode(value)
     
     return BasicValue(result)
@@ -514,7 +779,7 @@ def builtin_base64_a64encode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.a64encode(value)
     
     return BasicValue(result)
@@ -523,7 +788,7 @@ def builtin_base64_a64decode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.a64decode(value)
     
     return BasicValue(result)
@@ -532,7 +797,7 @@ def builtin_base64_a32encode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.a32encode(value)
     
     return BasicValue(result)
@@ -541,7 +806,7 @@ def builtin_base64_a32decode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.a32decode(value)
     
     return BasicValue(result)
@@ -550,7 +815,7 @@ def builtin_base64_a16encode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.a16encode(value)
     
     return BasicValue(result)
@@ -559,7 +824,7 @@ def builtin_base64_a16decode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.a16decode(value)
     
     return BasicValue(result)
@@ -568,7 +833,7 @@ def builtin_base64_encodebytes(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.encodebytes(value)
     
     return BasicValue(result)
@@ -577,7 +842,7 @@ def builtin_base64_decodebytes(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     result = base64.decodebytes(value)
     
     return BasicValue(result)
@@ -586,7 +851,7 @@ def builtin_str_base64_encode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     encoding = str(arguments.arguments[1].extract_value())
     result = value.encode(encoding)
     
@@ -596,7 +861,7 @@ def builtin_str_base64_decode(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value = str(arguments.arguments[0].extract_value())
+    value = arguments.arguments[0].extract_value()
     encoding = str(arguments.arguments[1].extract_value())
     result = value.decode(encoding)
     
@@ -615,7 +880,7 @@ def builtin_cryptography_fernet_encrypt(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
     
-    inputStr = bytes(str(arguments.arguments[0].extract_value()), encoding='utf8')
+    inputStr = bytes(arguments.arguments[0].extract_value(), encoding='utf8')
     key = bytes(str(arguments.arguments[1].extract_value()), encoding='utf8')
 
     from cryptography.fernet import Fernet
@@ -629,7 +894,7 @@ def builtin_cryptography_fernet_decrypt(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
     
-    token = bytes(str(arguments.arguments[0].extract_value()), encoding='utf8')
+    token = bytes(arguments.arguments[0].extract_value(), encoding='utf8')
     key = bytes(str(arguments.arguments[1].extract_value()), encoding='utf8')
 
     from cryptography.fernet import Fernet
@@ -669,10 +934,8 @@ def builtin_requests_get(arguments):
         return BasicValue(response_to_list(requests.get(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]])))
     elif len(arguments.arguments) > 2:
         return BasicValue(response_to_list(requests.get(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value())))
-    elif len(arguments.arguments) > 1:
+    else:
         return BasicValue(response_to_list(requests.get(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())))
-    elif len(arguments.arguments) > 0:
-        return BasicValue(response_to_list(requests.get(arguments.arguments[0].extract_value())))
     
     return BasicValue(None)
 
@@ -700,12 +963,8 @@ def builtin_requests_post(arguments):
         return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]], arguments.arguments[4].extract_value())))
     elif len(arguments.arguments) > 3:
         return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]])))
-    elif len(arguments.arguments) > 2:
+    else:
         return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value())))
-    elif len(arguments.arguments) > 1:
-        return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())))
-    elif len(arguments.arguments) > 0:
-        return BasicValue(response_to_list(requests.post(arguments.arguments[0].extract_value())))
     
     return BasicValue(None)
 
@@ -735,10 +994,8 @@ def builtin_requests_put(arguments):
         return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]])))
     elif len(arguments.arguments) > 2:
         return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value())))
-    elif len(arguments.arguments) > 1:
+    else:
         return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())))
-    elif len(arguments.arguments) > 0:
-        return BasicValue(response_to_list(requests.put(arguments.arguments[0].extract_value())))
     
     return BasicValue(None)
 
@@ -822,10 +1079,8 @@ def builtin_requests_patch(arguments):
         return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]])))
     elif len(arguments.arguments) > 2:
         return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value())))
-    elif len(arguments.arguments) > 1:
+    else:
         return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())))
-    elif len(arguments.arguments) > 0:
-        return BasicValue(response_to_list(requests.patch(arguments.arguments[0].extract_value())))
     
     return BasicValue(None)
 
@@ -855,18 +1110,16 @@ def builtin_requests_request(arguments):
         return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value(), [arguments.arguments[3].extract_value()[0], arguments.arguments[3].extract_value()[1]])))
     elif len(arguments.arguments) > 2:
         return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value())))
-    elif len(arguments.arguments) > 1:
+    else:
         return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())))
-    elif len(arguments.arguments) > 0:
-        return BasicValue(response_to_list(requests.request(arguments.arguments[0].extract_value())))
     
     return BasicValue(None)
 
-def builtin_eval(arguments):
+def builtin_pyeval(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    code = str(arguments.arguments[0].extract_value())
+    code = arguments.arguments[0].extract_value()
     codeGlobals = globals()
     codeLocals = locals()
     if len(arguments.arguments) > 1 and dict(arguments.arguments[1]) != []:
@@ -902,9 +1155,66 @@ def builtin_object_new(arguments):
         elif isinstance(constructor_method, NodeFunctionExpression):
             # push this object + any arguments passed here to the function
             passed_args = [new_instance, *arguments.arguments]
+            
+            expected_arg_count = len(constructor_method.argument_list.arguments)
+            given_arg_count = len(passed_args)
+            original_given_arg_count = given_arg_count
 
-            for i in range(0, len(constructor_method.argument_list.arguments)):
-                if i >= len(passed_args):
+            if isinstance(constructor_method.argument_list.arguments[-1], NodeSplatArgument):
+                if given_arg_count > 0:
+                    new_passed_args = []
+                    for i in range(0, given_arg_count):
+                        if i < expected_arg_count - 1:
+                            new_passed_args.append(passed_args[i])
+                        elif i == expected_arg_count - 1:
+                            new_passed_args.append([])
+                            try:
+                                value = BasicValue(eval(passed_args[i]))
+                            except:
+                                value = BasicValue(eval(str(BasicType(passed_args[i]))))
+                            new_passed_args[expected_arg_count - 1].append(value)
+                        elif i > expected_arg_count - 1:
+                            try:
+                                value = BasicValue(eval(passed_args[i]))
+                            except:
+                                value = BasicValue(eval(str(BasicType(passed_args[i]))))
+                            new_passed_args[expected_arg_count - 1].append(value)
+                    amount = len(new_passed_args)
+                    for i in range(0, expected_arg_count):
+                        if i > amount - 1:
+                            new_passed_args.append([])
+                    passed_args = new_passed_args
+                    if not isinstance(passed_args[-1], BasicObject) and not isinstance(passed_args[-1], BasicValue) and not isinstance(passed_args[-1], BasicType):
+                        try:
+                            value = BasicValue(eval(passed_args[-1]))
+                        except:
+                            value = BasicValue(eval(str(BasicType(passed_args[-1]))))
+                    else:
+                        value = passed_args[-1]
+                    passed_args[-1] = value
+                    given_arg_count = len(passed_args)
+                else:
+                    passed_args.append(BasicValue([]))
+                    given_arg_count = len(passed_args)
+            elif expected_arg_count < given_arg_count:
+                interpreter.error(node, ErrorType.ArgumentError, 'method expected {} arguments, {} given'.format(expected_arg_count, original_given_arg_count), False)
+                return None
+            for i in range(0, expected_arg_count):
+                if i >= given_arg_count:
+                    if isinstance(constructor_method.argument_list.arguments[i], NodeSplatArgument):
+                        arg = NodeDeclare(None, constructor_method.argument_list.arguments[i].token, NodeNone(constructor_method.argument_list.arguments[i].token))
+                    else:
+                        arg = constructor_method.argument_list.arguments[i]
+                    if not isinstance(arg.value, NodeNone):
+                        try:
+                            value = BasicValue(eval(constructor_method.argument_list.arguments[i].value.value.token.value))
+                        except:
+                            value = BasicValue(eval(str(BasicType(constructor_method.argument_list.arguments[i].value.value.token.value))))
+                        passed_args.append(value)
+                        given_arg_count += 1
+
+            for i in range(0, expected_arg_count):
+                if i >= given_arg_count:
                     interpreter.stack.push(BasicValue(None))
                 else:
                     interpreter.stack.push(passed_args[i])
@@ -1981,61 +2291,61 @@ def builtin_os_name(arguments):
     return BasicValue(os.name)
 
 def builtin_os_getenv(arguments):
-    if len(arguments.arguments) > 1:
-        return BasicValue(os.getenv(str(arguments.arguments[0]), str(arguments.arguments[1])))
-    return BasicValue(os.getenv(str(arguments.arguments[0])))
+    return BasicValue(os.getenv(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value()))
 
 def builtin_os_putenv(arguments):
-    os.putenv(str(arguments.arguments[0]), str(arguments.arguments[1]))
+    os.putenv(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())
+    return BasicValue(None)
+
+def builtin_os_unsetenv(arguments):
+    os.unsetenv(arguments.arguments[0].extract_value())
     return BasicValue(None)
 
 def builtin_os_chdir(arguments):
-    os.chdir(str(arguments.arguments[0]))
+    os.chdir(arguments.arguments[0].extract_value())
     return BasicValue(None)
 
 def builtin_os_getcwd(arguments):
     return BasicValue(os.getcwd())
 
 def builtin_os_listdir(arguments):
-    if len(arguments.arguments) > 0:
-        return BasicValue(os.listdir(str(arguments.arguments[0])))
-    return BasicValue(os.listdir())
+    return BasicValue(os.listdir(arguments.arguments[0].extract_value()))
 
 def builtin_os_mkdir(arguments):
-    os.mkdir(str(arguments.arguments[0]))
+    os.mkdir(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())
     return BasicValue(None)
 
 def builtin_os_makedirs(arguments):
-    os.makedirs(str(arguments.arguments[0]))
+    os.makedirs(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value(), arguments.arguments[2].extract_value())
     return BasicValue(None)
     
 def builtin_os_remove(arguments):
-    os.remove(str(arguments.arguments[0]))
+    os.remove(arguments.arguments[0].extract_value())
     return BasicValue(None)
 
 def builtin_os_removedirs(arguments):
-    os.removedirs(str(arguments.arguments[0]))
+    os.removedirs(arguments.arguments[0].extract_value())
     return BasicValue(None)
 
 def builtin_os_rename(arguments):
-    os.rename(str(arguments.arguments[0]), str(arguments.arguments[1]))
+    os.rename(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())
     return BasicValue(None)
 
 def builtin_os_renames(arguments):
-    os.renames(str(arguments.arguments[0]), str(arguments.arguments[1]))
+    os.renames(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())
     return BasicValue(None)
 
 def builtin_os_replace(arguments):
-    os.replace(str(arguments.arguments[0]), str(arguments.arguments[1]))
+    os.replace(arguments.arguments[0].extract_value(), arguments.arguments[1].extract_value())
     return BasicValue(None)
 
 def builtin_os_rmdir(arguments):
-    os.rmdir(str(arguments.arguments[0]))
+    os.rmdir(arguments.arguments[0].extract_value())
     return BasicValue(None)
 
 def builtin_os_scandir(arguments):
     if len(arguments.arguments) > 0:
-        return BasicValue(os.scandir(str(arguments.arguments[0])))
+        return BasicValue(os.scandir(arguments.arguments[0].extract_value()))
     return BasicValue(os.scandir())
 
 def builtin_clear(arguments):
@@ -2050,16 +2360,13 @@ def builtin_clear(arguments):
     return BasicValue(None)
 
 def builtin_quit(arguments):
-    if len(arguments.arguments) > 0:
-      quit(int(str(arguments.arguments[0])))
-    else:
-      quit()
+    quit(arguments.arguments[0].extract_value())
 
     return BasicValue(None)
 
 def builtin_sysexit(arguments):
     if len(arguments.arguments) > 0:
-      sys.exit(str(arguments.arguments[0]))
+      sys.exit(arguments.arguments[0].extract_value())
     else:
       sys.exit()
 
@@ -2133,72 +2440,70 @@ def builtin_math_min(arguments):
     return BasicValue(min_value)
 
 def builtin_math_degrees(arguments):
-    return BasicValue(math.degrees(float(str(arguments.arguments[0]))))
+    return BasicValue(math.degrees(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_dist(arguments):
-    return BasicValue(math.dist(float(str(arguments.arguments[0])), float(str(arguments.arguments[1]))))
+    return BasicValue(math.dist(float(arguments.arguments[0].extract_value()), float(arguments.arguments[1].extract_value())))
 
 def builtin_math_erf(arguments):
-    return BasicValue(math.erf(float(str(arguments.arguments[0]))))
+    return BasicValue(math.erf(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_erfc(arguments):
-    return BasicValue(math.erfc(float(str(arguments.arguments[0]))))
+    return BasicValue(math.erfc(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_exp(arguments):
-    return BasicValue(math.exp(float(str(arguments.arguments[0]))))
+    return BasicValue(math.exp(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_factorial(arguments):
-    return BasicValue(math.factorial(float(str(arguments.arguments[0]))))
+    return BasicValue(math.factorial(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_floor(arguments):
-    return BasicValue(math.floor(float(str(arguments.arguments[0]))))
+    return BasicValue(math.floor(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_fmod(arguments):
-    return BasicValue(math.fmod(float(str(arguments.arguments[0])), float(str(arguments.arguments[1]))))
+    return BasicValue(math.fmod(float(arguments.arguments[0].extract_value()), float(arguments.arguments[1].extract_value())))
 
 def builtin_math_frexp(arguments):
-    return BasicValue(math.frexp(float(str(arguments.arguments[0]))))
+    return BasicValue(math.frexp(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_fsum(arguments):
     return BasicValue(math.fsum(list(arguments.arguments[0])))
 
 def builtin_math_gamma(arguments):
-    return BasicValue(math.gamma(float(str(arguments.arguments[0]))))
+    return BasicValue(math.gamma(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_gcd(arguments):
-    return BasicValue(math.gcd(float(str(arguments.arguments[0])), float(str(arguments.arguments[1]))))
+    return BasicValue(math.gcd(float(arguments.arguments[0].extract_value()), float(arguments.arguments[1].extract_value())))
 
 def builtin_math_hypot(arguments):
-    return BasicValue(math.hypot(float(str(arguments.arguments[0])), float(str(arguments.arguments[1]))))
+    return BasicValue(math.hypot(float(arguments.arguments[0].extract_value()), float(arguments.arguments[1].extract_value())))
 
 def builtin_math_isclose(arguments):
-    return BasicValue(math.isclose(float(str(arguments.arguments[0])), float(str(arguments.arguments[1]))))
+    return BasicValue(math.isclose(float(arguments.arguments[0].extract_value()), float(arguments.arguments[1].extract_value())))
 
 def builtin_math_isfinite(arguments):
-    return BasicValue(math.isfinite(float(str(arguments.arguments[0]))))
+    return BasicValue(math.isfinite(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_isinf(arguments):
-    return BasicValue(math.isinf(float(str(arguments.arguments[0]))))
+    return BasicValue(math.isinf(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_isnan(arguments):
-    return BasicValue(math.isnan(float(str(arguments.arguments[0]))))
+    return BasicValue(math.isnan(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_isqrt(arguments):
-    return BasicValue(math.isqrt(float(str(arguments.arguments[0]))))
+    return BasicValue(math.isqrt(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_ldexp(arguments):
-    return BasicValue(math.ldexp(float(str(arguments.arguments[0]))))
+    return BasicValue(math.ldexp(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_lgamma(arguments):
-    return BasicValue(math.lgamma(float(str(arguments.arguments[0]))))
+    return BasicValue(math.lgamma(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_log(arguments):
-    if len(arguments.arguments) > 1:
-        return BasicValue(math.log(float(str(arguments.arguments[0])), float(str(arguments.arguments[1]))))
-    return BasicValue(math.log(float(str(arguments.arguments[0]))))
+    return BasicValue(math.log(float(arguments.arguments[0].extract_value()), float(arguments.arguments[1].extract_value())))
 
 def builtin_math_pow(arguments):
-    return BasicValue(math.pow(float(str(arguments.arguments[0])), float(str(arguments.arguments[0]))))
+    return BasicValue(math.pow(float(arguments.arguments[0].extract_value()), float(arguments.arguments[0].extract_value())))
 
 def builtin_math_prod(arguments):
     interpreter = arguments.interpreter
@@ -2213,25 +2518,25 @@ def builtin_math_prod(arguments):
     return BasicValue(math.prod(values))
 
 def builtin_math_radians(arguments):
-    return BasicValue(math.radians(float(str(arguments.arguments[0]))))
+    return BasicValue(math.radians(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_remainder(arguments):
-    return BasicValue(math.remainder(float(str(arguments.arguments[0])), float(str(arguments.arguments[1]))))
+    return BasicValue(math.remainder(float(arguments.arguments[0].extract_value()), float(arguments.arguments[1].extract_value())))
 
 def builtin_math_sin(arguments):
-    return BasicValue(math.sin(float(str(arguments.arguments[0]))))
+    return BasicValue(math.sin(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_sinh(arguments):
-    return BasicValue(math.sinh(float(str(arguments.arguments[0]))))
+    return BasicValue(math.sinh(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_tan(arguments):
-    return BasicValue(math.tan(float(str(arguments.arguments[0]))))
+    return BasicValue(math.tan(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_tanh(arguments):
-    return BasicValue(math.tanh(float(str(arguments.arguments[0]))))
+    return BasicValue(math.tanh(float(arguments.arguments[0].extract_value())))
 
 def builtin_math_trunc(arguments):
-    return BasicValue(math.trunc(float(str(arguments.arguments[0]))))
+    return BasicValue(math.trunc(float(arguments.arguments[0].extract_value())))
 
 def builtin_exception_raise(arguments):
     from lexer import Lexer
@@ -2239,11 +2544,14 @@ def builtin_exception_raise(arguments):
 
     interpreter = arguments.interpreter
     this_object = arguments.this_object
-    name = str(arguments.arguments[0].extract_value())
+    name = arguments.arguments[0].extract_value()
     message = arguments.arguments[1].extract_value()
     classnames = list(arguments.arguments[2].extract_value())
+    exception = arguments.arguments[3].extract_value()
 
-    interpreter.error(arguments.node, ErrorType.Exception, message, False, name, classnames)
+    # print(exception.members)
+
+    interpreter.error(arguments.node, ErrorType.Exception, message, False, name, classnames, exception)
 
     return BasicValue(None)
 

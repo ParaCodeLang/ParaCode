@@ -6,7 +6,7 @@ extended from the `Console` object.
 
 The `io` module is included by default as
 it is imported from within the
-standard __core__ module, so you don't have to
+standard \_\_core\_\_ module, so you don't have to
 import any modules manually in order to start using
 it.
 

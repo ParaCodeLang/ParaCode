@@ -77,7 +77,7 @@ class Parser():
         # if an error occurs
         location = self.current_token.location
 
-        self.error_list.push_error(Error(ErrorType.Syntax, location, message, self.filename))
+        self.error_list.push_error(Error(ErrorType.Syntax, location, message, self.filename, "Syntax Error"))
 
     # read next token and error if token.type != passed in token type
     def eat(self, token_type=None):
@@ -351,6 +351,8 @@ class Parser():
             has_vargs = False
             first_arg = True
 
+            any_default = False
+
             while True:
                 if has_vargs:
                     self.error('Arguments provided after variadic arguments')
@@ -383,10 +385,15 @@ class Parser():
 
                     # parse declaration(vname:type) without let keyword
                     argument = self.parse_variable_declaration(require_keyword=False)
-
                 if argument is None:
                     self.error('invalid argument')
                     break
+                if not isinstance(argument, NodeSplatArgument) and hasattr(argument.value, 'value'):
+                    any_default = True
+                else:
+                    if any_default:
+                        self.error('non-default argument follows default argument')
+                        break
 
                 arguments.append(argument)
 
@@ -503,7 +510,6 @@ class Parser():
     def parse_array_expression(self):
         members = []
     
-
         # eat left bracket
         if self.eat(TokenType.LBracket) is None:
             return None
@@ -562,7 +568,7 @@ class Parser():
         self.eat()
         return node
         
-    def parse_function_call(self, node):        
+    def parse_function_call(self, node):
         self.eat(TokenType.LParen)
         
         argnames = []
@@ -779,13 +785,17 @@ class Parser():
                 expr.append(NodeString(LexerToken("Exception")))
             elif self.current_token.type == TokenType.Identifier:
                 expr.append(self.parse_expression())
-
+    
                 if self.current_token.type == TokenType.Identifier:
                     e = self.parse_expression()
                     val_node = NodeAssign(NodeVariable(e.token), expr[-1])
-                    type_node = NodeVariable(LexerToken(e.token.value, TokenType.Identifier))
+                    type_node = NodeVariable(LexerToken("Exception", TokenType.Identifier))
+                    # type_node_token = self.current_token
+                    # type_node = self.parse_factor()
                     n = NodeDeclare(type_node, e.token, val_node)
                     variable.append(n)
+                elif self.current_token.type == TokenType.LBrace:
+                    variable.append(None)
 
             catch_block.append(self.parse_block_statement())
             token = self.current_token

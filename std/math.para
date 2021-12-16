@@ -37,11 +37,11 @@ let math = {
         return x2;
     }
 
-    func sqrt(self, x) {
+    func sqrt(_, x) {
         return math.sqrtf(x.to_float());
     }
 
-    func abs(self, x: num) {
+    func abs(_, x: num) {
         let result = x;
         if result < 0 {
             result = -1 * result;
@@ -129,14 +129,9 @@ let math = {
         return __intern_math_lgamma__(x);
     }
     
-    log = Func.extend({
-        instance = {
-            func __call__(self, _args) {
-                let args = _args.from(1);
-                return __intern_math_log__(*args);
-            }
-        }
-    }).new()
+    func log(_, x, base=math.e) {
+        return __intern_math_log__(x, base);
+    }
     
     func pow(_, x: num, y: num) {
         return __intern_math_pow__(x, y);

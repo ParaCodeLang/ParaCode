@@ -22,7 +22,7 @@ let Str = Array.extend({
                 return 0;
             }
 
-            return __intern_default_compare__(self._value, other._value);
+            return __intern_default_compare__(self, other);
         }
 
         func to_str(self) {
@@ -38,23 +38,24 @@ let Str = Array.extend({
         return self.find(value) == self.len() - value.len();
     }
 
-    replace
+    func replace(self, old, new, count=1) {
+        return __intern_str_replace__(self, old, new, count);
+    }
 
 	func tolower(self) {
-        return __intern_str_tolower__(self._value);
+        return __intern_str_tolower__(self);
     }
 
 	func toupper(self) {
-        return __intern_str_toupper__(self._value);
+        return __intern_str_toupper__(self);
     }
 
     func totitle(self) {
-        return __intern_str_totitle__(self._value);
+        return __intern_str_totitle__(self);
     }
     
     func __construct__(self, value) {
         self._value = value;
-        self.replace = intern_replace.new(self);
 
         return self;
     }
@@ -64,7 +65,7 @@ let Str = Array.extend({
     }
 
     func append(self, value) {
-        return __intern_str_append__(self._value, value.to_str());
+        return __intern_str_append__(self, value.to_str());
     }
 
     func to_int(self) {
@@ -153,63 +154,31 @@ let Str = Array.extend({
         let newstr = "";
         let index = self.len();
         while index {
-            newstr = newstr.append(self._value[index-1]);
+            newstr = newstr.append(self[index-1]);
             index -= 1;
+        }
+        return newstr;
+    }
+
+    func format(self, str, *args) {
+        let newstr = "";
+        let length = str.len();
+        let index = 0;
+        let argidx = 0;
+        while index != length {
+            if str[index] == '%' {
+                newstr += (args[argidx]);
+                argidx += 1;
+            }
+            else {
+                newstr += str[index];
+            }
+            index += 1;
         }
         return newstr;
     }
 
     func to_str(self) {
         return self.name;
-    }
-    
-    format = Func.extend({
-        instance = {
-            func __call__(self, args) {
-                let str = args[0];
-
-                let newstr = "";
-                let length = str.len();
-                let index = 0;
-                let argidx = 1;
-                while index != length {
-                    if str[index] == '%' {
-                        newstr += (args[argidx]);
-                        argidx += 1;
-                    }
-                    else {
-                        newstr += str[index];
-                    }
-                    index += 1;
-                }
-                return newstr;
-            }
-        }
-    }).new()
-});
-
-let intern_replace = Func.extend({
-  	instance = {
-		value
-
-  	  	func __call__(self, _args) {
-  	  	  	let args = _args.from(1);
-  	  	  	let toReplace = args[0];
-			let replaceWith = args[1];
-  	  	  	if args.len() > 2 {
-  	  	  	  	let amount = args[2];
-                return __intern_str_replace__(self.value._value, toReplace._value, replaceWith._value, amount);
-  	  	  	}
-            else {
-                return __intern_str_replace__(self.value._value, toReplace._value, replaceWith._value);
-            }
-            return self.value;
-  	  	}
-  	}
-
-    func __construct__(self, value) {
-        self.value = value;
-
-        return self;
     }
 });

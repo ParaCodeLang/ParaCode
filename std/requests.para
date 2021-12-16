@@ -1,68 +1,33 @@
 let requests = Type.extend({
     name = 'Requests'
 
-    get = Func.extend({
-        instance = {
-            func __call__(self, _args) {
-                let args = _args.from(1);
-                return intern_list_to_response(__intern_requests_get__(*args));
-            }
-        }
-    }).new()
-
-    post = Func.extend({
-        instance = {
-            func __call__(self, _args) {
-                let args = _args.from(1);
-                return intern_list_to_response(__intern_requests_post__(*args));
-            }
-        }
-    }).new()
-
-    put = Func.extend({
-        instance = {
-            func __call__(self, _args) {
-                let args = _args.from(1);
-                return intern_list_to_response(__intern_requests_put__(*args));
-            }
-        }
-    }).new()
-
-    head = Func.extend({
-        instance = {
-            func __call__(self, _args) {
-                let args = _args.from(1);
-                return intern_list_to_response(__intern_requests_head__(*args));
-            }
-        }
-    }).new()
+    func get(_, url, params=null, *args) {
+        return intern_list_to_response(__intern_requests_get__(url, params, *args));
+    }
     
-    delete = Func.extend({
-        instance = {
-            func __call__(self, _args) {
-                let args = _args.from(1);
-                return intern_list_to_response(__intern_requests_delete__(*args));
-            }
-        }
-    }).new()
+    func post(_, url, data=null, json=null, *args) {
+        return intern_list_to_response(__intern_requests_post__(url, data, json, *args));
+    }
 
-    patch = Func.extend({
-        instance = {
-            func __call__(self, _args) {
-                let args = _args.from(1);
-                return intern_list_to_response(__intern_requests_patch__(*args));
-            }
-        }
-    }).new()
+    func put(_, url, data=null, *args) {
+        return intern_list_to_response(__intern_requests_put__(url, data, *args));
+    }
+
+    func head(_, url, *args) {
+        return intern_list_to_response(__intern_requests_head__(url, *args));
+    }
     
-    request = Func.extend({
-        instance = {
-            func __call__(self, _args) {
-                let args = _args.from(1);
-                return intern_list_to_response(__intern_requests_request__(*args));
-            }
-        }
-    }).new()
+    func delete(_, url, *args) {
+        return intern_list_to_response(__intern_requests_delete__(url, *args));
+    }
+
+    func patch(_, url, *args) {
+        return intern_list_to_response(__intern_requests_patch__(url, *args));
+    }
+    
+    func request(_, method, url, *args) {
+        return intern_list_to_response(__intern_requests_request__(method, url, *args));
+    }
 });
 
 let Response = Type.extend({
