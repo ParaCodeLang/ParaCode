@@ -22,7 +22,7 @@ let Str = Array.extend({
                 return 0;
             }
 
-            return __intern_default_compare__(self, other);
+            return __intern_default_compare__(self._value, other._value);
         }
 
         func to_str(self) {
@@ -39,19 +39,19 @@ let Str = Array.extend({
     }
 
     func replace(self, old, new, count=1) {
-        return __intern_str_replace__(self, old, new, count);
+        return __intern_str_replace__(self._value, old._value, new._value, count);
     }
 
 	func tolower(self) {
-        return __intern_str_tolower__(self);
+        return __intern_str_tolower__(self._value);
     }
 
 	func toupper(self) {
-        return __intern_str_toupper__(self);
+        return __intern_str_toupper__(self._value);
     }
 
     func totitle(self) {
-        return __intern_str_totitle__(self);
+        return __intern_str_totitle__(self._value);
     }
     
     func __construct__(self, value) {
@@ -65,7 +65,7 @@ let Str = Array.extend({
     }
 
     func append(self, value) {
-        return __intern_str_append__(self, value.to_str());
+        return __intern_str_append__(self._value, value.to_str());
     }
 
     func to_int(self) {
@@ -84,13 +84,13 @@ let Str = Array.extend({
         let index = 0;
         
         // apply any unary negative
-        while self[index] == '-' {
+        while self._value[index] == '-' {
             negative = !negative;
             index += 1;
         }
         
         while index != len {
-            midx = smap.find(self[index]);
+            midx = smap.find(self._value[index]);
             // .find returns -1 if value does not exist in array
             if midx == -1 {
                 print("Error: Non-integer character in string");
@@ -120,13 +120,13 @@ let Str = Array.extend({
         let index = 0;
         
         // apply any unary negative
-        while self[index] == '-' {
+        while self._value[index] == '-' {
             svalue += '-';
             index += 1;
         }
         
         while index != len {
-            if self[index] == '.' {
+            if self._value[index] == '.' {
                 dvalue = self.replace(svalue + ".", "");
                 let div = "1";
                 let l = dvalue.len();
@@ -140,7 +140,7 @@ let Str = Array.extend({
                 index = len;
             }
             else {
-                svalue += self[index];
+                svalue += self._value[index];
                 index += 1;
             }
         }
@@ -154,7 +154,7 @@ let Str = Array.extend({
         let newstr = "";
         let index = self.len();
         while index {
-            newstr = newstr.append(self[index-1]);
+            newstr = newstr.append(self._value[index-1]);
             index -= 1;
         }
         return newstr;
