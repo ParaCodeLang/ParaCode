@@ -200,21 +200,17 @@ let CaseInsensitiveDict = Dict.extend({
             self._normal = Dict.new(self._normal[0], self._normal[1]);
         }
 
-        let result = [null, null];
+        let result = null;
 
         for i in Range.new(0, self.len()) {
             if self._value[0][i].tolower() == aindex.tolower() {
-                let key = self._normal._value[0][i];
-                let value = self._value[1][i];
-                result = [key, value];
+                result = self._value[1][i];
             }
             else {
-                if i == self.len() - 1 && result == [null, null] {
+                if i == self.len() - 1 && result == null {
                     let intIndex = self.len() - 1;
                     if intIndex != -1 {
-                        let key = self._normal._value[0][intIndex];
-                        let value = self._value[1][intIndex];
-                        result = [key, value];
+                        result = self._value[1][intIndex];
                     }
                 }
             }
@@ -230,21 +226,17 @@ let CaseInsensitiveDict = Dict.extend({
             self._normal = Dict.new(self._normal[0], self._normal[1]);
         }
 
-        let result = [null, null];
+        let result = null;
 
         for i in Range.new(0, self.len()) {
             if self._value[1][i] == aindex {
-                let key = self._normal._value[0][i];
-                let value = self._value[1][i];
-                result = [key, value];
+                result = self._normal._value[0][i];
             }
             else {
-                if i == self.len() - 1 && result == [null, null] {
+                if i == self.len() - 1 && result == null {
                     let intIndex = self.len() - 1;
                     if intIndex != -1 {
-                        let key = self._normal._value[0][intIndex];
-                        let value = self._value[1][intIndex];
-                        result = [key, value];
+                        result = self._normal._value[0][intIndex];
                     }
                 }
             }
@@ -336,3 +328,10 @@ let CaseInsensitiveDict = Dict.extend({
         return result;
     }
 });
+
+// Type aliases
+let caseinsensitivedict       = CaseInsensitiveDict;
+let CaseInsensitiveDictionary = CaseInsensitiveDict;
+let caseinsensitivedictionary = CaseInsensitiveDict;
+let InsensitiveDictionary     = CaseInsensitiveDict;
+let insensitivedictionary     = CaseInsensitiveDict;

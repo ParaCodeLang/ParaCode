@@ -31,3 +31,8 @@ let Num = Type.extend({
         return self._value;
     }
 });
+
+// Type aliases
+let num    = Num;
+let number = Num;
+let Number = Num;

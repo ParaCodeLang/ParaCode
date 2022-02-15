@@ -87,3 +87,8 @@ let Int = Num.extend({
         return __intern_int_bitshiftright__(self._value, other._value);
     }
 });
+
+// Type aliases
+let int     = Int;
+let Integer = Int;
+let integer = Int;

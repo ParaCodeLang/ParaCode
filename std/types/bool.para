@@ -11,7 +11,7 @@ let Bool = Num.extend({
     func _invert(self, value) {
         return value.__not__();
     }
-
+    
     func __bool__(self) {
         return self._value;
     }
@@ -45,3 +45,8 @@ let true = Bool.true;
 let True = Bool.true;
 let false = Bool.false;
 let False = Bool.false;
+
+// Type aliases
+let bool    = Bool;
+let Boolean = Bool;
+let boolean = Bool;

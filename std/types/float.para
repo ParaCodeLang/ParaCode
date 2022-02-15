@@ -76,3 +76,5 @@ let Float = Num.extend({
         return __intern_float_bitshiftleft__(self._value, other._value);
     }
 });
+
+let float = Float;

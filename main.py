@@ -1,10 +1,14 @@
 #!/bin/python3
 
+import sys
+
+# TODO: Implement version checker with `vermin --backport enum --no-parse-comments --versions .`
+
 import os
 from ParaCode import ParaCode
 from parse.parser import Parser
 
-import sys
+# TODO: Move installDependencies.py and dataCounter.py's code here
 
 def main():
     os.system("")

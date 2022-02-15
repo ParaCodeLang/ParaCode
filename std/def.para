@@ -7,6 +7,11 @@ __intern_object_patch__(Object, {
     func __eql__(self, other) {
         return __intern_default_compare__(self, other);
     }
+
+    func members(self) {
+        let result = __intern_object_members__(self);
+        return Dict.new(result[0], result[1]);
+    }
 });
 
 Type.patch({
@@ -14,6 +19,15 @@ Type.patch({
         return self.name;
     }
 });
+
+// These are only set so other code works fine before the actual io code gets run.
+let io = Type.extend({
+    func write(*args) {}
+    func read(*args) {}
+});
+func print(message="", end="\n") {
+    io.write(message, end);
+}
 
 let pyimport = __intern_import_python__;
 
@@ -32,6 +46,7 @@ import "std/types/caseinsensitivedict.para";
 import "std/types/str.para";
 import "std/types/range.para";
 import "std/types/macro.para";
+import "std/types/enum.para";
 
 import "std/types/exceptions/exception.para";
 import "std/types/exceptions/argumenterror.para";
@@ -39,41 +54,5 @@ import "std/types/exceptions/doesnotexisterror.para";
 import "std/types/exceptions/macroexpansionerror.para";
 import "std/types/exceptions/multipledefinitionerror.para";
 import "std/types/exceptions/typeerror.para";
-
-// Type aliases
-let object                     =    Object;
-let float                      =    Float;
-let type                       =    Type;
-
-let array                      =    Array;
-let Arr                        =    Array;
-let arr                        =    Array;
-                                    
-let dict                       =    Dict;
-let Dictionary                 =    Dict;
-let dictionary                 =    Dict;
-                                    
-let caseinsensitivedict        =    CaseInsensitiveDict;
-let CaseInsensitiveDictionary  =    CaseInsensitiveDict;
-let caseinsensitivedictionary  =    CaseInsensitiveDict;
-let InsensitiveDictionary      =    CaseInsensitiveDict;
-let insensitivedictionary      =    CaseInsensitiveDict;
-                                    
-let num                        =    Num;
-let number                     =    Num;
-let Number                     =    Num;
-                                    
-let int                        =    Int;
-let Integer                    =    Int;
-let integer                    =    Int;
-                                    
-let str                        =    Str;
-let String                     =    Str;
-let string                     =    Str;
-                                    
-let bool                       =    Bool;
-let Boolean                    =    Bool;
-let boolean                    =    Bool;
-                                    
-let Function                   =    Func;
-let function                   =    Func;
+import "std/types/exceptions/interruptederror.para";
+import "std/types/exceptions/notimplementederror.para";

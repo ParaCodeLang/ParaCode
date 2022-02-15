@@ -20,6 +20,7 @@ class ErrorType(Enum):
     MultipleDefinition = auto()
     ArgumentError = auto()
     MacroExpansionError = auto()
+    InterruptedError = auto()
 
 class Error():
     def __init__(self, type, location, message, filename, name="Exception"):

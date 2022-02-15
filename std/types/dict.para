@@ -119,6 +119,7 @@ let Dict = Iterable.extend({
     // Constructor
     func __construct__(self, keys, values) {
         self._value = [keys, values];
+        return self;
     }
 
     func setOrAppend(self, key, value) {
@@ -177,21 +178,17 @@ let Dict = Iterable.extend({
     }
 
     func atkey(self, aindex) {
-        let result = [null, null];
+        let result = null;
 
         for i in Range.new(0, self.len()) {
             if self._value[0][i] == aindex {
-                let key = self._value[0][i];
-                let value = self._value[1][i];
-                result = [key, value];
+                result = self._value[1][i];
             }
             else {
-                if i == self.len() - 1 && result == [null, null] {
+                if i == self.len() - 1 && result == null {
                     let intIndex = self.len() - 1;
                     if intIndex != -1 {
-                        let key = self._value[0][intIndex];
-                        let value = self._value[1][intIndex];
-                        result = [key, value];
+                        result = self._value[1][intIndex];
                     }
                 }
             }
@@ -203,21 +200,17 @@ let Dict = Iterable.extend({
 
 
     func atvalue(self, aindex) {
-        let result = [null, null];
+        let result = null;
 
         for i in Range.new(0, self.len()) {
             if self._value[1][i] == aindex {
-                let key = self._value[0][i];
-                let value = self._value[1][i];
-                result = [key, value];
+                result = self._value[0][i];
             }
             else {
-                if i == self.len() - 1 && result == [null, null] {
+                if i == self.len() - 1 && result == null {
                     let intIndex = self.len() - 1;
                     if intIndex != -1 {
-                        let key = self._value[0][intIndex];
-                        let value = self._value[1][intIndex];
-                        result = [key, value];
+                        result = self._value[0][intIndex];
                     }
                 }
             }
@@ -315,3 +308,8 @@ let Dict = Iterable.extend({
         return self._value[1];
     }
 });
+
+// Type aliases
+let dict       = Dict;
+let Dictionary = Dict;
+let dictionary = Dict;

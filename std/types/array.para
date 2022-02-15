@@ -175,3 +175,8 @@ let Array = Iterable.extend({
         return self.len();
     }
 });
+
+// Type aliases
+let array = Array;
+let Arr   = Array;
+let arr   = Array;

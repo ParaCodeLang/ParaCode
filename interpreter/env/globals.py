@@ -45,6 +45,7 @@ class Globals:
             ('Type', VariableType.Object, self.basic_type),
             ('Object', VariableType.Type, self.basic_object),
             ('Func', VariableType.Type, self.func_type),
+            ('__intern_object_members__', VariableType.Function, BuiltinFunction("__intern_object_members__", None, builtin_object_members)),
             ('__intern_object_patch__', VariableType.Function, BuiltinFunction("__intern_object_patch__", None, builtin_object_patch)),
             ('__intern_math_e__', VariableType.Function, BuiltinFunction("__intern_math_e__", None, builtin_math_e)),
             ('__intern_math_inf__', VariableType.Function, BuiltinFunction("__intern_math_inf__", None, builtin_math_inf)),

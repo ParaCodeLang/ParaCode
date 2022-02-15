@@ -11,3 +11,7 @@ Func.patch({
         self._method(*args);
     }
 });
+
+// Type aliases
+let Function = Func;
+let function = Func;

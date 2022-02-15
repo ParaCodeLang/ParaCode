@@ -39,3 +39,7 @@ Object.patch({
         return self.__compare__(other) != -1;
     }
 });
+
+// Type aliases
+let object = Object;
+let type = Type;

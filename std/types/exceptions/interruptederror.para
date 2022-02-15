@@ -1,0 +1,13 @@
+let InterruptedError = Exception.extend({
+    name = 'InterruptedError'
+
+    instance = {
+        func raise(self) {
+            return raise(self, "Interrupted Error");
+        }
+    }
+
+    func __construct__(self, _message) {
+        self.message = _message;
+    }
+});

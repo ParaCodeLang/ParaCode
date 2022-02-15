@@ -1,4 +1,4 @@
-let io = Type.extend({
+io = Type.extend({
     func pyeval(self, *args) {
         return __intern_pyeval__(*args);
     }
@@ -7,4 +7,4 @@ let io = Type.extend({
 import "std/io/file.para";
 import "std/io/console.para";
 
-let print = io.write;
+// print = io.write;

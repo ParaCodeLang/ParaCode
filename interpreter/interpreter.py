@@ -67,6 +67,9 @@ class Interpreter():
             elif type == ErrorType.ArgumentError:
                 name = "Argument Error"
                 classnames = ["Exception", "Argument Error"]
+            elif type == ErrorType.InterruptedError:
+                name = "Interrupted Error"
+                classnames = ["Exception", "InterruptedError"]
             elif type == ErrorType.MacroExpansionError:
                 name = "Macro Expansion Error"
                 classnames = ["Exception", "MacroExpansionError"]
@@ -269,8 +272,15 @@ class Interpreter():
                 return False
     
             if not type_object.compare_type(assignment_type):
-                self.error(node, ErrorType.TypeError, 'Attempted to assign <{}> to a value of type <{}>'.format(type_object.friendly_typename, assignment_type.friendly_typename))
-                return False
+                try:
+                    # target_type_object = assignment_type.lookup_type(self.global_scope).extract_basicvalue()
+                    # type_object
+                    # assignment_type
+                    # assignment_value
+                    builtin_object_new(BuiltinFunctionArguments(interpreter=self, this_object=assignment_type, arguments=[type_object], node=node))
+                except InterpreterError:
+                    self.error(node, ErrorType.TypeError, 'Attempted to assign <{}> to a value of type <{}>'.format(type_object.friendly_typename, assignment_type.friendly_typename))
+                    return False
 
         return True
 

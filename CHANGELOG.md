@@ -6,17 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Support for variables in the `catch` statement
-- More errors
+- More error messages
 - Complete requests HTTP library
 - Better interfacing with python code from ParaCode
 - The ability to use keyword arguments when calling a function
 - **kwargs (Keyword Arguments)
+- More exceptions
 
 ## [2.1.0] - CURRENTLY UNRELEASED
 ### Added
 - Easy use of default parameters in functions
 - *args (Non-Keyword Arguments)
 - Complete regex support
+- Enums
 
 ## [2.0.1] - 2021-10-18
 ### Fixed

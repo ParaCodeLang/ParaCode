@@ -1131,6 +1131,22 @@ def builtin_pyeval(arguments):
 
     return BasicValue(result)
 
+def builtin_object_members(arguments):
+    target = arguments.arguments[0].extract_value()
+
+    # members = {}
+    members = target.members.copy()
+
+    # for key in target.members:
+    #     if isinstance(target.members[key], BasicObject):
+    #         members[key] = target.members[key].clone(parent_override=target)
+    #     else:
+    #         members[key] = target.members[key]
+
+    members = [list(members.keys()), list(members.values())]
+
+    return fixiter(members)
+
 def builtin_object_new(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object

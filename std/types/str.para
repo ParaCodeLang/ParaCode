@@ -182,3 +182,8 @@ let Str = Array.extend({
         return self.name;
     }
 });
+
+// Type aliases
+let str    = Str;
+let String = Str;
+let string = Str;

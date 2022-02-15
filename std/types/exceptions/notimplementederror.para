@@ -1,0 +1,13 @@
+let NotImplementedError = Exception.extend({
+    name = 'NotImplementedError'
+
+    instance = {
+        func raise(self) {
+            return raise(self, "Not Implemented Error");
+        }
+    }
+
+    func __construct__(self, _message) {
+        self.message = _message;
+    }
+});
