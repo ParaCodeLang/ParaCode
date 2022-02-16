@@ -56,4 +56,8 @@ let os = Type.extend({
     func scandir(_, path=".") {
         return __intern_os_scandir__(path);
     }
+    func get_terminal_size(_) {
+        let size = __intern_os_get_terminal_size__();
+        return IntVector2.new(size[0], size[1]);
+    }
 });

@@ -7,8 +7,8 @@ let Str = Array.extend({
         func __mul__(self, value) {
             let str = "";
             while value {
-              str = self.append(str);
-              value -= 1;
+                str = self.append(str);
+                value -= 1;
             }
             return str;
         }
@@ -38,7 +38,7 @@ let Str = Array.extend({
         return self.find(value) == self.len() - value.len();
     }
 
-    func replace(self, old, new, count=1) {
+    func replace(self, old, new, count=-1) {
         return __intern_str_replace__(self._value, old._value, new._value, count);
     }
 
@@ -52,6 +52,13 @@ let Str = Array.extend({
 
     func totitle(self) {
         return __intern_str_totitle__(self._value);
+    }
+
+    func center(self, width, fillchar=" ") {
+        return __intern_str_center__(self._value, width, fillchar);
+    }
+    func color(_, num) {
+        return __intern_get_color__(num) + self;
     }
     
     func __construct__(self, value) {

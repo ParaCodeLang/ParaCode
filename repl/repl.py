@@ -35,9 +35,9 @@ class Repl:
         elif paraCode.release_stage == "stable":
             color = "\033[92m"
         self.welcome_message = f"""
-{"----- P a r a C o d e -----".center(os.get_terminal_size().columns).rstrip()}
-{color + (paraCode.release_stage.upper() + " v" + paraCode.version).center(os.get_terminal_size().columns).rstrip() + LogColor.Default}
-"""
+            ----- P a r a C o d e -----
+                {color + (paraCode.release_stage.upper() + " v" + paraCode.version) + LogColor.Default}
+            """
 
         try:
             from requests import get
@@ -45,26 +45,36 @@ class Repl:
             if "tag_name" not in latest_version.json() or latest_version.json()["tag_name"] < paraCode.version:
                 # Using unstable and/or development/beta version
                 self.welcome_message += LogColor.Warning + """
-You are using a possibly unstable version! If something doesn't work correctly, that is probably why.""" + LogColor.Default
+        You are using a possibly unstable
+        version! If something doesn't work
+        correctly, that is probably why.""" + LogColor.Default
             elif latest_version.json()["tag_name"] > paraCode.version:
                 # Update available
                 import datetime
                 self.welcome_message += LogColor.Warning + """
-Version {} is available to update to! It was released {}. Download it from GitHub for new features and bug fixes.""".format(latest_version.json()["tag_name"], "on " + datetime.datetime.strptime(latest_version.json()["published_at"], "%Y-%m-%dT%H:%M:%SZ").strftime('%A %b %d, %Y at %X')) + LogColor.Default
+        Version {} is available to update
+        to! It was released {}.
+        Download it from GitHub for new
+        features and bug fixes.""".format(latest_version.json()["tag_name"], "on " + datetime.datetime.strptime(latest_version.json()["published_at"], "%Y-%m-%dT%H:%M:%SZ").strftime('%A %b %d, %Y at %X')) + LogColor.Default
         except:
             # Error occured (connection failed, couldn't find any releases, etc.)
             pass
-
+        
+        # TODO: Check if the user has used ParaCode before.
         self.welcome_message += """
+        
 
+        Welcome to ParaCode Rewrite
+        (codenamed Peaches).
+        
         Let's get started!
         To learn more about ParaCode,
         type one of the following:
 
   {}
-            """.format('\n  '.join(map(lambda key: "{}--  {}".format(key.ljust(16), self._walkthrough_messages[key][0]),
-                                       self._walkthrough_messages)))
-
+            """.format('\n  '.join(map(lambda key: "{}--  {}".format(key.ljust(16), self._walkthrough_messages[key][0]), self._walkthrough_messages)))
+        
+        
         self.paraCode = paraCode
         self.interpreter = Interpreter(SourceLocation(Repl.REPL_FILENAME))
 
@@ -134,14 +144,12 @@ Version {} is available to update to! It was released {}. Download it from GitHu
             return
         elif trimmed in self._walkthrough_messages or (trimmed.endswith(".md") and trimmed.replace(".md", "", -1) in self._walkthrough_messages) or (trimmed.endswith(".md/") and trimmed.replace(".md/", "", -1) in self._walkthrough_messages):
             print(
-                self._walkthrough_messages[trimmed][1].replace('```\n', '').replace('```javascript\n', '').replace('```js\n', '').replace('`',
-                                                                                                                   ''))
+                self._walkthrough_messages[trimmed][1].replace('```\n', '').replace('```javascript\n', '').replace('```js\n', '').replace('`', ''))
 
             return
-        elif trimmed == "doc" or trimmed == "docs" or trimmed == "walkthrough" or trimmed == "walkthroughs":
+        elif trimmed == "doc" or trimmed == "docs" or trimmed == "documentation" or trimmed == "documentations" or trimmed == "walkthrough" or trimmed == "walkthroughs":
             print("""
-  {}""".format('\n  '.join(map(lambda key: "{}--  {}".format(key.ljust(16), self._walkthrough_messages[key][0]),
-                                       self._walkthrough_messages))))
+  {}""".format('\n  '.join(map(lambda key: "{}--  {}".format(key.ljust(16), self._walkthrough_messages[key][0]), self._walkthrough_messages))))
             return
 
         (brace_counter, bracket_counter, paren_counter, comment_type) = self.count_continuation_tokens(line)

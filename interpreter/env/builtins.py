@@ -262,14 +262,9 @@ def builtin_str_replace(arguments):
     value = arguments.arguments[0].extract_value()
     toReplace = str(arguments.arguments[1].extract_value())
     replaceWith = str(arguments.arguments[2].extract_value())
-		
-    result = value
-    
-    if len(arguments.arguments) > 3:
-      amount = int(str(arguments.arguments[3].extract_value()))
-      result = value.replace(toReplace, replaceWith, amount)
-    else:
-      result = value.replace(toReplace, replaceWith)
+    amount = int(str(arguments.arguments[3].extract_value()))
+
+    result = value.replace(toReplace, replaceWith, amount)
 
     return BasicValue(result)
 
@@ -299,6 +294,32 @@ def builtin_str_totitle(arguments):
     result = value.title()
     
     return BasicValue(result)
+
+def builtin_str_center(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+
+    value = arguments.arguments[0].extract_value()
+    width = arguments.arguments[1].extract_value()
+    fillchar = arguments.arguments[2].extract_value()
+    result = value.center(width, fillchar)
+    
+    return BasicValue(result)
+
+def builtin_get_color(arguments):
+    color = arguments.arguments[0].extract_value()
+    result = ""
+    if color == 0:
+        result = LogColor.Default
+    elif color == 1:
+        result = LogColor.Error
+    elif color == 2:
+        result = LogColor.Warning
+    elif color == 3:
+        result = LogColor.Info
+    elif color == 4:
+        result = LogColor.Bold
+    return BasicValue(color)
 
 def builtin_regex_compile(arguments):
     interpreter = arguments.interpreter
@@ -2364,6 +2385,9 @@ def builtin_os_scandir(arguments):
         return BasicValue(os.scandir(arguments.arguments[0].extract_value()))
     return BasicValue(os.scandir())
 
+def builtin_os_get_terminal_size(arguments):
+    return BasicValue(list(os.get_terminal_size()))
+
 def builtin_clear(arguments):
     # Windows
     if os.name == 'nt':
@@ -2382,9 +2406,9 @@ def builtin_quit(arguments):
 
 def builtin_sysexit(arguments):
     if len(arguments.arguments) > 0:
-      sys.exit(arguments.arguments[0].extract_value())
+        sys.exit(arguments.arguments[0].extract_value())
     else:
-      sys.exit()
+        sys.exit()
 
     return BasicValue(None)
 

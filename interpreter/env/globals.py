@@ -102,6 +102,7 @@ class Globals:
 			('__intern_str_tolower__', VariableType.Function, BuiltinFunction("__intern_str_tolower__", None, builtin_str_tolower)),
 			('__intern_str_toupper__', VariableType.Function, BuiltinFunction("__intern_str_toupper__", None, builtin_str_toupper)),
             ('__intern_str_totitle__', VariableType.Function, BuiltinFunction("__intern_str_totitle__", None, builtin_str_totitle)),
+            ('__intern_str_center__', VariableType.Function, BuiltinFunction("__intern_str_center__", None, builtin_str_center)),
 
             ('__intern_regex_compile__', VariableType.Function, BuiltinFunction("__intern_regex_compile__", None, builtin_regex_compile)),
             ('__intern_regex_search__', VariableType.Function, BuiltinFunction("__intern_regex_search__", None, builtin_regex_search)),
@@ -343,6 +344,7 @@ class Globals:
             ('__intern_os_replace__', VariableType.Function, BuiltinFunction("__intern_os_replace__", None, builtin_os_replace)),
             ('__intern_os_rmdir__', VariableType.Function, BuiltinFunction("__intern_os_rmdir__", None, builtin_os_rmdir)),
             ('__intern_os_scandir__', VariableType.Function, BuiltinFunction("__intern_os_scandir__", None, builtin_os_scandir)),
+            ('__intern_os_get_terminal_size__', VariableType.Function, BuiltinFunction("__intern_os_get_terminal_size__", None, builtin_os_get_terminal_size)),
 
             ('__intern_clear__', VariableType.Function, BuiltinFunction("__intern_clear__", None, builtin_clear)),
             ('__intern_quit__', VariableType.Function, BuiltinFunction("__intern_quit__", None, builtin_quit)),

@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complete regex support
 - Enums
 
+### Changed
+- Made the repl slightly nicer to look at
+
 ## [2.0.1] - 2021-10-18
 ### Fixed
 - Fixed what happens when using `||` and `&&` if you had an expression after the operators. If you ran `"A" == "A" || "A" == "B"`, it would interpret it as `("A" == "A" || "A") == "B"`, so it would return false instead of true.
