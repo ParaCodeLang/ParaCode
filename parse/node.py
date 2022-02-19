@@ -2,31 +2,31 @@ from lexer import LexerToken, TokenType
 from enum import Enum, auto
 
 class NodeType(Enum):
-    Empty    = auto()
-    BinOp    = auto()
-    Number   = auto()
-    String   = auto()
-    UnaryOp  = auto()
-    Block    = auto()
-    Assign   = auto()
-    Variable = auto()
-    Type     = auto()
-    Declare  = auto()
-    Call     = auto()
-    Import   = auto()
-    While    = auto()
-    For      = auto()
-    IfStatement  = auto()
-    Try  = auto()
-    ArgumentList = auto()
-    SplatArgument = auto()
-    FunctionReturn     = auto()
-    FunctionExpression = auto()
-    Macro = auto()
-    Mixin = auto()
-    ArrayExpression  = auto()
-    ObjectExpression = auto()
-    MemberExpression = auto()
+    Empty                 = auto()
+    BinOp                 = auto()
+    Number                = auto()
+    String                = auto()
+    UnaryOp               = auto()
+    Block                 = auto()
+    Assign                = auto()
+    Variable              = auto()
+    Type                  = auto()
+    Declare               = auto()
+    Call                  = auto()
+    Import                = auto()
+    While                 = auto()
+    For                   = auto()
+    IfStatement           = auto()
+    Try                   = auto()
+    ArgumentList          = auto()
+    SplatArgument         = auto()
+    FunctionReturn        = auto()
+    FunctionExpression    = auto()
+    Macro                 = auto()
+    Mixin                 = auto()
+    ArrayExpression       = auto()
+    ObjectExpression      = auto()
+    MemberExpression      = auto()
     ArrayAccessExpression = auto()
 
 class AstNode():
@@ -194,10 +194,11 @@ class NodeMixin(AstNode):
         self.tokens = tokens
 
 class NodeArrayExpression(AstNode):
-    def __init__(self, members, token):
+    def __init__(self, members, token, is_dictionary=False):
         # members are var decls
         AstNode.__init__(self, NodeType.ArrayExpression, token)
         self.members = members
+        self.is_dictionary = is_dictionary
 
 class NodeObjectExpression(AstNode):
     def __init__(self, members):

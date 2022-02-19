@@ -508,6 +508,7 @@ class Parser():
         return block
 
     def parse_array_expression(self):
+        is_dictionary = False
         members = []
     
         # eat left bracket
@@ -515,6 +516,14 @@ class Parser():
             return None
 
         token = self.current_token
+
+        at_dictionary_value = False
+
+        if self.peek_token(0, expected_type=TokenType.Colon) and self.peek_token(1, expected_type=TokenType.RBracket):
+            is_dictionary = True
+            members = [[], []]
+            self.eat(TokenType.Colon)
+            token = self.current_token
 
         while token.type != TokenType.RBracket:
             # parse expr
@@ -524,17 +533,36 @@ class Parser():
                 self.error('invalid array member item {}'.format(self.current_token))
                 return None
 
-            members.append(item_expr)
+            if not is_dictionary and members == [] and self.peek_token(0, expected_type=TokenType.Colon):
+                is_dictionary = True
+                members = [[], []]
+            
+            if is_dictionary:
+                if not at_dictionary_value:
+                    members[0].append(item_expr)
+                else:
+                    members[1].append(item_expr)
+            else:
+                members.append(item_expr)
 
             if self.current_token.type == TokenType.Comma:
                 self.eat(TokenType.Comma)
+                if is_dictionary and at_dictionary_value:
+                    at_dictionary_value = False
+            elif self.current_token.type == TokenType.Colon and is_dictionary and not at_dictionary_value:
+                self.eat(TokenType.Colon)
+                at_dictionary_value = True
             else:
                 break
+
+        if is_dictionary:
+            members[0] = NodeArrayExpression(members[0], token)
+            members[1] = NodeArrayExpression(members[1], token)
 
         if self.eat(TokenType.RBracket) is None:
             return None
 
-        return NodeArrayExpression(members, token)
+        return NodeArrayExpression(members, token, is_dictionary)
 
     def parse_object_expression(self):
         members = [] # array of var declarations

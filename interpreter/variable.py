@@ -8,12 +8,12 @@ class VariableType(Enum):
     Auto     = 'auto'
     Int      = 'int'
     String   = 'str'
-    Dict     = 'dict'
     Any      = 'any'
     Function = 'func'
     Type     = 'type'
     
     Array = auto()
+    Dict = auto()
     Object = auto() # Class, data structure, etc.
 
 # class Variable(BasicValue):

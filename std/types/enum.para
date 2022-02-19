@@ -42,7 +42,7 @@ let Enum = Num.extend({
     }
 
     func values(self) {
-        let result = Dictionary.new([], []);
+        let result = [:];
 
         if self._value == null {
             for member in self.members() {

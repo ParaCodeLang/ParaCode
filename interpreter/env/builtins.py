@@ -9,6 +9,7 @@ import requests
 from interpreter.typing.basic_type import BasicType
 from interpreter.basic_object import BasicObject
 from interpreter.basic_value import BasicValue
+from interpreter.variable import VariableType
 from interpreter.function import BuiltinFunction
 from interpreter.env.builtin.arith import *
 from interpreter.env.builtin.time import *
@@ -162,7 +163,9 @@ def builtin_array_len(arguments):
     return BasicValue(len(arguments.arguments[0].extract_value()))
 
 def builtin_dictionary_len(arguments):
-    return BasicValue(len(arguments.arguments[0][0].extract_value()))
+    if type(arguments.arguments[0].extract_value()) == dict:
+        return BasicValue(len(arguments.arguments[0].extract_value()))
+    return BasicValue(len(arguments.arguments[0].extract_value()[0]))
 
 def builtin_array_set(arguments):
     array = arguments.arguments[0].extract_value()
@@ -174,13 +177,13 @@ def builtin_array_set(arguments):
     return BasicValue(array)
 
 def builtin_dictionary_set(arguments):
-    array = arguments.arguments[0][0].extract_value()
-    index = arguments.arguments[0][1].extract_value()
-    value = arguments.arguments[0][2].extract_value()
+    dictionary = arguments.arguments[0].extract_value()
+    key = arguments.arguments[1].extract_value()
+    value = arguments.arguments[2].extract_value()
 
-    array[index] = value
+    dictionary[key] = value
 
-    return BasicValue(array)
+    return BasicValue(dictionary)
 
 def builtin_array_clone(arguments):
     array = arguments.arguments[0].extract_value()
@@ -188,56 +191,87 @@ def builtin_array_clone(arguments):
     return BasicValue(new_array)
 
 def builtin_dictionary_clone(arguments):
-    array = arguments.arguments[0][0].extract_value()
-    new_array = array.copy()
-    return BasicValue(new_array)
+    dictionary = arguments.arguments[0].extract_value()
+    new_dictionary = dictionary.copy()
+    return BasicValue(new_dictionary)
 
 def builtin_array_at(arguments):
     obj = arguments.arguments[0].extract_value()
     index = arguments.arguments[1].extract_value()
 
     if index > len(obj):
-        # TODO make throw internal exception
+        # TODO throw internal exception
         return BasicValue(None)
 
     return BasicValue(obj[index])
 
 def builtin_dictionary_at(arguments):
-    obj = arguments.arguments[0][0].extract_value()
-    index = arguments.arguments[0][1].extract_value()
+    obj = arguments.arguments[0].extract_value()
+    key = arguments.arguments[1].extract_value()
 
-    if index > len(obj):
-        # TODO make throw internal exception
+    if key not in obj:
+        # TODO throw internal exception
         return BasicValue(None)
 
-    return BasicValue(obj[index])
+    return BasicValue(obj[key])
+
+def builtin_dictionary_atindex(arguments):
+    obj = arguments.arguments[0].extract_value()
+    index = arguments.arguments[1].extract_value()
+
+    if index > len(obj):
+        # TODO throw internal exception
+        return BasicValue(None)
+
+    return BasicValue([list(obj)[index], obj[list(obj)[index]]])
+
+def builtin_dictionary_indexatkey(arguments):
+    obj = arguments.arguments[0].extract_value()
+    key = arguments.arguments[1].extract_value()
+
+    if key not in obj:
+        # TODO throw internal exception
+        return BasicValue(None)
+
+    return BasicValue(list(obj.keys()).index(key))
+
+def builtin_dictionary_keys(arguments):
+    obj = arguments.arguments[0].extract_value()
+
+    return BasicValue(list(obj.keys()))
+
+def builtin_dictionary_values(arguments):
+    obj = arguments.arguments[0].extract_value()
+
+    return BasicValue(list(obj.values()))
+
+def builtin_dictionary_contains(arguments):
+    obj = arguments.arguments[0].extract_value()
+    key = arguments.arguments[1].extract_value()
+
+    return BasicValue(key in obj)
     
 def builtin_array_append(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
     
-    value_start = arguments.arguments[0]
+    value = arguments.arguments[0].extract_value()
     
-    value = value_start.extract_value()
-
     if len(arguments.arguments) > 1:
         for arg in arguments.arguments[1:]:
             value.append(arg.extract_value())
 
     return BasicValue(value)
 
-
 def builtin_dictionary_append(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    value_start = arguments.arguments[0][0]
+    value = arguments.arguments[0].extract_value()
 
-    value = value_start.extract_value()
-
-    if len(arguments.arguments[0]) > 1:
-        for arg in arguments.arguments[0][1:]:
-            value.append(arg.extract_value())
+    if len(arguments.arguments) > 1:
+        for arg in arguments.arguments[1:]:
+            value[arg.extract_value()[0]] = arg.extract_value()[1]
 
     return BasicValue(value)
 
@@ -245,9 +279,7 @@ def builtin_str_append(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
 
-    str_value_start = arguments.arguments[0]
-
-    str_value = str(str_value_start.extract_value())
+    str_value = str(arguments.arguments[0].extract_value())
 
     if len(arguments.arguments) > 1:
         for arg in arguments.arguments[1:]:
@@ -2621,4 +2653,28 @@ def builtin_macro_expand(arguments):
     for node in ast:
         interpreter.visit(node)
 
+    return BasicValue(None)
+
+def builtin_import_python(arguments):
+    interpreter = arguments.interpreter
+    this_object = arguments.this_object
+    node = arguments.node
+
+    # return BasicValue(exec((("from " + str(arguments.arguments[0].extract_value()).replace(".py", "").replace("/", ".") + " import *;") if str(arguments.arguments[0].extract_value()).endswith(".py") else (str(arguments.arguments[0].extract_value()) + ";\n")) + "interpreter._globals.variables.append(('" + str(arguments.arguments[1].extract_value()) + "', VariableType.Function, BuiltinFunction('" + str(arguments.arguments[1].extract_value()) + "', None, " + (str(arguments.arguments[2].extract_value()) if len(arguments.arguments) > 2 else str(arguments.arguments[1].extract_value())) + "))); interpreter._globals.apply_to_scope(arguments.interpreter.current_scope);") or None)
+
+
+    
+    if str(arguments.arguments[0].extract_value()).endswith(".py"):
+        code = ("from " + str(arguments.arguments[0].extract_value()).replace(".py", "").replace("/", ".") + " import *;")
+    else:
+        code = str(arguments.arguments[0].extract_value()) + ";\n"
+    code += "interpreter._globals.variables.append(('" + str(arguments.arguments[1].extract_value()) + "', VariableType.Function, BuiltinFunction('" + str(arguments.arguments[1].extract_value()) + "', None, "
+    if len(arguments.arguments) > 2:
+        code += str(arguments.arguments[2].extract_value())
+    else:
+        code += str(arguments.arguments[1].extract_value())
+    code += "))); interpreter._globals.apply_to_scope(arguments.interpreter.current_scope);"
+    
+    exec(code)
+    
     return BasicValue(None)

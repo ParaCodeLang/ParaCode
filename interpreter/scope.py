@@ -23,13 +23,20 @@ class Scope():
             var.value_wrapper.assign_value(value)
 
     def find_variable_info(self, name, limit=False):
+        # if name != "self":
+        #     print(name)
+
         if name in self.variables:
             return self.variables[name]
 
         if limit or self.parent is None:
             return None
 
-        return self.parent.find_variable_info(name)
+        try:
+            return self.parent.find_variable_info(name)
+        except:
+            # TODO: Maybe throw an error.
+            return None
 
     def find_variable_value(self, name, limit=False):
         return self.find_variable_info(name, limit).value_wrapper

@@ -181,9 +181,14 @@ class Globals:
 
             ('__intern_dictionary_len__', VariableType.Function, BuiltinFunction("__intern_dictionary_len__", None, builtin_dictionary_len)),
             ('__intern_dictionary_at__', VariableType.Function, BuiltinFunction("__intern_dictionary_at__", None, builtin_dictionary_at)),
+            ('__intern_dictionary_atindex__', VariableType.Function, BuiltinFunction("__intern_dictionary_atindex__", None, builtin_dictionary_atindex)),
+            ('__intern_dictionary_indexatkey__', VariableType.Function, BuiltinFunction("__intern_dictionary_indexatkey__", None, builtin_dictionary_indexatkey)),
             ('__intern_dictionary_append__', VariableType.Function, BuiltinFunction("__intern_dictionary_append__", None, builtin_dictionary_append)),
             ('__intern_dictionary_set__', VariableType.Function, BuiltinFunction("__intern_dictionary_set__", None, builtin_dictionary_set)),
             ('__intern_dictionary_clone__', VariableType.Function, BuiltinFunction("__intern_dictionary_clone__", None, builtin_dictionary_clone)),
+            ('__intern_dictionary_keys__', VariableType.Function, BuiltinFunction("__intern_dictionary_keys__", None, builtin_dictionary_keys)),
+            ('__intern_dictionary_values__', VariableType.Function, BuiltinFunction("__intern_dictionary_values__", None, builtin_dictionary_values)),
+            ('__intern_dictionary_contains__', VariableType.Function, BuiltinFunction("__intern_dictionary_contains__", None, builtin_dictionary_contains)),
             
             ('__intern_console_input__', VariableType.Function, BuiltinFunction("__intern_console_input__", None, builtin_console_input)),
             ('__intern_file_read__', VariableType.Function, BuiltinFunction("__intern_file_read__", None, builtin_file_read)),
@@ -378,7 +383,10 @@ class Globals:
 
             ('__intern_macro_expand__', VariableType.Function, BuiltinFunction("__intern_macro_expand__", None, builtin_macro_expand)),
             
-            ('__intern_import_python__', VariableType.Function, BuiltinFunction("__intern_import_python__", None, lambda arguments, self=self : exec((("from " + str(arguments.arguments[0].extract_value()).replace(".py", "").replace("/", ".") + " import *;") if str(arguments.arguments[0].extract_value()).endswith(".py") else (str(arguments.arguments[0].extract_value()) + ";\n")) + "self.variables.append(('" + str(arguments.arguments[1].extract_value()) + "', VariableType.Function, BuiltinFunction('" + str(arguments.arguments[1].extract_value()) + "', None, " + (str(arguments.arguments[2].extract_value()) if len(arguments.arguments) > 2 else str(arguments.arguments[1].extract_value())) + "))); self.apply_to_scope(arguments.interpreter.current_scope);") or BasicValue(None)))
+            ('__intern_import_python__', VariableType.Function, BuiltinFunction("__intern_import_python__", None, builtin_import_python))
+            # ('__intern_import_python__', VariableType.Function, BuiltinFunction("__intern_import_python__", None, lambda arguments, self=self : exec((("from " + str(arguments.arguments[0].extract_value()).replace(".py", "").replace("/", ".") + " import *;") if str(arguments.arguments[0].extract_value()).endswith(".py") else (str(arguments.arguments[0].extract_value()) + ";\n")) + "self.variables.append(('" + str(arguments.arguments[1].extract_value()) + "', VariableType.Function, BuiltinFunction('" + str(arguments.arguments[1].extract_value()) + "', None, " + (str(arguments.arguments[2].extract_value()) if len(arguments.arguments) > 2 else str(arguments.arguments[1].extract_value())) + "))); self.apply_to_scope(arguments.interpreter.current_scope);") or BasicValue(None)))
+            # ('__intern_import_python__', VariableType.Function, BuiltinFunction("__intern_import_python__", None, lambda arguments, self=self : exec((("from " + str(arguments.arguments[0].extract_value()).replace(".py", "").replace("/", ".") + " import *;") if str(arguments.arguments[0].extract_value()).endswith(".py") else (str(arguments.arguments[0].extract_value()) + ";\n")) + "self.variables.append(('" + str(arguments.arguments[1].extract_value()) + "', VariableType.Function, BuiltinFunction('" + str(arguments.arguments[1].extract_value()) + "', None, " + (str(arguments.arguments[2].extract_value()) if len(arguments.arguments) > 2 else str(arguments.arguments[1].extract_value())) + "))); self.apply_to_scope(arguments.interpreter.current_scope);") or BasicValue(None)))
+            # ('__intern_import_python__', VariableType.Function, BuiltinFunction("__intern_import_python__", None, lambda arguments, self=self : exec((("from " + str(arguments.arguments[0].extract_value()).replace(".py", "").replace("/", ".") + " import *;") if str(arguments.arguments[0].extract_value()).endswith(".py") else (str(arguments.arguments[0].extract_value()) + ";\n")) + "self.variables.append(('" + str(arguments.arguments[1].extract_value()) + "', VariableType.Function, BuiltinFunction('" + str(arguments.arguments[1].extract_value()) + "', None, " + (str(arguments.arguments[2].extract_value()) if len(arguments.arguments) > 2 else str(arguments.arguments[1].extract_value())) + "))); self.apply_to_scope(arguments.interpreter.current_scope);") or BasicValue(None)))
         ]
 
     def vartype_to_typeobject(self, vartype):

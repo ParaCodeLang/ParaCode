@@ -2,12 +2,10 @@ let Dict = Iterable.extend({
     name = 'Dict'
 
     instance = {
-        _value = [[], []]
+        _value = [:]
 
-        func __at__(self, index) {
-            let result = self.atkey(index);
-
-            return result;
+        func __at__(self, key) {
+            return __intern_dictionary_at__(self._value, key);
         }
         
         func __add__(self, value) {
@@ -25,9 +23,9 @@ let Dict = Iterable.extend({
 
             while remaining != 0 {
                 index = len - remaining;
-                item = value._value[index];
+                item = value.getpair(index);
 
-                if res_dictionary._value[0].find(item[0]) == -1 && res_dictionary._value[1].find(item[1]) == -1 {
+                if res_dictionary.findpair(item) == -1 {
                     res_dictionary.append(item);
                 }
 
@@ -38,22 +36,20 @@ let Dict = Iterable.extend({
         }
 
         func __bitand__(self, value) {
-            let res_dictionary = Dictionary.new([], []);
+            let res_dictionary = [:];
 
             let remaining = self.len();
             let len = self.len();
 
             let index;
-            let key;
-            let dictValue;
+            let item;
 
             while remaining != 0 {
                 index = len - remaining;
-                key = self._value[0][index];
-                dictValue = self._value[1][index];
+                item = self.getpair(index);
 
-                if value._value[0].find(key) != -1 && value._value[1].find(dictValue) != -1 && value._value[0].find(key) == value._value[1].find(dictValue) {
-                    res_dictionary.append([key, value]);
+                if value.findpair(item) != -1 {
+                    res_dictionary.append(item);
                 }
 
                 remaining -= 1;
@@ -69,7 +65,7 @@ let Dict = Iterable.extend({
             while remaining != 0 {
                 let index = len - remaining;
 
-                cb([self._value[0][index], self._value[1][index]]);
+                cb(self.getpair(index));
 
                 remaining -= 1;
             }
@@ -79,8 +75,9 @@ let Dict = Iterable.extend({
             let str_result = '{';
 
             for index in Range.new(0, self.len()) {
-                let key = self._value[0][index];
-                let value = self._value[1][index];
+                let pair = self.getpair(index);
+                let key = pair[0];
+                let value = pair[1];
 
                 if value.type() == Str { str_result += "'"; }
                 str_result += key.to_str();
@@ -100,170 +97,94 @@ let Dict = Iterable.extend({
 
         func from(self, index) {
             let len = self.len();
-            let newarr = Dictionary.new([], []);
+            let newdict = [:];
             // TODO: < not !=
-            while index != len {
-                newarr[0] += self._value[0][index];
-                newarr[1] += self._value[1][index];
+            while index < len {
+                newdict += self.getpair(index);
                 index += 1;
             }
-            return newarr;
+            return newdict;
         }
 
-        func __set__(self, index, value) {
-            self.setOrAppend(index, value);
+        func __set__(self, key, value) {
+            __intern_dictionary_set__(self._value, key, value);
             return self;
         }
     }
 
     // Constructor
-    func __construct__(self, keys, values) {
-        self._value = [keys, values];
+    func __construct__(self, value) {
+        self._value = value;
         return self;
     }
 
-    func setOrAppend(self, key, value) {
-        if self.containskey(key) {
-            self._value[1][self.indexatkey(key)] = value;
-        }
-        else {
-            self._value = self.appendToArray([key, value]);
-        }
-    }
-
-    func getkey(self, aindex) {
-        let key = self._value[0][aindex];
+    func getkey(self, index) {
+        let key = self.getpair(index)[0];
 
         return key;
     }
 
-    func getvalue(self, aindex) {
-        let value = self._value[1][aindex];
+    func getvalue(self, index) {
+        let value = self.getpair(index)[1];
 
         return value;
     }
 
-    func getpair(self, aindex) {
-        let result = self.atindex(aindex);
+    func getpair(self, index) {
+        let result = self.atindex(index);
 
         return result;
     }
 
-    func atindex(self, aindex) {
-        let key = self._value[0][aindex];
-        let value = self._value[1][aindex];
-        let result = [key, value];
-
-        return result;
+    func atindex(self, index) {
+        return __intern_dictionary_atindex__(self._value, index);
     }
 
-    func indexatkey(self, aindex) {
-        let resultIndex = -1;
-
-        for i in Range.new(0, self.len()) {
-            if self._value[0][i] == aindex {
-                resultIndex = i;
-            }
-            else {
-                if i == self.len() - 1 && resultIndex == -1 {
-                    let intIndex = self.len() - 1;
-                    if intIndex != -1 {
-                        resultIndex = intIndex;
-                    }
-                }
-            }
-        }
-
-        return resultIndex;
+    func indexatkey(self, key) {
+        return __intern_dictionary_indexatkey__(self._value, key);
     }
 
-    func atkey(self, aindex) {
-        let result = null;
-
-        for i in Range.new(0, self.len()) {
-            if self._value[0][i] == aindex {
-                result = self._value[1][i];
-            }
-            else {
-                if i == self.len() - 1 && result == null {
-                    let intIndex = self.len() - 1;
-                    if intIndex != -1 {
-                        result = self._value[1][intIndex];
-                    }
-                }
-            }
-        }
-
-        return result;
-    }
-
-
-
-    func atvalue(self, aindex) {
-        let result = null;
-
-        for i in Range.new(0, self.len()) {
-            if self._value[1][i] == aindex {
-                result = self._value[0][i];
-            }
-            else {
-                if i == self.len() - 1 && result == null {
-                    let intIndex = self.len() - 1;
-                    if intIndex != -1 {
-                        result = self._value[0][intIndex];
-                    }
-                }
-            }
-        }
-
-        return result;
-    }
-
-    func containskey(self, value) {
-        return self._value[0].find(value) != -1;
-    }
-
-    func contains(self, value) {
-        return self._value[1].find(value) != -1;
+    func contains(self, key) {
+        return __intern_dictionary_contains__(self._value, key);
     }
 
     func to_array(self) {
-        return self._value;
+        return [self.keys(), self.values()];
     }
 
     func len(self) {
-        let _rval = self.to_array()[0].len();
-        return _rval;
+        return __intern_dictionary_len__(self._value);
     }
 
     func append(self, value) {
-        let result = self.appendToArray(value);
-        return Dictionary.new(result[0], result[1]);
+        return __intern_dictionary_append__(self._value, value);
     }
 
-    func appendToArray(self, value) {
-        let resultKeys = self._value[0].append(value[0]);
-        let resultValues = self._value[1].append(value[1]);
-        let result = [resultKeys, resultValues];
-        return result;
-    }
-
-    func update(self, index, value) {
-        return self.clone().modify(index, value);
+    func update(self, key, value) {
+        return self.clone().modify(key, value);
     }
 
     func clone(self) {
-        let resultKeys = self._value[0].clone();
-        let resultValues = self._value[1].clone();
-        let result = Dictionary.new(resultKeys, resultValues);
-        return result;
+        return __intern_dictionary_clone__(self._value);
     }
 
-    func find(self, value) {
+    func find(self, key) {
         let length = self.len();
         let index = 0;
         while index != length {
-            if self._value[1][index] == value {
+            if self.getkey(index) == key {
+                return index;
+            }
+            index += 1;
+        }
+        return -1;
+    }
+
+    func findpair(self, pair) {
+        let length = self.len();
+        let index = 0;
+        while index != length {
+            if self.getpair(index) == pair {
                 return index;
             }
             index += 1;
@@ -272,14 +193,14 @@ let Dict = Iterable.extend({
     }
 
     func map(self, cb) {
-        let result = Dictionary.new([], []);
+        let result = [:];
         let remaining = self.len();
         let len = self.len();
 
         while remaining != 0 {
             let index = len - remaining;
 
-            result.append(cb([self._value[0][index], self._value[1][index]]));
+            result.append(cb(self.getpair(index)));
 
             remaining -= 1;
         }
@@ -301,11 +222,11 @@ let Dict = Iterable.extend({
     }
 
     func keys(self) {
-        return self._value[0];
+        return __intern_dictionary_keys__(self._value);
     }
 
     func values(self) {
-        return self._value[1];
+        return __intern_dictionary_values__(self._value);
     }
 });
 

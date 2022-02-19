@@ -7,7 +7,7 @@ lots of related variable names.
 Here's an example of how to create a dictionary and assign
 it to a variable.
 
-`let names = Dictionary.new(['Jeffrey', 'Sam', 'Buddy'], ['Williams', 'Johnson', 'White']);`
+`let names = ['Jeffrey': 'Williams', 'Sam': 'Johnson', 'Buddy': 'White'];`
 
 The `names` dictionary holds three strings, each
 representing a name.
@@ -22,10 +22,16 @@ for name in names {
 
 Prints:
 ```
-[Jeffrey, Williams]
-[Sam, Johnson]
-[Buddy, White]
+['Jeffrey', 'Williams']
+['Sam', 'Johnson']
+['Buddy', 'White']
 ```
+
+Creating an *empty* dictionary is a little different.
+Here's an example of how to create an empty dictionary
+and assign it to a variable.
+
+`let names = [:];`
 
 To access a specific item in a dictionary by index, use the
 access operator (square brackets)
@@ -37,12 +43,11 @@ an object is contained by the dictionary, appending new items to
 a dictionary, and more.
 
 ```javascript
-names.contains('Buddy'); // false
-names.containskey('Buddy'); // true
+names.contains('Buddy'); // true
 
 names.append(['Tiffany', 'Jones']); // names is now {'Jeffrey': 'Williams', 'Sam': 'Johnson', 'Buddy': 'White', 'Tiffany': 'Jones'}
 
-names | Dict.new(['Sam', 'Johnson'], ['Tyler', 'Scotts']); // returns {'Jeffrey': 'Williams', 'Sam': 'Johnson', 'Buddy': 'White', 'Tyler': 'Scotts'}
+names | ['Sam': 'Tyler', 'Johnson': 'Scotts']; // returns {'Jeffrey': 'Williams', 'Sam': 'Johnson', 'Buddy': 'White', 'Tyler': 'Scotts'}
 
-names & Dict.new(['Sam', 'Johnson'], ['Tyler', 'Scotts']); // returns {'Sam': 'Johnson'}
+names & ['Sam': 'Tyler', 'Johnson': 'Scotts']; // returns {'Sam': 'Johnson'}
 ```

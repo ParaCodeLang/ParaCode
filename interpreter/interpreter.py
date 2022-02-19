@@ -31,7 +31,9 @@ class Interpreter():
         self.global_scope = Scope(None)
         self._top_level_scope = None
 
-        Globals().apply_to_scope(self.global_scope)
+        # _globals is only used for pyimport
+        self._globals = Globals()
+        self._globals.apply_to_scope(self.global_scope)
 
     @property
     def current_scope(self):
@@ -983,12 +985,21 @@ class Interpreter():
         self.close_scope()
 
     def visit_ArrayExpression(self, node):
-        members = []
+        if node.is_dictionary:
+            members = {}
 
-        for member_decl in node.members:
-            value = self.visit(member_decl)
+            for i in range(len(self.visit(node.members[0]).extract_value())):
+                key = self.visit(self.visit(node.members[0]).extract_value()[i])
+                value = self.visit(self.visit(node.members[1]).extract_value()[i])
 
-            members.append(value)
+                members[key] = value
+        else:
+            members = []
+
+            for member_decl in node.members:
+                value = self.visit(member_decl)
+
+                members.append(value)
 
         return BasicValue(members)
 

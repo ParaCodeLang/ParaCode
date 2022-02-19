@@ -2,11 +2,11 @@ let tk = Type.extend({
     instance = {
         windowTitle
         variableName
-        labels = Dict.new([], [])
-        buttons = Dict.new([], [])
-        entries = Dict.new([], [])
-        texts = Dict.new([], [])
-        frames = Dict.new([], [])
+        labels = [:]
+        buttons = [:]
+        entries = [:]
+        texts = [:]
+        frames = [:]
 
         func setWindowTitle(self, title) {
             self.windowTitle = title;
@@ -71,11 +71,11 @@ let Frame = Type.extend({
         variableName
         master
 
-        labels = Dict.new([], [])
-        buttons = Dict.new([], [])
-        entries = Dict.new([], [])
-        texts = Dict.new([], [])
-        frames = Dict.new([], [])
+        labels = [:]
+        buttons = [:]
+        entries = [:]
+        texts = [:]
+        frames = [:]
 
         tk1
 
