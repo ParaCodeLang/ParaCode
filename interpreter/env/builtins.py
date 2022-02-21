@@ -2668,12 +2668,20 @@ def builtin_import_python(arguments):
         code = ("from " + str(arguments.arguments[0].extract_value()).replace(".py", "").replace("/", ".") + " import *;")
     else:
         code = str(arguments.arguments[0].extract_value()) + ";\n"
-    code += "interpreter._globals.variables.append(('" + str(arguments.arguments[1].extract_value()) + "', VariableType.Function, BuiltinFunction('" + str(arguments.arguments[1].extract_value()) + "', None, "
-    if len(arguments.arguments) > 2:
-        code += str(arguments.arguments[2].extract_value())
-    else:
-        code += str(arguments.arguments[1].extract_value())
-    code += "))); interpreter._globals.apply_to_scope(arguments.interpreter.current_scope);"
+
+    if type(arguments.arguments[1].extract_value()) is dict:
+        for key in dict(arguments.arguments[1].extract_value()):
+            value = dict(arguments.arguments[1].extract_value())[key]
+            code += "interpreter._globals.variables.append(('" + str(value.extract_value()) + "', VariableType.Function, BuiltinFunction('" + str(value.extract_value()) + "', None, "
+            code += str(key.extract_value())
+            code += "))); interpreter._globals.apply_to_scope(arguments.interpreter.current_scope); "
+    # else:
+    #     code += "interpreter._globals.variables.append(('" + str(arguments.arguments[1].extract_value()) + "', VariableType.Function, BuiltinFunction('" + str(arguments.arguments[1].extract_value()) + "', None, "
+    #     if len(arguments.arguments) > 2:
+    #         code += str(arguments.arguments[2].extract_value())
+    #     else:
+    #         code += str(arguments.arguments[1].extract_value())
+    #     code += "))); interpreter._globals.apply_to_scope(arguments.interpreter.current_scope);"
     
     exec(code)
     

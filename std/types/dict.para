@@ -119,24 +119,14 @@ let Dict = Iterable.extend({
     }
 
     func getkey(self, index) {
-        let key = self.getpair(index)[0];
-
-        return key;
+        return self.getpair(index)[0];
     }
 
     func getvalue(self, index) {
-        let value = self.getpair(index)[1];
-
-        return value;
+        return self.getpair(index)[1];
     }
 
     func getpair(self, index) {
-        let result = self.atindex(index);
-
-        return result;
-    }
-
-    func atindex(self, index) {
         return __intern_dictionary_atindex__(self._value, index);
     }
 

@@ -3,14 +3,14 @@ let CaseInsensitiveDict = Dict.extend({
 
     instance = {
         _value = [:]
-        _normal = [:]
+        //_normal = [:]
 
         func __at__(self, key) {
             return __intern_dictionary_at__(self._value, self._getcorrectkey(key));
         }
         
         func __add__(self, value) {
-            return self.append(value[0]);
+            return self.append(value);
         }
 
         func __bitor__(self, value) {
@@ -37,7 +37,7 @@ let CaseInsensitiveDict = Dict.extend({
         }
 
         func __bitand__(self, value) {
-            let res_dictionary = [:];
+            let res_dictionary = CaseInsensitiveDict.new([:]);
 
             let remaining = self.len();
             let len = self.len();
@@ -73,12 +73,13 @@ let CaseInsensitiveDict = Dict.extend({
         }
 
         func to_str(self) {
-            return self._normal.to_str();
+            //return self._normal.to_str();
+            return self._value.to_str();
         }
 
         func from(self, index) {
             let len = self.len();
-            let newdict = [:];
+            let newdict = CaseInsensitiveDict([:]);
             // TODO: < not !=
             while index < len {
                 newdict += self.getpair(index);
@@ -88,27 +89,45 @@ let CaseInsensitiveDict = Dict.extend({
         }
 
         func __set__(self, key, value) {
-            __intern_dictionary_set__(self._value, key, value);
+            __intern_dictionary_set__(self._value, self._getcorrectkey(key, 3, true), value);
             return self;
         }
     }
 
     // Constructor
     func __construct__(self, value) {
-        self._value = [:];
-        for pair in value {
-            self._value[self._getcorrectkey(pair[0])];
+        //self._value = [:];
+        //for pair in value {
+        //    self._value[self._getcorrectkey(pair[0])] = pair[1];
+        //}
+        //self._normal = value;
+        
+        if value.type() == CaseInsensitiveDict {
+            self._value = value._value;
         }
-        self._normal = value;
+        else {
+            self._value = value;
+        }
         return self;
     }
 
-    func _getcorrectkey(self, key) {
+    func _getcorrectkey(self, key, check_depth=3, keep_case=false) {
+        //if key.type() == Str {
+        //    return key.tolower();
+        //}
+        //return key;
+
+        if check_depth == 2 || (check_depth == 3 && self.contains(key)) {
+            if key.type() == Str {
+                return self._value.getkey(self.indexatkey(key.tolower()));
+            }
+            return self._value.getkey(self.indexatkey(key));
+        }
         if key.type() == Str {
             return key.tolower();
         }
         return key;
-    }    
+    }
     
     func getkey(self, index) {
         return self.getpair(index)[0];
@@ -119,21 +138,23 @@ let CaseInsensitiveDict = Dict.extend({
     }
 
     func getpair(self, index) {
-        return self.atindex(index);
-    }
-
-    func atindex(self, index) {
         return __intern_dictionary_atindex__(self._value, index);
     }
 
     func indexatkey(self, key) {
-        let key = self._getcorrectkey(key);
-        return __intern_dictionary_indexatkey__(self._value, key);
+        for i in Range.new(self.len()) {
+            if self._getcorrectkey(self.getkey(i), 1) == self._getcorrectkey(key, 1) {
+                return i;
+            }
+        }
     }
 
     func contains(self, key) {
-        let key = self._getcorrectkey(key);
-        return __intern_dictionary_contains__(self._value, key);
+        for pair in self {
+            if self._getcorrectkey(pair[0], 1) == self._getcorrectkey(key, 1) {
+                return true;
+            }
+        }
     }
 
     func to_array(self) {
@@ -151,22 +172,21 @@ let CaseInsensitiveDict = Dict.extend({
     func update(self, key, value) {
         let key = self._getcorrectkey(key);
         let result = self.clone().modify(key, value);
-        result._normal.modify(result._normal.getkey(result.indexatkey(key)), value);
+        //result._normal.modify(result._normal.getkey(result.indexatkey(key)), value);
         return result;
     }
 
     func clone(self) {
-        let result = __intern_dictionary_clone__(self._value);
-        result._normal = self._normal.clone();
+        let result = CaseInsensitiveDict.new(__intern_dictionary_clone__(self._value));
+        //result._normal = self._normal.clone();
         return result;
     }
 
     func find(self, key) {
-        let key = self._getcorrectkey(key);
         let length = self.len();
         let index = 0;
         while index != length {
-            if self.getkey(index) == key {
+            if self._getcorrectkey(self.getkey(index), 1) == self._getcorrectkey(key, 1) {
                 return index;
             }
             index += 1;
@@ -175,11 +195,11 @@ let CaseInsensitiveDict = Dict.extend({
     }
 
     func findpair(self, pair) {
-        let pair = [pair[0], self._getcorrectkey(pair[1])];
         let length = self.len();
         let index = 0;
         while index != length {
-            if self.getpair(index) == pair {
+            let p = self.getpair(index);
+            if [self._getcorrectkey(p[0], 1), p[1]] == [self._getcorrectkey(pair[0], 1), pair[1]] {
                 return index;
             }
             index += 1;
@@ -188,7 +208,7 @@ let CaseInsensitiveDict = Dict.extend({
     }
 
     func map(self, cb) {
-        let result = [:];
+        let result = CaseInsensitiveDict([:]);
         let remaining = self.len();
         let len = self.len();
 
