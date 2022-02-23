@@ -100,11 +100,12 @@ class NodeVarType(AstNode):
 
 # Declare node; declare variable or function
 class NodeDeclare(AstNode):
-    def __init__(self, type, name, value):
+    def __init__(self, type, name, value, allow_casting=False):
         AstNode.__init__(self, NodeType.Declare, name)
         self.type_node = type
         self.name = name
         self.value = value
+        self.allow_casting = allow_casting
         
 class NodeImport(AstNode):
     def __init__(self, filename, source_location):
@@ -140,10 +141,11 @@ class NodeAssign(AstNode):
 
 # Variable node; request value of variable
 class NodeVariable(AstNode):
-    def __init__(self, token):
+    def __init__(self, token, allow_casting=False):
         AstNode.__init__(self, NodeType.Variable, token)
         self.token = token
         self.value = token.value
+        self.allow_casting = allow_casting
         
 class NodeIfStatement(AstNode):
     def __init__(self, expr, block, else_block, token):

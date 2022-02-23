@@ -56,3 +56,5 @@ import "std/types/exceptions/multipledefinitionerror.para";
 import "std/types/exceptions/typeerror.para";
 import "std/types/exceptions/interruptederror.para";
 import "std/types/exceptions/notimplementederror.para";
+import "std/types/exceptions/lookuperror.para";
+import "std/types/exceptions/indexerror.para";

@@ -199,17 +199,27 @@ def builtin_array_at(arguments):
     obj = arguments.arguments[0].extract_value()
     index = arguments.arguments[1].extract_value()
 
-    if index > len(obj):
-        # TODO throw internal exception
-        return BasicValue(None)
-
     return BasicValue(obj[index])
 
 def builtin_dictionary_at(arguments):
     obj = arguments.arguments[0].extract_value()
-    key = arguments.arguments[1].extract_value()
+    key = arguments.arguments[1]
 
+    print(key)
+    print(type(key))
+    # print(obj)
+    # print(list(obj.keys()))
+    print(list(obj.keys())[0])
+    print(type(list(obj.keys())[0]))
+    print()
+    print(repr(key))
+    print(repr(list(obj.keys())[0]))
+    print()
+    print(list(obj.keys())[0] is key)
+    print(list(obj.keys())[0] == key)
+    print(BasicValue(list(obj.keys())[0].extract_value()) == BasicValue(key.extract_value()))
     if key not in obj:
+        print("NOOOOOOOO")
         # TODO throw internal exception
         return BasicValue(None)
 
@@ -219,7 +229,7 @@ def builtin_dictionary_atindex(arguments):
     obj = arguments.arguments[0].extract_value()
     index = arguments.arguments[1].extract_value()
 
-    if index > len(obj):
+    if index >= len(obj):
         # TODO throw internal exception
         return BasicValue(None)
 
@@ -247,8 +257,14 @@ def builtin_dictionary_values(arguments):
 
 def builtin_dictionary_contains(arguments):
     obj = arguments.arguments[0].extract_value()
-    key = arguments.arguments[1].extract_value()
+    key = arguments.arguments[1]
 
+    print(obj)
+    print(list(obj.keys()))
+    print(list(obj.keys())[0])
+    print(type(list(obj.keys())[0]))
+    print(key)
+    print(type(key))
     return BasicValue(key in obj)
     
 def builtin_array_append(arguments):

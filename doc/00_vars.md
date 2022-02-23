@@ -10,7 +10,9 @@ optional type, such as `int`,
 
 For example:
 
-`let mynum: int = 5;`
+```typescript
+let mynum: int = 5;
+```
 
 Creates a variable named mynum,
 with a type of `int`, and assigns

@@ -5,7 +5,13 @@ let Dict = Iterable.extend({
         _value = [:]
 
         func __at__(self, key) {
-            return __intern_dictionary_at__(self._value, key);
+            print(self.contains(key));
+            if !self.contains(key) {
+                print("No.");
+                return null;
+            }
+            //return __intern_dictionary_at__(self._value, key);
+            return self.getvalue(self.indexatkey(key));
         }
         
         func __add__(self, value) {
@@ -112,9 +118,16 @@ let Dict = Iterable.extend({
         }
     }
 
-    // Constructor
-    func __construct__(self, value) {
-        self._value = value;
+    // Constructor (Value can be the dictionary value or its keys. Values is only for when you give keys)
+    func __construct__(self, value, values=null) {
+        if values != null {
+            for i in Range.new(0, value.len()) {
+                self[value[i]] = values[i];
+            }
+        }
+        else {
+            self._value = value;
+        }
         return self;
     }
 
@@ -135,7 +148,8 @@ let Dict = Iterable.extend({
     }
 
     func contains(self, key) {
-        return __intern_dictionary_contains__(self._value, key);
+        //return __intern_dictionary_contains__(self._value, key);
+        return self.keys().contains(key);
     }
 
     func to_array(self) {

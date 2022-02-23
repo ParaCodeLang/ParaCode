@@ -723,6 +723,7 @@ class Parser():
             return None
 
         type_node = None
+        allow_casting = False
         
         # manual type set
         if self.current_token.type == TokenType.Colon:
@@ -734,12 +735,16 @@ class Parser():
                 self.error('Declaration type should either be an identifier or member access, got {}'.format(type_node_token))
                 return None
 
+            if self.current_token.type == TokenType.Question:
+                self.eat(TokenType.Question)
+                allow_casting = True
+
         if self.current_token.type == TokenType.Equals:
-            val_node = self.parse_assignment_statement(NodeVariable(name))
+            val_node = self.parse_assignment_statement(NodeVariable(name, allow_casting))
         else:
             val_node = NodeNone(name)
 
-        vnodes = NodeDeclare(type_node, name, val_node)
+        vnodes = NodeDeclare(type_node, name, val_node, allow_casting)
         
         return vnodes
 

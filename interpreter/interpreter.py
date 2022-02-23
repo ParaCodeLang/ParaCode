@@ -94,7 +94,7 @@ class Interpreter():
         if cont or not self.in_try:
             raise InterpreterError('Interpreter error', node, type, message, cont, name, classnames, object)
         
-    def visit(self, node):
+    def visit(self, node, allow_casting=False):
         if isinstance(node, BasicValue):
             return node
 
@@ -104,6 +104,8 @@ class Interpreter():
         except:
             raise Exception('No visitor function defined for node {}'.format(node))
 
+        if caller_name == "visit_Assign":
+            return caller(node, allow_casting)
         return caller(node)
 
     def visit_UnaryOp(self, node):
@@ -211,8 +213,8 @@ class Interpreter():
         if self.current_scope.find_variable_info(node.name.value, limit=True) != None:
             self.error(node, ErrorType.MultipleDefinition, "multiple definition of '{}'".format(node.name.value))
    
-        self.current_scope.declare_variable(node.name.value, type_node_value)
-        val = self.visit(node.value)
+        self.current_scope.declare_variable(node.name.value, type_node_value, node.allow_casting)
+        val = self.visit(node.value, node.allow_casting)
         return val
     
     def visit_Import(self, node):
@@ -250,12 +252,16 @@ class Interpreter():
         if create_scope:
             self.close_scope()
 
-    def assignment_typecheck(self, node, type_object, assignment_value):
+    def assignment_typecheck(self, node, type_object, assignment_value, detailed_return=False, allow_casting=False):
         if type_object is None:
             self.error(node, ErrorType.TypeError, 'Set with decltype but decltype resolved to None')
+            if detailed_return:
+                return False, assignment_value
             return False
         elif not isinstance(type_object, BasicType):
             self.error(node, ErrorType.TypeError, '{} is not a valid type object and cannot be used as a declaration type'.format(type_object))
+            if detailed_return:
+                return False, assignment_value
             return False
         else:
             assignment_type = BasicValue(assignment_value).lookup_type(self.global_scope)
@@ -265,36 +271,48 @@ class Interpreter():
 
             if assignment_type is None:
                 self.error(node, ErrorType.TypeError, 'Assignment requires type {} but could not resolve a runtime type of assignment value'.format(type_object))
+                if detailed_return:
+                    return None, assignment_value
                 return None
             if isinstance(assignment_type, BasicValue):
                 assignment_type = assignment_type.extract_value()
 
             if not isinstance(assignment_type, BasicType):
                 self.error(node, ErrorType.TypeError, '{} is not a valid runtime type object'.format(assignment_type))
+                if detailed_return:
+                    return False, assignment_value
                 return False
     
             if not type_object.compare_type(assignment_type):
-                try:
-                    # target_type_object = assignment_type.lookup_type(self.global_scope).extract_basicvalue()
-                    # type_object
-                    # assignment_type
-                    # assignment_value
-                    builtin_object_new(BuiltinFunctionArguments(interpreter=self, this_object=assignment_type, arguments=[type_object], node=node))
-                except InterpreterError:
+                if allow_casting:
+                    try:
+                        assignment_value = builtin_object_new(BuiltinFunctionArguments(interpreter=self, this_object=type_object, arguments=[assignment_value], node=node))
+                        assignment_type = type_object
+                    except:
+                        self.error(node, ErrorType.TypeError, 'Attempted to assign <{}> to a value of type <{}>'.format(type_object.friendly_typename, assignment_type.friendly_typename))
+                        if detailed_return:
+                            return False, assignment_value
+                        return False
+                else:
                     self.error(node, ErrorType.TypeError, 'Attempted to assign <{}> to a value of type <{}>'.format(type_object.friendly_typename, assignment_type.friendly_typename))
+                    if detailed_return:
+                        return False, assignment_value
                     return False
 
+        if detailed_return:
+            return True, assignment_value
         return True
 
-    def visit_Assign(self, node):
+    def visit_Assign(self, node, allow_casting=False):
         if isinstance(node.lhs, NodeVariable):
+            node.allow_casting = allow_casting
             target_info = self.walk_variable(node.lhs)
             target_value = target_info.value_wrapper
 
             value = self.visit(node.value)
             # TYPE CHECK
             if target_info.decltype is not None:
-                typecheck_value = self.assignment_typecheck(node.lhs, target_info.decltype, value)
+                typecheck_value, value = self.assignment_typecheck(node.lhs, target_info.decltype, value, True, allow_casting)
 
                 if typecheck_value is not True:
                     return None

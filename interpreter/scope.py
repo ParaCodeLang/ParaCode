@@ -1,18 +1,19 @@
 from interpreter.basic_value import BasicValue
 
 class SymbolInfo:
-    def __init__(self, varname, decltype, value=None):
+    def __init__(self, varname, decltype, value=None, allow_casting=False):
         self.varname = varname
         self.decltype = decltype
         self.value_wrapper = BasicValue(value)
+        self.allow_casting = allow_casting
 
 class Scope():
     def __init__(self, parent=None):
         self.variables = {}
         self.parent = parent
 
-    def declare_variable(self, name, decltype):
-        self.variables[name] = SymbolInfo(name, decltype)
+    def declare_variable(self, name, decltype, allow_casting=False):
+        self.variables[name] = SymbolInfo(name, decltype, allow_casting)
 
         return self.variables[name].value_wrapper
 

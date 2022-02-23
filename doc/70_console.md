@@ -11,11 +11,14 @@ import any modules manually in order to start using
 it.
 
 To print to the console:
-`io.write('your string here');`
+```typescript
+io.write('your string here');
+```
+
 
 And to read input from the console:
 
-```javascript
+```typescript
 let response = io.read(); // read user input and store in `response`
 io.write(response);       // print it back out to the console
 ```
@@ -23,6 +26,6 @@ io.write(response);       // print it back out to the console
 You can also print to the console in a few different colors!
 Here's an example on how to do that:
 
-```javascript
+```typescript
 io.write_color(Console.BLUE, "I'm blue ba ba dee ba ba die");
 ```

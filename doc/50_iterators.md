@@ -8,7 +8,7 @@ While the `for` loop is powerful, in some instances you may want to allow your o
 
 If you look at the `__iterate__` method in `std/types/array.para` you'll see how the `Array` type handles for loops.
 
-```javascript
+```typescript
 // std/types/array.para
 
 func __iterate__(self, cb: Func) {

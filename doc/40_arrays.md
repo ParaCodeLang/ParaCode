@@ -18,21 +18,23 @@ Arrays can be iterated over one-by-one by using the
 Here's an example of how to create an array and assign
 it to a variable.
 
-`let names = ['Jeffrey', 'Sam', 'Buddy'];`
+```typescript
+let names = ['Jeffrey', 'Sam', 'Buddy'];
+```
 
 The `names` array holds three strings, each
 representing a name.
 
 If you want to loop over these names, you can use `for`.
 
-```javascript
+```typescript
 for name in names {
     print(name);
 }
 ```
 
 Prints:
-```
+```bash
 Jeffrey
 Sam
 Buddy
@@ -42,13 +44,15 @@ Buddy
 To access a specific item in an array by index, use the
 access operator (square brackets)
 
-`print(names[1]); // prints 'Sam'`
+```typescript
+print(names[1]); // prints 'Sam'
+```
 
 Arrays have multiple methods, including ways of checking whether
 an object is contained by the array, appending new items to
 an array, and more.
 
-```javascript
+```typescript
 names.contains('Buddy'); // true
 names.append('Tiffany'); // names is now ['Jeffrey', 'Sam', 'Buddy', 'Tiffany']
 

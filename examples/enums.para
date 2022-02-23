@@ -7,7 +7,8 @@ let ExampleEnum = Enum.extend({
     WORLD = 1
 });
 
-// interpreter.py: line 275
-// let v: ExampleEnum = ExampleEnum.new(ExampleEnum.HELLO);
-let v: ExampleEnum = ExampleEnum.HELLO;
-print(v.to_str());
+let a = ExampleEnum.new(ExampleEnum.HELLO);
+print(a);
+
+let b: ExampleEnum? = ExampleEnum.HELLO;
+print(b);

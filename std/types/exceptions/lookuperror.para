@@ -1,0 +1,13 @@
+let LookupError = Exception.extend({
+    name = 'LookupError'
+
+    instance = {
+        func raise(self) {
+            return raise(self, "Lookup Error");
+        }
+    }
+
+    func __construct__(self, _message) {
+        self.message = _message;
+    }
+});

@@ -1,0 +1,13 @@
+let IndexError = LookupError.extend({
+    name = 'IndexError'
+
+    instance = {
+        func raise(self) {
+            return raise(self, "Index Error");
+        }
+    }
+
+    func __construct__(self, _message) {
+        self.message = _message;
+    }
+});

@@ -144,7 +144,7 @@ class Repl:
             return
         elif trimmed in self._walkthrough_messages or (trimmed.endswith(".md") and trimmed.replace(".md", "", -1) in self._walkthrough_messages) or (trimmed.endswith(".md/") and trimmed.replace(".md/", "", -1) in self._walkthrough_messages):
             print(
-                self._walkthrough_messages[trimmed][1].replace('```\n', '').replace('```javascript\n', '').replace('```js\n', '').replace('`', ''))
+                self._walkthrough_messages[trimmed][1].replace('```\n', '').replace('```javascript\n', '').replace('```js\n', '').replace('```typescript\n', '').replace('```ts\n', '').replace('```shell\n', '').replace('```bash\n', '').replace('`', ''))
 
             return
         elif trimmed == "doc" or trimmed == "docs" or trimmed == "documentation" or trimmed == "documentations" or trimmed == "walkthrough" or trimmed == "walkthroughs":

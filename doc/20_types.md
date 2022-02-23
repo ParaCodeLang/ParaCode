@@ -12,7 +12,7 @@ many different forms.
 To create your own type, use the
 syntax:
 
-```javascript
+```typescript
 let Person: type = {
   instance: {
     name: str;
@@ -35,7 +35,7 @@ use.
 
 For example:
 
-```javascript
+```typescript
 let Person: type = {
   instance: {
     name: str;
@@ -49,7 +49,7 @@ let Person: type = {
 ```
 
 In usage:
-```javascript
+```typescript
 person_a = Person.new();
 person_a.name = "Ron";
 

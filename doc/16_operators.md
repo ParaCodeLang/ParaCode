@@ -41,7 +41,7 @@ standard objects.
 
 Here's an example of how you can use (and abuse) operator overloading
 
-```javascript
+```typescript
 let Person = Type.extend({
     instance = {
         name
