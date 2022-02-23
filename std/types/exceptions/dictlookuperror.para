@@ -1,0 +1,13 @@
+let DictLookupError = LookupError.extend({
+    name = 'DictLookupError'
+
+    instance = {
+        func raise(self) {
+            return raise(self, "Dictionary Lookup Error");
+        }
+    }
+
+    func __construct__(self, _message) {
+        self.message = _message;
+    }
+});

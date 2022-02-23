@@ -6,7 +6,7 @@ let Array = Iterable.extend({
 
         func __at__(self, index: int) {
             if index >= self.len() {
-                IndexError.new("Array index out of range!").raise();
+                ArrayLookupError.new("Index out of range!").raise();
                 return null;
             }
             let value = __intern_array_at__(self._value, index);

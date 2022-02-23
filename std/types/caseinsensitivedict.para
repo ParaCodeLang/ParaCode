@@ -3,9 +3,12 @@ let CaseInsensitiveDict = Dict.extend({
 
     instance = {
         _value = [:]
-        //_normal = [:]
 
         func __at__(self, key) {
+            if !self.contains(key) {
+                DictLookupError.new("Key doesn't exist!").raise();
+                return null;
+            }
             return __intern_dictionary_at__(self._value, self._getcorrectkey(key));
         }
         
@@ -73,14 +76,12 @@ let CaseInsensitiveDict = Dict.extend({
         }
 
         func to_str(self) {
-            //return self._normal.to_str();
             return self._value.to_str();
         }
 
         func from(self, index) {
             let len = self.len();
             let newdict = CaseInsensitiveDict([:]);
-            // TODO: < not !=
             while index < len {
                 newdict += self.getpair(index);
                 index += 1;
@@ -95,35 +96,31 @@ let CaseInsensitiveDict = Dict.extend({
     }
 
     // Constructor
-    func __construct__(self, value) {
-        //self._value = [:];
-        //for pair in value {
-        //    self._value[self._getcorrectkey(pair[0])] = pair[1];
-        //}
-        //self._normal = value;
-        
+    func __construct__(self, value, values=null) {
         if value.type() == CaseInsensitiveDict {
             self._value = value._value;
         }
         else {
-            self._value = value;
+            if values != null {
+                for i in Range.new(0, value.len()) {
+                    self[value[i]] = values[i];
+                }
+            }
+            else {
+                self._value = value;
+            }
         }
         return self;
     }
 
     func _getcorrectkey(self, key, check_depth=3, keep_case=false) {
-        //if key.type() == Str {
-        //    return key.tolower();
-        //}
-        //return key;
-
         if check_depth == 2 || (check_depth == 3 && self.contains(key)) {
-            if key.type() == Str {
+            if key.type() == Str && !keep_case {
                 return self._value.getkey(self.indexatkey(key.tolower()));
             }
             return self._value.getkey(self.indexatkey(key));
         }
-        if key.type() == Str {
+        if key.type() == Str && !keep_case {
             return key.tolower();
         }
         return key;
@@ -142,6 +139,11 @@ let CaseInsensitiveDict = Dict.extend({
     }
 
     func indexatkey(self, key) {
+        if !self.contains(key) {
+            DictLookupError.new("Key doesn't exist!").raise();
+            return null;
+        }
+        
         for i in Range.new(self.len()) {
             if self._getcorrectkey(self.getkey(i), 1) == self._getcorrectkey(key, 1) {
                 return i;
@@ -170,15 +172,12 @@ let CaseInsensitiveDict = Dict.extend({
     }
 
     func update(self, key, value) {
-        let key = self._getcorrectkey(key);
-        let result = self.clone().modify(key, value);
-        //result._normal.modify(result._normal.getkey(result.indexatkey(key)), value);
+        let result = self.clone().modify(self._getcorrectkey(key), value);
         return result;
     }
 
     func clone(self) {
         let result = CaseInsensitiveDict.new(__intern_dictionary_clone__(self._value));
-        //result._normal = self._normal.clone();
         return result;
     }
 
@@ -199,8 +198,14 @@ let CaseInsensitiveDict = Dict.extend({
         let index = 0;
         while index != length {
             let p = self.getpair(index);
-            if [self._getcorrectkey(p[0], 1), p[1]] == [self._getcorrectkey(pair[0], 1), pair[1]] {
-                return index;
+            if pair.len() == 2 {
+                if self._getcorrectkey(p[0], 1) == self._getcorrectkey(pair[0], 1) && p[1] == pair[1] {
+                    return index;
+                }
+            }
+            else {
+                DictLookupError.new("Invalid pair!").raise();
+                return -1;
             }
             index += 1;
         }

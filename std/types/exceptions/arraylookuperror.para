@@ -1,9 +1,9 @@
-let IndexError = LookupError.extend({
-    name = 'IndexError'
+let ArrayLookupError = LookupError.extend({
+    name = 'ArrayLookupError'
 
     instance = {
         func raise(self) {
-            return raise(self, "Index Error");
+            return raise(self, "Array Lookup Error");
         }
     }
 

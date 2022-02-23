@@ -5,13 +5,11 @@ let Dict = Iterable.extend({
         _value = [:]
 
         func __at__(self, key) {
-            print(self.contains(key));
             if !self.contains(key) {
-                print("No.");
+                DictLookupError.new("Key doesn't exist!").raise();
                 return null;
             }
-            //return __intern_dictionary_at__(self._value, key);
-            return self.getvalue(self.indexatkey(key));
+            return __intern_dictionary_at__(self._value, key);
         }
         
         func __add__(self, value) {
@@ -104,7 +102,6 @@ let Dict = Iterable.extend({
         func from(self, index) {
             let len = self.len();
             let newdict = [:];
-            // TODO: < not !=
             while index < len {
                 newdict += self.getpair(index);
                 index += 1;
@@ -144,12 +141,15 @@ let Dict = Iterable.extend({
     }
 
     func indexatkey(self, key) {
+        if !self.contains(key) {
+            DictLookupError.new("Key doesn't exist!").raise();
+            return null;
+        }
         return __intern_dictionary_indexatkey__(self._value, key);
     }
 
     func contains(self, key) {
-        //return __intern_dictionary_contains__(self._value, key);
-        return self.keys().contains(key);
+        return __intern_dictionary_contains__(self._value, key);
     }
 
     func to_array(self) {
@@ -188,8 +188,15 @@ let Dict = Iterable.extend({
         let length = self.len();
         let index = 0;
         while index != length {
-            if self.getpair(index) == pair {
-                return index;
+            let p = self.getpair(index);
+            if pair.len() == 2 {
+                if p[0] == pair[0] && p[1] == pair[1] {
+                    return index;
+                }
+            }
+            else {
+                DictLookupError.new("Invalid pair!").raise();
+                return -1;
             }
             index += 1;
         }
