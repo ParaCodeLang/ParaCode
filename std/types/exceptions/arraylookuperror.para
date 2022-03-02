@@ -1,0 +1,13 @@
+let ArrayLookupError = LookupError.extend({
+    name = 'ArrayLookupError'
+
+    instance = {
+        func raise(self) {
+            return raise(self, "Array Lookup Error");
+        }
+    }
+
+    func __construct__(self, _message) {
+        self.message = _message;
+    }
+});

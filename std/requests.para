@@ -1,0 +1,262 @@
+let requests = Type.extend({
+    name = 'Requests'
+
+    func get(_, url, params=null, *args) {
+        return intern_list_to_response(__intern_requests_get__(url, params, *args));
+    }
+    
+    func post(_, url, data=null, json=null, *args) {
+        return intern_list_to_response(__intern_requests_post__(url, data, json, *args));
+    }
+
+    func put(_, url, data=null, *args) {
+        return intern_list_to_response(__intern_requests_put__(url, data, *args));
+    }
+
+    func head(_, url, *args) {
+        return intern_list_to_response(__intern_requests_head__(url, *args));
+    }
+    
+    func delete(_, url, *args) {
+        return intern_list_to_response(__intern_requests_delete__(url, *args));
+    }
+
+    func patch(_, url, *args) {
+        return intern_list_to_response(__intern_requests_patch__(url, *args));
+    }
+    
+    func request(_, method, url, *args) {
+        return intern_list_to_response(__intern_requests_request__(method, url, *args));
+    }
+});
+
+let Response = Type.extend({
+    name = 'Response'
+
+    instance = {
+        url
+        text
+        status_code
+        request
+        reason
+        ok
+        next
+        links
+        is_redirect
+        is_permanent_redirect
+        history
+        headers
+        encoding
+        elapsed
+        //cookies
+        content
+        apparent_encoding
+    
+        //raise_for_status = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_response_raise_for_status__(*args);
+        //        }
+        //    }
+        //}).new()
+
+        //json = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_response_json__(*args);
+        //        }
+        //    }
+        //}).new()
+
+        //iter_lines = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_response_iter_lines__(*args);
+        //        }
+        //    }
+        //}).new()
+
+        //iter_content = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_response_iter_content__(*args);
+        //        }
+        //    }
+        //}).new()
+
+        //close = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_response_close__(*args);
+        //        }
+        //    }
+        //}).new()
+    }
+
+    func __construct__(self, _url, _text, _status_code, _request, _reason, _ok, _next, _links, _is_redirect, _is_permanent_redirect, _history, _headers, _encoding, _elapsed, _content, _apparent_encoding) {
+        self.url = _url;
+        self.text = _text;
+        self.status_code = _status_code;
+        self.request = _request;
+        self.reason = _reason;
+        self.ok = _ok;
+        self.next = _next;
+        self.links = _links;
+        self.is_redirect = _is_redirect;
+        self.is_permanent_redirect = _is_permanent_redirect;
+        self.history = _history;
+        self.headers = _headers;
+        self.encoding = _encoding;
+        self.elapsed = _elapsed;
+        //self.cookies = _cookies;
+        self.content = _content;
+        self.apparent_encoding = _apparent_encoding;
+
+        return self;
+    }
+});
+
+let PreparedRequest = Type.extend({
+    name = 'PreparedRequest'
+
+    instance = {
+        body
+        headers
+        hooks
+        method
+        path_url
+        url
+
+        //deregister_hook = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_preparedrequest_deregister_hook__(*args);
+        //        }
+        //    }
+        //}).new()
+
+        //prepare = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_preparedrequest_prepare__(*args);
+        //        }
+        //    }
+        //}).new()
+
+        //prepare_auth = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_preparedrequest_prepare_auth__(*args);
+        //        }
+        //    }
+        //}).new()
+
+        //prepare_body = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_preparedrequest_prepare_body__(*args);
+        //        }
+        //    }
+        //}).new()
+
+        //prepare_content_length = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_preparedrequest_prepare_content_length__(*args);
+        //        }
+        //    }
+        //}).new()
+
+        //prepare_cookies = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_preparedrequest_prepare_cookies__(*args);
+        //        }
+        //    }
+        //}).new()
+
+        //prepare_headers = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_preparedrequest_prepare_headers__(*args);
+        //        }
+        //    }
+        //}).new()
+
+        //prepare_hooks = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_preparedrequest_prepare_hooks__(*args);
+        //        }
+        //    }
+        //}).new()
+
+        //prepare_method = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_preparedrequest_prepare_method__(*args);
+        //        }
+        //    }
+        //}).new()
+
+        //prepare_url = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_preparedrequest_prepare_url__(*args);
+        //        }
+        //    }
+        //}).new()
+
+        //register_hook = Func.extend({
+        //    instance = {
+        //        func __call__(self, _args) {
+        //            let args = _args.from(1);
+        //            return __intern_requests_preparedrequest_register_hook__(*args);
+        //        }
+        //    }
+        //}).new()
+
+        func to_str(self) {
+            return "PreparedRequest(" + self.method + ")";
+        }
+    }
+
+    func __construct__(self, _body, _headers, _hooks, _method, _path_url, _url) {
+        self.body = _body;
+        self.headers = _headers;
+        self.hooks = _hooks;
+        self.method = _method;
+        self.path_url = _path_url;
+        self.url = _url;
+
+        return self;
+    }
+});
+
+func intern_list_to_response(values) {
+    import "std/time.para";
+    let result = Response.new(values[0], values[1], values[2], PreparedRequest.new(values[3][0], CaseInsensitiveDict.new(values[3][1][0], values[3][1][1]), Dict.new(values[3][2][0], values[3][2][1]), values[3][3], values[3][4], values[3][5]), values[4], Bool.new(values[5]), values[6], Dict.new(values[7][0], values[7][1]), Bool.new(values[8]), Bool.new(values[9]), [], CaseInsensitiveDict.new(values[3][1][0], values[3][1][1]), values[12], TimeDelta.new(values[13][0], values[13][1], values[13][2], values[13][3], values[13][4], values[13][5], values[13][6]), values[14], values[15]);
+
+    for r in values[10] {
+        result.history.append(intern_list_to_response(r));
+    }
+
+    return result;
+}
+
+//let x = requests.delete("https://w3schools.com/python/demopage.htm");

@@ -1,0 +1,14 @@
+let ExampleEnum = Enum.extend({
+    name = 'ExampleEnum'
+
+    instance = {}
+
+    HELLO = 0
+    WORLD = 1
+});
+
+let a = ExampleEnum.new(ExampleEnum.HELLO);
+print(a);
+
+let b: ExampleEnum? = ExampleEnum.HELLO;
+print(b);

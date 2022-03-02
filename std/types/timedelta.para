@@ -1,0 +1,49 @@
+let TimeDelta = Type.extend({
+    name = 'TimeDelta'
+
+    instance = {
+        days = 0
+        seconds = 0
+        microseconds = 0
+
+        func to_str(self) {
+            return "TimeDelta(" + self.days + ", " + self.seconds + ", " + self.microseconds + ")";
+        }
+    }
+
+    min
+    max
+    resolution
+
+    func __construct__(self, _weeks, _days, _hours, _minutes, _seconds, _milliseconds, _microseconds) {
+        if _weeks != null && _weeks > 0 {
+            self.days += __intern_to_int__(_weeks) * 7;
+        }
+        if _days != null && _days > 0 {
+            self.days += __intern_to_int__(_days);
+        }
+
+        if _hours != null && _hours > 0 {
+            self.seconds += __intern_to_int__(_hours) * 3600;
+        }
+        if _minutes != null && _minutes > 0 {
+            self.seconds += __intern_to_int__(_minutes) * 60;
+        }
+        if _seconds != null && _seconds > 0 {
+            self.seconds += __intern_to_int__(_seconds);
+        }
+
+        if _milliseconds != null && _milliseconds > 0 {
+            self.microseconds += __intern_to_int__(_milliseconds) * 1000;
+        }
+        if _microseconds != null && _microseconds > 0 {
+            self.microseconds += __intern_to_int__(_microseconds);
+        }
+        
+        return self;
+    }
+});
+
+TimeDelta.min = TimeDelta.new(-999999999);
+TimeDelta.max = TimeDelta.new(0, 999999999, 23, 59, 59, 0, 999999);
+TimeDelta.resolution = TimeDelta.new(0, 0, 0, 0, 0, 0, 1);

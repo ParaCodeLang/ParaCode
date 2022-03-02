@@ -1,41 +1,45 @@
 Object.patch({
-  func __bool__(self) {
-    return 1;
-  }
-
-  func __and__(self, other) {
-    if !self {
-      return self;
+    func __bool__(self) {
+        return 1;
     }
 
-    return other;
-  }
+    func __and__(self, other) {
+        if !self {
+            return self;
+        }
 
-  func __or__(self, other) {
-    if self {
-      return self;
+        return other;
     }
 
-    return other;
-  }
+    func __or__(self, other) {
+        if self {
+            return self;
+        }
 
-  func __noteql__(self, other) {
-    return !self.__eql__(other);
-  }
+        return other;
+    }
 
-  func __lt__(self, other) {
-    return self.__compare__(other) == -1;
-  }
+    func __noteql__(self, other) {
+        return !self.__eql__(other);
+    }
 
-  func __gt__(self, other) {
-    return self.__compare__(other) == 1;
-  }
+    func __lt__(self, other) {
+        return self.__compare__(other) == -1;
+    }
 
-  func __lte__(self, other) {
-    return self.__compare__(other) != 1;
-  }
+    func __gt__(self, other) {
+        return self.__compare__(other) == 1;
+    }
 
-  func __gte__(self, other) {
-    return self.__compare__(other) != -1;
-  }
+    func __lte__(self, other) {
+        return self.__compare__(other) != 1;
+    }
+
+    func __gte__(self, other) {
+        return self.__compare__(other) != -1;
+    }
 });
+
+// Type aliases
+let object = Object;
+let type = Type;

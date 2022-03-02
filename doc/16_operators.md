@@ -14,9 +14,11 @@ Some examples of what method names operators are paired with are:
 * `*` - `__mul__`
 * `/` - `__div__`
 * `%` - `__mod__`
+* `**` - `__expon__`
 * `==` - `__eql__`
 * `!=` - `__noteql__`
 * `!` - `__not__`
+* `~` - `__bitnot__`
 * `<=>` - `__compare__` (spaceship operator: return -1 if less than, 0 if equal, 1 if greater than)
 * `<` - `__lt__` (defaults to `(self <=> other) == -1;`)
 * `<=` - `__lte__` (defaults to `(self <=> other) != 1;`)
@@ -25,6 +27,8 @@ Some examples of what method names operators are paired with are:
 * `&` - `__bitand__`
 * `|` - `__bitor__`
 * `^` - `__bitxor__`
+* `<<` - `__bitshiftleft__`
+* `>>` - `__bitshiftright__`
 * `&&` - `__and__`
 * `||` - `__or__`
 * `()` (function call) - `__call__`
@@ -37,7 +41,7 @@ standard objects.
 
 Here's an example of how you can use (and abuse) operator overloading
 
-```javascript
+```typescript
 let Person = Type.extend({
     instance = {
         name

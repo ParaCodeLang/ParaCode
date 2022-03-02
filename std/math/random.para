@@ -1,50 +1,23 @@
 let Random = {
     index = 0
     
-    random
-    range
+    func random(_, seed=null) {
+        if seed == null {
+            seed = __intern_time_now__().to_int() + Random.index;
+        }
+        Random.index += 1;
+        let v0:int = 12345+(seed*1103515245);
+        let rand = v0.to_int() & 2147483647;
+        return rand;
+    }
+    func range(_, high, low=0, seed=null) {
+        if seed == null {
+            seed = __intern_time_now__().to_int() + Random.index;
+        }
+        Random.index += 1;
+        let rand = Random.random(seed);
+        return rand % (high-low+1)+low;
+    }
 };
-
-let intern_random = Func.extend({
-  instance = {
-    func __call__(self, _args) {
-      let args = _args.from(1);
-      let seed;
-      if args.len() > 0 {
-        seed = args[0];
-      }
-      else {
-        seed = __intern_time_now__().to_int() + Random.index;
-        Random.index += 1;
-      }
-      let rand;
-      let v0:int = 12345+(seed*1103515245);
-      rand = v0.to_int() & 2147483647;
-      return rand;
-    }
-  }
-});
-Random.random = intern_random.new();
-
-let intern_range = Func.extend({
-  instance = {
-    func __call__(self, _args) {
-      let args = _args.from(1);
-      let high = args[0];
-      let low = args[1];
-      let seed;
-      if args.len() > 2 {
-        seed = args[2];
-      }
-      else {
-        seed = __intern_time_now__().to_int() + Random.index;
-        Random.index += 1;
-      }
-      let rand = Random.random(seed);
-      return rand % (high-low+1)+low;
-    }
-  }
-});
-Random.range = intern_range.new();
 
 let random = Random;

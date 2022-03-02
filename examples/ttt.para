@@ -12,6 +12,7 @@ let ttt = Type.extend({
             return "TicToeToe moves: " + self.moves.to_str();
         }
     }
+    
     func __construct__(self){
     }
     
@@ -39,10 +40,10 @@ let ttt = Type.extend({
     }
     
     func ai_find_next_spot(self) {
-				let about_to_win = self.check_almost_winner(self.O_SPOT);
-				let opponent_about_to_win = self.check_almost_winner(self.X_SPOT);
+        let about_to_win = self.check_almost_winner(self.O_SPOT);
+        let opponent_about_to_win = self.check_almost_winner(self.X_SPOT);
 
-				let available_spaces = [];
+        let available_spaces = [];
         let index = 0;
         for move in self.moves {
             if move == 0 {
@@ -59,70 +60,70 @@ let ttt = Type.extend({
         }
         
         let spot;
-				let done = false;
-				if about_to_win {
-						spot = self.check_missing_spot(self.O_SPOT);
+        let done = false;
+        if about_to_win {
+            spot = self.check_missing_spot(self.O_SPOT);
 
-						if self.moves[spot] == 0 {
-								self.moves[spot] = self.O_SPOT;
-								done = true;
-						}
-						else {
-								if opponent_about_to_win {
-										spot = self.check_missing_spot(self.X_SPOT);
+            if self.moves[spot] == 0 {
+                self.moves[spot] = self.O_SPOT;
+                done = true;
+            }
+            else {
+                if opponent_about_to_win {
+                    spot = self.check_missing_spot(self.X_SPOT);
 
-										if self.moves[spot] == 0 {
-												self.moves[spot] = self.O_SPOT;
-												done = true;
-										}
-										else {
-												import "std/time.para";
-												import "std/math/random.para";
+                    if self.moves[spot] == 0 {
+                        self.moves[spot] = self.O_SPOT;
+                        done = true;
+                    }
+                    else {
+                        import "std/time.para";
+                        import "std/math/random.para";
 
-												spot = random.range(available_spaces.len()-1, 0, Time.now().to_int());
+                        spot = random.range(available_spaces.len()-1, 0, Time.now().to_int());
 
-												self.moves[available_spaces[spot]] = self.O_SPOT;
-												done = true;
-										}
-								}
-								else {
-										import "std/time.para";
-										import "std/math/random.para";
+                        self.moves[available_spaces[spot]] = self.O_SPOT;
+                        done = true;
+                    }
+                }
+                else {
+                    import "std/time.para";
+                    import "std/math/random.para";
 
-										spot = random.range(available_spaces.len()-1, 0, Time.now().to_int());
+                    spot = random.range(available_spaces.len()-1, 0, Time.now().to_int());
 
-										self.moves[available_spaces[spot]] = self.O_SPOT;
+                    self.moves[available_spaces[spot]] = self.O_SPOT;
 
-										done = true;
-								}
-						}
-				}
-				if opponent_about_to_win && !done {
-						spot = self.check_missing_spot(self.X_SPOT);
+                    done = true;
+                }
+            }
+        }
+        if opponent_about_to_win && !done {
+                spot = self.check_missing_spot(self.X_SPOT);
 
-						if self.moves[spot] == 0 {
-								self.moves[spot] = self.O_SPOT;
-								done = true;
-						}
-						else {
-								import "std/time.para";
-								import "std/math/random.para";
+                if self.moves[spot] == 0 {
+                    self.moves[spot] = self.O_SPOT;
+                    done = true;
+                }
+                else {
+                    import "std/time.para";
+                    import "std/math/random.para";
 
-								spot = random.range(available_spaces.len()-1, 0, Time.now().to_int());
+                    spot = random.range(available_spaces.len()-1, 0, Time.now().to_int());
 
-								self.moves[available_spaces[spot]] = self.O_SPOT;
-								done = true;
-						}
-				}
-				if !done {
-						import "std/time.para";
-						import "std/math/random.para";
+                    self.moves[available_spaces[spot]] = self.O_SPOT;
+                    done = true;
+                }
+        }
+        if !done {
+                import "std/time.para";
+                import "std/math/random.para";
 
-						spot = random.range(available_spaces.len()-1, 0, Time.now().to_int());
+                spot = random.range(available_spaces.len()-1, 0, Time.now().to_int());
 
-						self.moves[available_spaces[spot]] = self.O_SPOT;
-						done = true;
-				}
+                self.moves[available_spaces[spot]] = self.O_SPOT;
+                done = true;
+        }
 
         available_spaces = [];
         for move in self.moves {
@@ -131,8 +132,8 @@ let ttt = Type.extend({
             }
             index += 1;
         }
-				if available_spaces.len() == 0 {
-						self.board_draw();
+        if available_spaces.len() == 0 {
+            self.board_draw();
             print("\n=== TIED! ===\n");
             self.clear_board();
             self.ai_find_next_spot();
@@ -140,7 +141,7 @@ let ttt = Type.extend({
         }
     }
 
-		func ai_random_find_next_spot(self) {
+    func ai_random_find_next_spot(self) {
         import "std/time.para";
         import "std/math/random.para";
         
@@ -201,24 +202,24 @@ let ttt = Type.extend({
         return self.EMPTY;
     }
 
-		func check_almost_index(self, player, center_index, offset, check_offset) {
+    func check_almost_index(self, player, center_index, offset, check_offset) {
         let index = 0;
         
         while index != 3 {
             if self.moves[center_index-check_offset] == player {
-								if self.moves[center_index] == player {
-										return player;
-								}
+                if self.moves[center_index] == player {
+                    return player;
+                }
             }
-						if self.moves[center_index+check_offset] == player {
-								if self.moves[center_index] == player {
-										return player;
-								}
+            if self.moves[center_index+check_offset] == player {
+                if self.moves[center_index] == player {
+                    return player;
+                }
             }
-						if self.moves[center_index+check_offset] == player {
-								if self.moves[center_index-check_offset] == player {
-										return player;
-								}
+            if self.moves[center_index+check_offset] == player {
+                if self.moves[center_index-check_offset] == player {
+                    return player;
+                }
             }
             center_index += offset;
 
@@ -227,24 +228,24 @@ let ttt = Type.extend({
         return self.EMPTY;
     }
 
-		func check_missing_index(self, player, center_index, offset, check_offset) {
+    func check_missing_index(self, player, center_index, offset, check_offset) {
         let index = 0;
         
         while index != 3 {
             if self.moves[center_index-check_offset] == player {
-								if self.moves[center_index] == player {
-										return center_index+check_offset;
-								}
+                if self.moves[center_index] == player {
+                    return center_index+check_offset;
+                }
             }
-						if self.moves[center_index+check_offset] == player {
-								if self.moves[center_index] == player {
-										return center_index-check_offset;
-								}
+            if self.moves[center_index+check_offset] == player {
+                if self.moves[center_index] == player {
+                    return center_index-check_offset;
+                }
             }
-						if self.moves[center_index+check_offset] == player {
-								if self.moves[center_index-check_offset] == player {
-										return center_index;
-								}
+            if self.moves[center_index+check_offset] == player {
+                if self.moves[center_index-check_offset] == player {
+                    return center_index;
+                }
             }
             center_index += offset;
 
@@ -264,41 +265,41 @@ let ttt = Type.extend({
         return self.EMPTY;
     }
 
-		func check_almost_diag_corner(self, player, top, bottom) {
+	func check_almost_diag_corner(self, player, top, bottom) {
         if self.moves[top] == player {
-						if self.moves[4] == player {
-								return player;
-						}
+            if self.moves[4] == player {
+                return player;
+            }
         }
-				if self.moves[bottom] == player {
-						if self.moves[4] == player {
-								return player;
-						}
-				}
-				if self.moves[top] == player {
-						if self.moves[bottom] == player {
-								return player;
-						}
-				}
+        if self.moves[bottom] == player {
+            if self.moves[4] == player {
+                return player;
+            }
+        }
+        if self.moves[top] == player {
+            if self.moves[bottom] == player {
+                return player;
+            }
+        }
         return self.EMPTY;
     }
 
-		func check_missing_diag_corner(self, player, top, bottom) {
+	func check_missing_diag_corner(self, player, top, bottom) {
         if self.moves[top] == player {
-						if self.moves[4] == player {
-								return bottom;
-						}
+            if self.moves[4] == player {
+                return bottom;
+            }
         }
-				if self.moves[bottom] == player {
-						if self.moves[4] == player {
-								return top;
-						}
-				}
-				if self.moves[top] == player {
-						if self.moves[bottom] == player {
-								return 4;
-						}
-				}
+        if self.moves[bottom] == player {
+            if self.moves[4] == player {
+                return top;
+            }
+        }
+        if self.moves[top] == player {
+            if self.moves[bottom] == player {
+                return 4;
+            }
+        }
         return self.EMPTY;
     }
     
@@ -314,7 +315,7 @@ let ttt = Type.extend({
         return self.EMPTY;
     }
 
-		func check_almost_diagonal(self, player) {
+	func check_almost_diagonal(self, player) {
         let tl = self.check_almost_diag_corner(player, 0, 8);
         let bl = self.check_almost_diag_corner(player, 6, 2);
         if tl {
@@ -326,15 +327,15 @@ let ttt = Type.extend({
         return self.EMPTY;
     }
 
-		func check_missing_diagonal(self, player) {
+	func check_missing_diagonal(self, player) {
         let tl = self.check_almost_diag_corner(player, 0, 8);
         let bl = self.check_almost_diag_corner(player, 6, 2);
         if tl {
-						let missing = self.check_missing_diag_corner(player, 0, 8);
+            let missing = self.check_missing_diag_corner(player, 0, 8);
             return missing;
         }
         if bl {
-						let missing = self.check_missing_diag_corner(player, 6, 2);
+            let missing = self.check_missing_diag_corner(player, 6, 2);
             return missing;
         }
         return self.EMPTY;
@@ -381,7 +382,7 @@ let ttt = Type.extend({
         return false;
     }
 
-		func check_almost_winner(self, player) {
+    func check_almost_winner(self, player) {
         // start at left side in middle of board, checking above and below, and move by 1 spot.
         let colcheck = self.check_almost_index(player, 3, 1, 3);
         // start at top in middle of board, checking left and right and moving down by board width
@@ -405,7 +406,7 @@ let ttt = Type.extend({
         return false;
     }
 
-		func check_missing_spot(self, player) {
+    func check_missing_spot(self, player) {
         // start at left side in middle of board, checking above and below, and move by 1 spot.
         let colcheck = self.check_almost_index(player, 3, 1, 3);
         // start at top in middle of board, checking left and right and moving down by board width
@@ -415,18 +416,18 @@ let ttt = Type.extend({
         
         // check if almost win in columns
         if colcheck {
-						let missing = self.check_missing_index(player, 3, 1, 3);
+            let missing = self.check_missing_index(player, 3, 1, 3);
             return missing;
         }
         // check if almost win in rows
         elif rowcheck {
-						let missing = self.check_missing_index(player, 1, 3, 1);
+            let missing = self.check_missing_index(player, 1, 3, 1);
             return missing;
         }
         // check if almost win in diagonal spaces
         elif diagcheck {
             let missing = self.check_missing_diagonal(player);
-						return missing;
+            return missing;
         }
 
         return false;

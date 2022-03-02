@@ -1,0 +1,24 @@
+try {
+    // Comment below line, change the exception to MultipleDefinitionError, TypeError, ArgumentError, MacroExpansionError, or Exception
+    MultipleDefinitionError.new("AIEVN").raise();
+    print("TRY");
+}
+catch MultipleDefinitionError e {
+    print("CATCH MultipleDefinitionError");
+    print(e.type());
+}
+//catch [TypeError, ArgumentError] {
+//    print("CATCH ArgumentError/TypeError");
+//}
+//catch MacroExpansionError {
+//    print("CATCH MacroExpansionError");
+//}
+//catch {
+//    print("CATCH Any Exception");
+//}
+//else {
+//    print("ELSE");
+//}
+//finally {
+//    print("FINALLY");
+//}

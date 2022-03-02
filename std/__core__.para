@@ -2,7 +2,7 @@ import "std/def.para";
 import "std/io.para";
 
 let varinfo = func (_vname_) {
-   return  __intern_varinfo__(_vname_);
+    return  __intern_varinfo__(_vname_);
 }
 
 let exit = func (_rcode_) {

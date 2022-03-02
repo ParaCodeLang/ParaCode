@@ -1,0 +1,260 @@
+let CaseInsensitiveDict = Dict.extend({
+    name = 'CaseInsensitiveDict'
+
+    instance = {
+        _value = [:]
+
+        func __at__(self, key) {
+            if !self.contains(key) {
+                DictLookupError.new("Key doesn't exist!").raise();
+                return null;
+            }
+            return __intern_dictionary_at__(self._value, self._getcorrectkey(key));
+        }
+        
+        func __add__(self, value) {
+            return self.append(value);
+        }
+
+        func __bitor__(self, value) {
+            let res_dictionary = self.clone();
+
+            let remaining = value.len();
+            let len = value.len();
+
+            let index;
+            let item;
+
+            while remaining != 0 {
+                index = len - remaining;
+                item = value.getpair(index);
+
+                if res_dictionary.findpair(item) == -1 {
+                    res_dictionary.append(item);
+                }
+
+                remaining -= 1;
+            }
+
+            return res_dictionary;
+        }
+
+        func __bitand__(self, value) {
+            let res_dictionary = CaseInsensitiveDict.new([:]);
+
+            let remaining = self.len();
+            let len = self.len();
+
+            let index;
+            let item;
+
+            while remaining != 0 {
+                index = len - remaining;
+                item = self.getpair(index);
+
+                if value.findpair(item) != -1 {
+                    res_dictionary.append(item);
+                }
+
+                remaining -= 1;
+            }
+
+            return res_dictionary;
+        }
+
+        func __iterate__(self, cb: Func) {
+            let remaining = self.len();
+            let len = self.len();
+
+            while remaining != 0 {
+                let index = len - remaining;
+
+                cb(self.getpair(index));
+
+                remaining -= 1;
+            }
+        }
+
+        func to_str(self) {
+            return self._value.to_str();
+        }
+
+        func from(self, index) {
+            let len = self.len();
+            let newdict = CaseInsensitiveDict([:]);
+            while index < len {
+                newdict += self.getpair(index);
+                index += 1;
+            }
+            return newdict;
+        }
+
+        func __set__(self, key, value) {
+            __intern_dictionary_set__(self._value, self._getcorrectkey(key, 3, true), value);
+            return self;
+        }
+    }
+
+    // Constructor
+    func __construct__(self, value, values=null) {
+        if value.type() == CaseInsensitiveDict {
+            self._value = value._value;
+        }
+        else {
+            if values != null {
+                for i in Range.new(0, value.len()) {
+                    self[value[i]] = values[i];
+                }
+            }
+            else {
+                self._value = value;
+            }
+        }
+        return self;
+    }
+
+    func _getcorrectkey(self, key, check_depth=3, keep_case=false) {
+        if check_depth == 2 || (check_depth == 3 && self.contains(key)) {
+            if key.type() == Str && !keep_case {
+                return self._value.getkey(self.indexatkey(key.tolower()));
+            }
+            return self._value.getkey(self.indexatkey(key));
+        }
+        if key.type() == Str && !keep_case {
+            return key.tolower();
+        }
+        return key;
+    }
+    
+    func getkey(self, index) {
+        return self.getpair(index)[0];
+    }
+
+    func getvalue(self, index) {
+        return self.getpair(index)[1];
+    }
+
+    func getpair(self, index) {
+        return __intern_dictionary_atindex__(self._value, index);
+    }
+
+    func indexatkey(self, key) {
+        if !self.contains(key) {
+            DictLookupError.new("Key doesn't exist!").raise();
+            return null;
+        }
+        
+        for i in Range.new(self.len()) {
+            if self._getcorrectkey(self.getkey(i), 1) == self._getcorrectkey(key, 1) {
+                return i;
+            }
+        }
+    }
+
+    func contains(self, key) {
+        for pair in self {
+            if self._getcorrectkey(pair[0], 1) == self._getcorrectkey(key, 1) {
+                return true;
+            }
+        }
+    }
+
+    func to_array(self) {
+        return [self.keys(), self.values()];
+    }
+
+    func len(self) {
+        return __intern_dictionary_len__(self._value);
+    }
+
+    func append(self, value) {
+        return __intern_dictionary_append__(self._value, [self._getcorrectkey(value[0]), value[1]]);
+    }
+
+    func update(self, key, value) {
+        let result = self.clone().modify(self._getcorrectkey(key), value);
+        return result;
+    }
+
+    func clone(self) {
+        let result = CaseInsensitiveDict.new(__intern_dictionary_clone__(self._value));
+        return result;
+    }
+
+    func find(self, key) {
+        let length = self.len();
+        let index = 0;
+        while index != length {
+            if self._getcorrectkey(self.getkey(index), 1) == self._getcorrectkey(key, 1) {
+                return index;
+            }
+            index += 1;
+        }
+        return -1;
+    }
+
+    func findpair(self, pair) {
+        let length = self.len();
+        let index = 0;
+        while index != length {
+            let p = self.getpair(index);
+            if pair.len() == 2 {
+                if self._getcorrectkey(p[0], 1) == self._getcorrectkey(pair[0], 1) && p[1] == pair[1] {
+                    return index;
+                }
+            }
+            else {
+                DictLookupError.new("Invalid pair!").raise();
+                return -1;
+            }
+            index += 1;
+        }
+        return -1;
+    }
+
+    func map(self, cb) {
+        let result = CaseInsensitiveDict([:]);
+        let remaining = self.len();
+        let len = self.len();
+
+        while remaining != 0 {
+            let index = len - remaining;
+
+            result.append(cb(self.getpair(index)));
+
+            remaining -= 1;
+        }
+
+        return result;
+    }
+
+    // Iterable methods
+    func step(self) {
+        return 1;
+    }
+
+    func start(self) {
+        return 0;
+    }
+
+    func end(self) {
+        return self.len();
+    }
+
+    func keys(self) {
+        return __intern_dictionary_keys__(self._value);
+    }
+
+    func values(self) {
+        return __intern_dictionary_values__(self._value);
+    }
+});
+
+// Type aliases
+let caseinsensitivedict       = CaseInsensitiveDict;
+let CaseInsensitiveDictionary = CaseInsensitiveDict;
+let caseinsensitivedictionary = CaseInsensitiveDict;
+let InsensitiveDict           = CaseInsensitiveDict;
+let insensitivedict           = CaseInsensitiveDict;
+let InsensitiveDictionary     = CaseInsensitiveDict;
+let insensitivedictionary     = CaseInsensitiveDict;

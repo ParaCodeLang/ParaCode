@@ -1,0 +1,13 @@
+let DoesNotExistError = Exception.extend({
+    name = 'DoesNotExistError'
+
+    instance = {
+        func raise(self) {
+            return raise(self, "DoesNotExist Error");
+        }
+    }
+
+    func __construct__(self, _message) {
+        self.message = _message;
+    }
+});

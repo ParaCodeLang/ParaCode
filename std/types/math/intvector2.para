@@ -1,0 +1,115 @@
+let IntVector2 = Num.extend({
+    name = 'IntVector2'
+
+    zero
+    one
+    neone
+    up
+    down
+    right
+    left
+
+    instance = {
+        x = 0
+        y = 0
+        
+        // For other vectors
+        z = 0
+        w = 0
+
+        func __eql__(self, other) {
+            if other.type() != self.type() {
+                return 0;
+            }
+
+            let same = self.x + other.x;
+            same = same && self.y + other.y;
+            return same;
+        }
+
+        func to_str(self) {
+            return "[" + self.x.to_str() + ", " + self.y.to_str() + "]";
+        }
+
+        func to_array(self) {
+            return [self.x, self.y];
+        }
+
+        func from_array(self) {
+            return self;
+        }
+
+        func getX(self) {
+            return self.x;
+        }
+
+        func getY(self) {
+            return self.y;
+        }
+    }
+
+    func __construct__(self, _x, _y) {
+        if _x != null && _y == null {
+            self.x = __intern_to_int__(_x);
+            self.y = __intern_to_int__(_x);
+
+            return self;
+        }
+        else {
+            if _x == null {
+                self.x = 0;
+                self.y = 0;
+
+                return self;
+            }
+            else {
+                self.x = __intern_to_int__(_x);
+                self.y = __intern_to_int__(_y);
+
+                return self;
+            }
+        }
+    }
+
+    // Operator methods
+    func __add__(self, other) {
+        let vec = IntVector2.new(self.x + other.x, self.y + other.y);
+        return vec;
+    }
+
+    func __sub__(self, other) {
+        let vec = IntVector2.new(self.x - other.x, self.y - other.y);
+        return vec;
+    }
+    
+    func __mul__(self, other) {
+        let vec = IntVector2.new(self.x * other.x, self.y * other.y);
+        return vec;
+    }
+
+    func __div__(self, other) {     
+        let vec = IntVector2.new(self.x / other.x, self.y / other.y);
+        return vec;
+    }
+    
+    func __mod__(self, other) {
+        let vec = IntVector2.new(self.x % other.x, self.y % other.y);
+        return vec;
+    }
+});
+
+IntVector2.zero = IntVector2.new(0, 0);
+IntVector2.one = IntVector2.new(1, 1);
+IntVector2.neone = IntVector2.new(-1, -1);
+IntVector2.up = IntVector2.new(0, 1);
+IntVector2.down = IntVector2.new(0, -1);
+IntVector2.right = IntVector2.new(1, 0);
+IntVector2.left = IntVector2.new(-1, 0);
+
+let intvector2 = IntVector2;
+let IVector2 = IntVector2;
+let ivector2 = IntVector2;
+let IntVec2 = IntVector2;
+let intvec2 = IntVector2;
+let IVec2 = IntVector2;
+let ivec2 = IntVector2;

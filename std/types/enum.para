@@ -1,0 +1,67 @@
+let Enum = Num.extend({
+    name = 'Enum'
+
+    instance = {
+        _value = null
+
+        func to_str(self) {
+            if self._value != null {
+                let v = self._value;
+                let str_result = self.name;
+
+                for member in self.values() {
+                    if v == member[1] {
+                        str_result += "." + member[0];
+                    }
+                }
+
+                return str_result;
+            }
+            return self.name.to_str();
+        }
+
+        func __construct__(self, value=0) {
+            self._value = value;
+
+            let valid = false;
+            for member in self.values() {
+                if value == member[1] {
+                    valid = true;
+                }
+            }
+
+            if !valid {
+                ArgumentError.new("Enum value is out of range!").raise();
+            }
+            return self;
+        }
+    }
+
+    func __get__(self) {
+        return self._value;
+    }
+
+    func values(self) {
+        let result = [:];
+
+        if self._value == null {
+            for member in self.members() {
+               if member[1].type() == Int {
+                   result.append(Dict.new(member[0], member[1]));
+               }
+            }
+        }
+        else {
+            for member in self.type().members() {
+                if member[1].type() == Int {
+                    result.append(member);
+                }
+            }
+        }
+
+        return result;
+    }
+});
+
+// Type aliases
+let enum = Enum;

@@ -21,10 +21,14 @@ Say you want to write some text to the console.
 You can use our standard `random` package, provided
 with the language, by writing this line of code:
 
-`import "std/math/random.para";`
+```typescript
+import "std/math/random.para";
+```
 
 Easy, right? Now you can generate random numbers using the
 `random` object. Try this:
 
 Try it for yourself:
-`print(random.random(999));`
+```typescript
+print(random.random(999));
+```

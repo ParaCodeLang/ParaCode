@@ -9,50 +9,56 @@ ParaCode also has many methods that have functional language characteristics for
 
 Later I plan to rewrite ParaCode in C/C++ for better speed, efficiency. I plan to keep ParaCode code and the standard library similar to how it is today.
 
-[vars](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/00_vars.md) - How to declare and use variables
+[vars](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/00_vars.md) - How to declare and use variables
 
-[functions](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/10_functions.md) - Writing and calling functions
+[functions](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/10_functions.md) - Writing and calling functions
 
-[strings](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/15_strings.md) - Strings operations and interpolation
+[strings](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/15_strings.md) - Strings operations and interpolation
 
-[operators](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/16_operators.md) - Available operators + Operator overloading
+[operators](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/16_operators.md) - Available operators + Operator overloading
 
-[types](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/20_types.md) - Custom types
+[types](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/20_types.md) - Custom types
 
-[proto](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/30_proto.md) - Extending types using prototypical inheritance
+[proto](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/30_proto.md) - Extending types using prototypical inheritance
 
-[macros](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/35_macros.md) - Macros
+[macros](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/35_macros.md) - Macros
 
-[arrays](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/40_arrays.md) - Array operations
+[arrays](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/40_arrays.md) - Array operations
 
-[iterators](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/50_iterators.md) - Building custom iterator objects
+[dictionary](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/41_dictionary.md) - Dictionary operations
 
-[random](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/55_random.md) - Random number generation
+[iterators](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/50_iterators.md) - Building custom iterator objects
 
-[modules](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/60_modules.md) - Modules
+[random](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/55_random.md) - Random number generation
 
-[console](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/70_console.md) - Console input and output
+[modules](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/60_modules.md) - Modules
 
-[files](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/80_files.md) - File reading and writing
+[packages](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/61_packages.md) - Packages
 
-[json](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#doc/81_json.md) - File reading and writing
+[console](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/70_console.md) - Console input and output
+
+[files](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/80_files.md) - File reading and writing
+
+[json](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/doc/81_json.md) - JSON reading and writing
 
 
 ### Examples
 
-[embedding](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/embed.py)
+[embedding](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/examples/embed.py)
 
-[numbers](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/numbers.para)
+[numbers](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/examples/numbers.para)
 
-[strings](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/string.para)
+[strings](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/examples/string.para)
 
-[patching](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/patching.para)
+[patching](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/examples/patching.para)
 
-[operator overloading](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/operator_overloading.para)
+[operator overloading](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/examples/operator_overloading.para)
 
-[tic tac toe](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/ttt.para)
+[tic tac toe](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/examples/ttt.para)
 
-[pythagorean theorem calculator](https://repl.it/@DaRubyMiner360/ParaCode-Rewrite#examples/pythagorean.para)
+[pythagorean theorem calculator](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/examples/pythagorean.para)
+
+[rule110](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/examples/rule110.para)
 
 Be sure to check out our TicTacToe example!
 Start the REPL by running `main.py` and call `tictactoe();` to try it out!
@@ -62,3 +68,5 @@ To update ParaCode, run the `update.sh` file. On most operating systems this can
 sh update.sh
 ```
 Or, to install and update ParaCode, run everything from `update.sh`.
+
+You can find the [Changelog](https://github.com/DaRubyMiner360/ParaCode/blob/rewrite/CHANGELOG.md) here.

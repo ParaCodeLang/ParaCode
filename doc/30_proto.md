@@ -19,7 +19,7 @@ functionality and not have to write the same code again twice.
 
 Here is an example on how to create our `Customer` and `Employee` types.
 
-```javascript
+```typescript
 let Customer: type = Person.extend({
   instance = {
     customer_id: str;

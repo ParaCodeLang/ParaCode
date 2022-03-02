@@ -1,0 +1,23 @@
+io.pyeval("import os\ntry:\n    from cryptography.fernet import Fernet\nexcept ImportError:\n    os.system('pip install cryptography')");
+
+let Fernet: type = Type.extend({
+    instance = {
+        _key
+
+        func encrypt(self, input) {
+            return __intern_cryptography_fernet_encrypt__(input.to_str()._value, self._key);
+        }
+
+        func decrypt(self, token) {
+            return __intern_cryptography_fernet_decrypt__(token.to_str()._value, self._key);
+        }
+    }
+
+    func generate_key(self) {
+        return __intern_cryptography_fernet_generate_key__();
+    }
+
+    func __construct__(self, key) {
+        self._key = key;
+    }
+});

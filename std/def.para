@@ -1,18 +1,35 @@
 /// Patch `Object` to define `patch` method as well as default compare operator
 __intern_object_patch__(Object, {
-  func patch(self, _patch) {
-    return __intern_object_patch__(self, _patch);
-  }
-  func __eql__(self, other) {
-    return __intern_default_compare__(self, other);
-  }
+    func patch(self, _patch) {
+        return __intern_object_patch__(self, _patch);
+    }
+
+    func __eql__(self, other) {
+        return __intern_default_compare__(self, other);
+    }
+
+    func members(self) {
+        let result = __intern_object_members__(self);
+        return Dict.new(result[0], result[1]);
+    }
 });
 
 Type.patch({
-  func to_str(self) {
-    return self.name;
-  }
+    func to_str(self) {
+        return self.name;
+    }
 });
+
+// These are only set so other code works fine before the actual io code gets run.
+let io = Type.extend({
+    func write(*args) {}
+    func read(*args) {}
+});
+func print(message="", end="\n") {
+    io.write(message, end);
+}
+
+let pyimport = __intern_import_python__;
 
 
 import "std/types/null.para";
@@ -25,54 +42,20 @@ import "std/types/func.para";
 import "std/types/iterable.para";
 import "std/types/array.para";
 import "std/types/dict.para";
+import "std/types/caseinsensitivedict.para";
 import "std/types/str.para";
 import "std/types/range.para";
 import "std/types/macro.para";
+import "std/types/enum.para";
 
-import "std/types/tk/tk.para";
-
-import "std/types/math/vectors/vectors.para";
-//import "std/types/math/matrix/matrix.para";
-import "std/types/math/matrix/matrix3.para";
-import "std/types/math/matrix/matrix4.para";
-
-// Type aliases
-let object = Object;
-let float = Float;
-let type = Type;
-let array = Array;
-
-let dict = Dict;
-let Dictionary = Dict;
-let dictionary = Dict;
-
-let num = Num;
-let number = Num;
-let Number = Num;
-
-let int = Int;
-let Integer = Int;
-let integer = Int;
-
-let str = Str;
-let String = Str;
-let string = Str;
-
-let bool = Bool;
-let Boolean = Bool;
-let boolean = Bool;
-
-let Function = Func;
-let function = Func;
-
-//let matrix = Matrix;
-//let Mat = Matrix;
-//let mat = Matrix;
-
-let matrix3 = Matrix3;
-let Mat3 = Matrix3;
-let mat3 = Matrix3;
-
-let matrix4 = Matrix4;
-let Mat4 = Matrix4;
-let mat4 = Matrix4;
+import "std/types/exceptions/exception.para";
+import "std/types/exceptions/argumenterror.para";
+import "std/types/exceptions/doesnotexisterror.para";
+import "std/types/exceptions/macroexpansionerror.para";
+import "std/types/exceptions/multipledefinitionerror.para";
+import "std/types/exceptions/typeerror.para";
+import "std/types/exceptions/interruptederror.para";
+import "std/types/exceptions/notimplementederror.para";
+import "std/types/exceptions/lookuperror.para";
+import "std/types/exceptions/arraylookuperror.para";
+import "std/types/exceptions/dictlookuperror.para";
