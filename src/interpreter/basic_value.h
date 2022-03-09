@@ -1,5 +1,7 @@
 #pragma once
 
+#include "util.h"
+
 class Scope;
 
 class BasicValue
@@ -51,11 +53,6 @@ public:
     std::string toString() const
     {
         std::string result = Util::toString(this->value);
-        // return result;
-        return "";
+        return result;
     }
 };
-
-namespace Util {
-    template<> std::string toString(const BasicValue& t) { return t.toString(); }
-}

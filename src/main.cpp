@@ -18,7 +18,7 @@ int main(int argc, char** argv)
     //     std::cout << argv[i] << "\n";
 
     std::string filename = argv[1];
-    paraCode.eval_file(filename);
+    paraCode.evalFile(filename);
   
     return 0;
 }
