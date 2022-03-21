@@ -1,7 +1,6 @@
 #pragma once
 
-class LogColor
-{
+class LogColor {
 public:
     static std::string Default;
     static std::string Error;

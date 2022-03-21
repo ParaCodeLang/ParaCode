@@ -12,7 +12,6 @@ class ReturnJump : public std::runtime_error
 {
 public:
     virtual const char* what() const noexcept {
-    {
         return "ReturnJump";
     }
 };
@@ -29,8 +28,7 @@ public:
     Scope* globalScope;
 
     Interpreter() = default;
-    Interpreter(SourceLocation* sourceLocation)
-    {
+    Interpreter(SourceLocation* sourceLocation) {
         this->sourceLocation = sourceLocation;
         this->errorList = new ErrorList();
         // declare scopes + global scope

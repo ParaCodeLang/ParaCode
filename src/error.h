@@ -4,8 +4,7 @@
 
 #include <stdexcept>
 
-class InterpreterError : public std::runtime_error
-{
+class InterpreterError : public std::runtime_error {
 public:
     std::string m;
     // node = nullptr;
@@ -53,8 +52,7 @@ public:
     std::string name = "Exception";
 
     Error() = default;
-    Error(ErrorType type, std::tuple<int, int> location, std::string message, std::string filename, std::string name = "Exception")
-    {
+    Error(ErrorType type, std::tuple<int, int> location, std::string message, std::string filename, std::string name = "Exception") {
         this->type = type;
         this->filename = filename;
         this->message = message;
@@ -84,8 +82,7 @@ public:
     }
 };
 
-class ErrorList
-{
+class ErrorList {
 public:
     std::vector<Error*> errors;
 
