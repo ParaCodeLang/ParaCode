@@ -8,18 +8,17 @@ class SymbolInfo
 {
 public:
     std::string varname;
-    void* decltype;
-    BasicValue* value_wrapper;
-    bool allow_casting;
+    void* declltype;
+    BasicValue* valueWrapper;
+    bool allowCasting;
 
     SymbolInfo() = default;
-
-    SymbolInfo(std::string varname, void* decltype, bool value = false, bool allow_casting = false)
+    SymbolInfo(std::string varname, void* declltype, bool value = false, bool allowCasting = false)
     {
         this->varname = varname;
-        this->decltype = ddecltype
-        this->value_wrapper = new BasicValue(value);
-        this->allow_casting = allow_casting;
+        this->declltype = declltype;
+        this->valueWrapper = new BasicValue(value);
+        this->allowCasting = allowCasting;
     }
 };
 
@@ -37,11 +36,11 @@ public:
         this->parent = parent;
     }
 
-    BasicValue* declare_variable(std::string name, void* decltype, bool allow_casting = false)
+    BasicValue* declare_variable(std::string name, void* declltype, bool allowCasting = false)
     {
-        this->variables[name] = SymbolInfo(name, decltype, allow_casting);
+        this->variables[name] = SymbolInfo(name, declltype, allowCasting);
 
-        return this->variables[name].value_wrapper;
+        return this->variables[name].valueWrapper;
     }
 
     std::string toString() const
@@ -52,7 +51,7 @@ public:
         {
             result += it.first;
             result += ": ";
-            result += Util::toString(it->second);
+            result += Util::toString(it.second);
             if (it != this->variables.end())
                 result += ", ";
         }

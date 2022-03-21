@@ -1,6 +1,7 @@
 #pragma once
 
-class LogColor {
+class LogColor
+{
 public:
     static std::string Default;
     static std::string Error;
@@ -32,10 +33,11 @@ namespace Util {
 
     template<typename... Args>
     std::string format(const std::string& format, Args... args) {
-        size_t size = snprintf(nullptr, 0, format.c_str(), args...) + 1; // Extra space for '\0'
-        if (size <= 0) { throw std::runtime_error("Error during formatting."); }
-        std::unique_ptr<char[]> buf( new char[size]);
-        snprintf(buf.get(), size, format.c_str(), args...);
+        int size_s = std::snprintf(nullptr, 0, format.c_str(), args...) + 1; // Extra space for '\0'
+        if (size_s <= 0) { throw std::runtime_error("Error during formatting."); }
+        auto size = static_cast<size_t>(size_s);
+        std::unique_ptr<char[]> buf(new char[size]);
+        std::snprintf(buf.get(), size, format.c_str(), args...);
         return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
     }
 
@@ -47,4 +49,6 @@ namespace Util {
     std::string ltrimCopy(std::string s);
     std::string rtrimCopy(std::string s);
     std::string trimCopy(std::string s);
+    void ljust(std::string& s, int amount);
+    std::string ljustCopy(std::string s, int amount);
 }

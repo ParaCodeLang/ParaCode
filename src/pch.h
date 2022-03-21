@@ -1,11 +1,12 @@
 #pragma once
 
-#include <vector>
-#include <typeinfo>
+#include <ctype.h>
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <typeinfo>
 #include <bitset>
+#include <vector>
 #include <string>
 #include <regex>
 #include <tuple>

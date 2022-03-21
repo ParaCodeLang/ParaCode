@@ -14,6 +14,9 @@ mkdir build
 #     cp _build/vendor build/vendor
 #     # cp _build/CMakeFiles/boost_* build/CMakeFiles
 # fi
+cp -r doc build/doc
+cp -r examples build/examples
+cp -r std build/std
 cd build
 cmake ../ && cmake --build . && ./ParaCode "$@"
 cd ..

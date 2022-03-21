@@ -95,4 +95,16 @@ namespace Util {
         trim(s);
         return s;
     }
+
+    void ljust(std::string& s, int amount) {
+        int length = s.length();
+        if (length < amount) {
+            s += std::string(amount - length, ' ');
+        }
+    }
+
+    std::string ljustCopy(std::string s, int amount) {
+        ljust(s, amount);
+        return s;
+    }
 }
