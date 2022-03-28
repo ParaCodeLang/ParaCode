@@ -2,8 +2,13 @@
 
 #include "util.h"
 
+#include "lexer.h"
+#include "parse/parser.h"
+#include "parse/node.h"
 #include "interpreter/basic_value.h"
 #include "parse/source_location.h"
+#include "interpreter/interpreter.h"
+#include "error.h"
 
 class ParaCode
 {

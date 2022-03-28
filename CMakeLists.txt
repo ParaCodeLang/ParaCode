@@ -23,6 +23,8 @@ set(SOURCE_FILES
     src/util.cpp
     src/interpreter/basic_value.cpp
     src/lexer.cpp
+    src/parse/parser.cpp
+    src/parse/node.cpp
     src/ParaCode.cpp
 	src/main.cpp
 	${HEADER_FILES}

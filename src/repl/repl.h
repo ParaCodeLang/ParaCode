@@ -23,8 +23,7 @@
 #include <readline/history.h>
 #endif
 
-class Repl
-{
+class Repl {
 public:
     static std::string REPL_FILENAME;
     std::map<std::string, std::tuple<std::string, std::string>> m_WalkthroughMessages;
@@ -33,8 +32,7 @@ public:
     ParaCode* paraCode = nullptr;
 
     Repl() = default;
-    Repl(ParaCode* paraCode)
-    {
+    Repl(ParaCode* paraCode) {
         this->m_WalkthroughMessages = this->loadWalkthroughMessages();
         
         std::string color = LogColor::Default;
@@ -54,8 +52,7 @@ public:
         // Version checking.
         // latestVersion = get("https://api.github.com/repos/DaRubyMiner360/ParaCode/releases/latest")
         cpr::Response r = cpr::Get(cpr::Url{"https://api.github.com/repos/DaRubyMiner360/ParaCode/releases/latest"});
-        if (r.status_code == 200)
-        {
+        if (r.status_code == 200) {
             rapidjson::Document document;
             document.Parse(r.text.c_str());
             

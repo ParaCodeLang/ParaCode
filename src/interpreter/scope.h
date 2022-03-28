@@ -1,11 +1,9 @@
 #pragma once
 
-#include <map>
 #include <iterator>
 #include <algorithm>
 
-class SymbolInfo
-{
+class SymbolInfo {
 public:
     std::string varname;
     void* declltype;
@@ -42,8 +40,7 @@ public:
 
     std::string toString() const {
         std::string result = "Scope definitions: {";
-        for (auto it = this->variables.begin(); it != this->variables.end(); ++it)
-        {
+        for (auto it = this->variables.begin(); it != this->variables.end(); ++it) {
             result += it->first;
             result += ": ";
             result += Util::toString(it->second);

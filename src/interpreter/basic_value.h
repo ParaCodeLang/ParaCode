@@ -9,49 +9,41 @@ class BasicValue
 public:
     void* value;
     
-    BasicValue(void* value)
-    {
-        this->assign_value(value);
+    BasicValue(void* value) {
+        this->assignValue(value);
     }
 
-    bool compare_value(BasicValue* other)
-    {
-        return this->extract_value() == other->extract_value();
+    bool compareValue(BasicValue* other) {
+        return this->extractValue() == other->extractValue();
     }
 
-    void assign_value(void* value)
-    {
+    void assignValue(void* value) {
         this->value = value;
     }
 
-    BasicValue* extract_basicvalue()
-    {
+    BasicValue* extractBasicValue() {
         if (this->value != nullptr && Util::isType<BasicValue>(this->value))
-            return ((BasicValue*) this->value)->extract_basicvalue();
+            return ((BasicValue*) this->value)->extractBasicValue();
 
         return this;
     }
 
-    void* extract_value()
-    {
+    void* extractValue() {
         if (Util::isType<BasicValue>(this->value))
-            return ((BasicValue*) this->value)->extract_value();
+            return ((BasicValue*) this->value)->extractValue();
 
         return this->value;
     }
 
-    void* lookup_type(Scope* global_scope)
-    {
+    void* lookupType(Scope* globalScope) {
         return nullptr;
     }
 
-    BasicValue* clone()
-    {
+    BasicValue* clone() {
         return new BasicValue(this->value);
     }
 
-    std::string toString() const
-    {
+    std::string toString() const {
         std::string result = Util::toString(this->value);
         return result;
     }

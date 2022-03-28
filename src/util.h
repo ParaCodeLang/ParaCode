@@ -43,11 +43,31 @@ namespace Util {
     std::string upper(std::string str);
     std::string lower(std::string str);
     void ltrim(std::string &s);
+    void ltrim(std::string &s, std::string &chars);
     void rtrim(std::string &s);
+    void rtrim(std::string &s, std::string &chars);
     void trim(std::string &s);
+    void trim(std::string &s, std::string &chars);
     std::string ltrimCopy(std::string s);
+    std::string ltrimCopy(std::string s, std::string chars);
     std::string rtrimCopy(std::string s);
+    std::string rtrimCopy(std::string s, std::string chars);
     std::string trimCopy(std::string s);
+    std::string trimCopy(std::string s, std::string chars);
     void ljust(std::string& s, int amount);
     std::string ljustCopy(std::string s, int amount);
+    bool isDigits(const std::string &str);
+    bool isSpaces(const std::string &str);
 }
+
+template <typename T>
+inline std::vector<T> operator+(const std::vector<T> & a, const std::vector<T> & b) {
+    std::vector<T> res = a;
+    res.insert(res.end(), b.begin(), b.end());
+    return res;
+}
+// template <typename T>
+// std::vector<T>& operator +(std::vector<T>& vector1, const std::vector<T>& vector2) {
+//     vector1.insert(vector1.end(), vector2.begin(), vector2.end());
+//     return vector1;
+// }

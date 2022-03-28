@@ -2,12 +2,10 @@
 
 #include "ParaCode.h"
   
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
     ParaCode paraCode = ParaCode();
 
-    if (argc <= 1)
-    {
+    if (argc <= 1) {
         paraCode.repl();
         return 0;
     }

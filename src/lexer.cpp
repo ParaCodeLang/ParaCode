@@ -1,154 +1,195 @@
 #include "lexer.h"
 
-boost::any Keywords::Let = "let";
-boost::any Keywords::If = "if";
-boost::any Keywords::Else = "else";
-boost::any Keywords::Elif = "elif";
-boost::any Keywords::Func = "func";
-boost::any Keywords::Import = "import";
-boost::any Keywords::Return = "return";
-boost::any Keywords::While = "while";
-boost::any Keywords::For = "for";
-boost::any Keywords::In = "in";
-boost::any Keywords::Macro = "macro";
-boost::any Keywords::Mixin = "mixin";
-boost::any Keywords::Try = "try";
-boost::any Keywords::Catch = "catch";
-boost::any Keywords::Finally = "finally";
+Keywords Keywords::Let = Keywords("Let", "let");
+Keywords Keywords::If = Keywords("If", "if");
+Keywords Keywords::Else = Keywords("Else", "else");
+Keywords Keywords::Elif = Keywords("Elif", "elif");
+Keywords Keywords::Func = Keywords("Func", "func");
+Keywords Keywords::Import = Keywords("Import", "import");
+Keywords Keywords::Return = Keywords("Return", "return");
+Keywords Keywords::While = Keywords("While", "while");
+Keywords Keywords::For = Keywords("For", "for");
+Keywords Keywords::In = Keywords("In", "in");
+Keywords Keywords::Macro = Keywords("Macro", "macro");
+Keywords Keywords::Mixin = Keywords("Mixin", "mixin");
+Keywords Keywords::Try = Keywords("Try", "try");
+Keywords Keywords::Catch = Keywords("Catch", "catch");
+Keywords Keywords::Finally = Keywords("Finally", "finally");
 
-std::map<std::string, boost::any> Keywords::s_Values = {
-    { "Let", Keywords::Let },
-    { "If", Keywords::If },
-    { "Else", Keywords::Else },
-    { "Elif", Keywords::Elif },
-    { "Func", Keywords::Func },
-    { "Import", Keywords::Import },
-    { "Return", Keywords::Return },
-    { "While", Keywords::While },
-    { "For", Keywords::For },
-    { "In", Keywords::In },
-    { "Macro", Keywords::Macro },
-    { "Mixin", Keywords::Mixin },
-    { "Try", Keywords::Try },
-    { "Catch", Keywords::Catch },
-    { "Finally", Keywords::Finally }
+std::map<std::string, Keywords> Keywords::s_Values = {
+    { Keywords::Let.name, Keywords::Let },
+    { Keywords::If.name, Keywords::If },
+    { Keywords::Else.name, Keywords::Else },
+    { Keywords::Elif.name, Keywords::Elif },
+    { Keywords::Func.name, Keywords::Func },
+    { Keywords::Import.name, Keywords::Import },
+    { Keywords::Return.name, Keywords::Return },
+    { Keywords::While.name, Keywords::While },
+    { Keywords::For.name, Keywords::For },
+    { Keywords::In.name, Keywords::In },
+    { Keywords::Macro.name, Keywords::Macro },
+    { Keywords::Mixin.name, Keywords::Mixin },
+    { Keywords::Try.name, Keywords::Try },
+    { Keywords::Catch.name, Keywords::Catch },
+    { Keywords::Finally.name, Keywords::Finally }
 };
 
 
-boost::any TokenType::NoneToken = 1;
+TokenType TokenType::NoneToken = TokenType("NoneToken", 1);
 
-boost::any TokenType::LParen = "(";
-boost::any TokenType::RParen = ")";
-boost::any TokenType::LBrace = "{";
-boost::any TokenType::RBrace = "}";
-boost::any TokenType::LBracket = "[";
-boost::any TokenType::RBracket = "]";
-boost::any TokenType::Plus = "+";
-boost::any TokenType::Minus = "-";
-boost::any TokenType::Multiply = "*";
-boost::any TokenType::Exponentiation = "**";
-boost::any TokenType::Divide = "/";
-boost::any TokenType::Equals = "=";
-boost::any TokenType::Semicolon = ";";
-boost::any TokenType::Colon = ":";
-boost::any TokenType::Dot = ".";
-boost::any TokenType::Comma = ",";
-boost::any TokenType::Not = "!";
-boost::any TokenType::Question = "?";
-boost::any TokenType::Modulus = "%";
-boost::any TokenType::LessThan = "<";
-boost::any TokenType::LessThanEqual = "<=";
-boost::any TokenType::GreaterThan = ">";
-boost::any TokenType::GreaterThanEqual = ">=";
+TokenType TokenType::LParen = TokenType("LParen", "(");
+TokenType TokenType::RParen = TokenType("RParen", ")");
+TokenType TokenType::LBrace = TokenType("LBrace", "{");
+TokenType TokenType::RBrace = TokenType("RBrace", "}");
+TokenType TokenType::LBracket = TokenType("LBracket", "[");
+TokenType TokenType::RBracket = TokenType("RBracket", "]");
+TokenType TokenType::Plus = TokenType("Plus", "+");
+TokenType TokenType::Minus = TokenType("Minus", "-");
+TokenType TokenType::Multiply = TokenType("Multiply", "*");
+TokenType TokenType::Exponentiation = TokenType("Exponentiation", "**");
+TokenType TokenType::Divide = TokenType("Divide", "/");
+TokenType TokenType::Equals = TokenType("Equals", "=");
+TokenType TokenType::Semicolon = TokenType("Semicolon", ";");
+TokenType TokenType::Colon = TokenType("Colon", ":");
+TokenType TokenType::Dot = TokenType("Dot", ".");
+TokenType TokenType::Comma = TokenType("Comma", ",");
+TokenType TokenType::Not = TokenType("Not", "!");
+TokenType TokenType::Question = TokenType("Question", "?");
+TokenType TokenType::Modulus = TokenType("Modulus", "%");
+TokenType TokenType::LessThan = TokenType("LessThan", "<");
+TokenType TokenType::LessThanEqual = TokenType("LessThanEqual", "<=");
+TokenType TokenType::GreaterThan = TokenType("GreaterThan", ">");
+TokenType TokenType::GreaterThanEqual = TokenType("GreaterThanEqual", ">=");
 
-boost::any TokenType::And = "&&";
-boost::any TokenType::Or = "||";
+TokenType TokenType::And = TokenType("And", "&&");
+TokenType TokenType::Or = TokenType("Or", "||");
 
-boost::any TokenType::BitwiseOr = "|";
-boost::any TokenType::BitwiseAnd = "&";
-boost::any TokenType::BitwiseXor = "^";
-boost::any TokenType::BitwiseNot = "~";
-boost::any TokenType::BitwiseLShift = "<<";
-boost::any TokenType::BitwiseRShift = ">>";
+TokenType TokenType::BitwiseOr = TokenType("BitwiseOr", "|");
+TokenType TokenType::BitwiseAnd = TokenType("BitwiseAnd", "&");
+TokenType TokenType::BitwiseXor = TokenType("BitwiseXor", "^");
+TokenType TokenType::BitwiseNot = TokenType("BitwiseNot", "~");
+TokenType TokenType::BitwiseLShift = TokenType("BitwiseLShift", "<<");
+TokenType TokenType::BitwiseRShift = TokenType("BitwiseRShift", ">>");
 
-boost::any TokenType::Compare = "==";
-boost::any TokenType::NotCompare = "!=";
-boost::any TokenType::Spaceship = "<=>";
+TokenType TokenType::Compare = TokenType("Compare", "==");
+TokenType TokenType::NotCompare = TokenType("NotCompare", "!=");
+TokenType TokenType::Spaceship = TokenType("Spaceship", "<=>");
 
-boost::any TokenType::Arrow = "->";
+TokenType TokenType::Arrow = TokenType("Arrow", "->");
 
-boost::any TokenType::PlusEquals = "+=";
-boost::any TokenType::MinusEquals = "-=";
-boost::any TokenType::MultiplyEquals = "*=";
-boost::any TokenType::DivideEquals = "/=";
-boost::any TokenType::ModulusEquals = "%=";
-boost::any TokenType::BitwiseOrEquals = "|=";
-boost::any TokenType::BitwiseAndEquals = "&=";
-boost::any TokenType::BitwiseXorEquals = "^=";
-boost::any TokenType::BitwiseLShiftEquals = "<<=";
-boost::any TokenType::BitwiseRShiftEquals = ">>=";
+TokenType TokenType::PlusEquals = TokenType("PlusEquals", "+=");
+TokenType TokenType::MinusEquals = TokenType("MinusEquals", "-=");
+TokenType TokenType::MultiplyEquals = TokenType("MultiplyEquals", "*=");
+TokenType TokenType::DivideEquals = TokenType("DivideEquals", "/=");
+TokenType TokenType::ModulusEquals = TokenType("ModulusEquals", "%=");
+TokenType TokenType::BitwiseOrEquals = TokenType("BitwiseOrEquals", "|=");
+TokenType TokenType::BitwiseAndEquals = TokenType("BitwiseAndEquals", "&=");
+TokenType TokenType::BitwiseXorEquals = TokenType("BitwiseXorEquals", "^=");
+TokenType TokenType::BitwiseLShiftEquals = TokenType("BitwiseLShiftEquals", "<<=");
+TokenType TokenType::BitwiseRShiftEquals = TokenType("BitwiseRShiftEquals", ">>=");
 
-boost::any TokenType::Identifier = 2;
-boost::any TokenType::Number = 3;
-boost::any TokenType::String = 4;
-boost::any TokenType::Keyword = 5;
+TokenType TokenType::Identifier = TokenType("Identifier", 2);
+TokenType TokenType::Number = TokenType("Number", 3);
+TokenType TokenType::String = TokenType("String", 4);
+TokenType TokenType::Keyword = TokenType("Keyword", 5);
 
-std::map<std::string, boost::any> TokenType::s_Values = {
-    { "NoneToken", TokenType::NoneToken },
+std::map<std::string, TokenType> TokenType::s_Values = {
+    { TokenType::NoneToken.name, TokenType::NoneToken },
 
-    { "LParen", TokenType::LParen },
-    { "RParen", TokenType::RParen },
-    { "LBrace", TokenType::LBrace },
-    { "RBrace", TokenType::RBrace },
-    { "LBracket", TokenType::LBracket },
-    { "RBracket", TokenType::RBracket },
-    { "Plus", TokenType::Plus },
-    { "Minus", TokenType::Minus },
-    { "Multiply", TokenType::Multiply },
-    { "Exponentiation", TokenType::Exponentiation },
-    { "Divide", TokenType::Divide },
-    { "Equals", TokenType::Equals },
-    { "Semicolon", TokenType::Semicolon },
-    { "Colon", TokenType::Colon },
-    { "Dot", TokenType::Dot },
-    { "Comma", TokenType::Comma },
-    { "Not", TokenType::Not },
-    { "Question", TokenType::Question },
-    { "Modulus", TokenType::Modulus },
-    { "LessThan", TokenType::LessThan },
-    { "LessThanEqual", TokenType::LessThanEqual },
-    { "GreaterThan", TokenType::GreaterThan },
-    { "GreaterThanEqual", TokenType::GreaterThanEqual },
+    { TokenType::LParen.name, TokenType::LParen },
+    { TokenType::RParen.name, TokenType::RParen },
+    { TokenType::LBrace.name, TokenType::LBrace },
+    { TokenType::RBrace.name, TokenType::RBrace },
+    { TokenType::LBracket.name, TokenType::LBracket },
+    { TokenType::RBracket.name, TokenType::RBracket },
+    { TokenType::Plus.name, TokenType::Plus },
+    { TokenType::Minus.name, TokenType::Minus },
+    { TokenType::Multiply.name, TokenType::Multiply },
+    { TokenType::Exponentiation.name, TokenType::Exponentiation },
+    { TokenType::Divide.name, TokenType::Divide },
+    { TokenType::Equals.name, TokenType::Equals },
+    { TokenType::Semicolon.name, TokenType::Semicolon },
+    { TokenType::Colon.name, TokenType::Colon },
+    { TokenType::Dot.name, TokenType::Dot },
+    { TokenType::Comma.name, TokenType::Comma },
+    { TokenType::Not.name, TokenType::Not },
+    { TokenType::Question.name, TokenType::Question },
+    { TokenType::Modulus.name, TokenType::Modulus },
+    { TokenType::LessThan.name, TokenType::LessThan },
+    { TokenType::LessThanEqual.name, TokenType::LessThanEqual },
+    { TokenType::GreaterThan.name, TokenType::GreaterThan },
+    { TokenType::GreaterThanEqual.name, TokenType::GreaterThanEqual },
 
-    { "And", TokenType::And },
-    { "Or", TokenType::Or },
+    { TokenType::And.name, TokenType::And },
+    { TokenType::Or.name, TokenType::Or },
 
-    { "BitwiseOr", TokenType::BitwiseOr },
-    { "BitwiseAnd", TokenType::BitwiseAnd },
-    { "BitwiseXor", TokenType::BitwiseXor },
-    { "BitwiseNot", TokenType::BitwiseNot },
-    { "BitwiseLShift", TokenType::BitwiseLShift },
-    { "BitwiseRShift", TokenType::BitwiseRShift },
+    { TokenType::BitwiseOr.name, TokenType::BitwiseOr },
+    { TokenType::BitwiseAnd.name, TokenType::BitwiseAnd },
+    { TokenType::BitwiseXor.name, TokenType::BitwiseXor },
+    { TokenType::BitwiseNot.name, TokenType::BitwiseNot },
+    { TokenType::BitwiseLShift.name, TokenType::BitwiseLShift },
+    { TokenType::BitwiseRShift.name, TokenType::BitwiseRShift },
 
-    { "Compare", TokenType::Compare },
-    { "NotCompare", TokenType::NotCompare },
-    { "Spaceship", TokenType::Spaceship },
+    { TokenType::Compare.name, TokenType::Compare },
+    { TokenType::NotCompare.name, TokenType::NotCompare },
+    { TokenType::Spaceship.name, TokenType::Spaceship },
 
-    { "Arrow", TokenType::Arrow },
+    { TokenType::Arrow.name, TokenType::Arrow },
 
-    { "PlusEquals", TokenType::PlusEquals },
-    { "MinusEquals", TokenType::MinusEquals },
-    { "MultiplyEquals", TokenType::MultiplyEquals },
-    { "DivideEquals", TokenType::DivideEquals },
-    { "ModulusEquals", TokenType::ModulusEquals },
-    { "BitwiseOrEquals", TokenType::BitwiseOrEquals },
-    { "BitwiseAndEquals", TokenType::BitwiseAndEquals },
-    { "BitwiseXorEquals", TokenType::BitwiseXorEquals },
-    { "BitwiseLShiftEquals", TokenType::BitwiseLShiftEquals },
-    { "BitwiseRShiftEquals", TokenType::BitwiseRShiftEquals },
+    { TokenType::PlusEquals.name, TokenType::PlusEquals },
+    { TokenType::MinusEquals.name, TokenType::MinusEquals },
+    { TokenType::MultiplyEquals.name, TokenType::MultiplyEquals },
+    { TokenType::DivideEquals.name, TokenType::DivideEquals },
+    { TokenType::ModulusEquals.name, TokenType::ModulusEquals },
+    { TokenType::BitwiseOrEquals.name, TokenType::BitwiseOrEquals },
+    { TokenType::BitwiseAndEquals.name, TokenType::BitwiseAndEquals },
+    { TokenType::BitwiseXorEquals.name, TokenType::BitwiseXorEquals },
+    { TokenType::BitwiseLShiftEquals.name, TokenType::BitwiseLShiftEquals },
+    { TokenType::BitwiseRShiftEquals.name, TokenType::BitwiseRShiftEquals },
 
-    { "Identifier", TokenType::Identifier },
-    { "Number", TokenType::Number },
-    { "String", TokenType::String },
-    { "Keyword", TokenType::Keyword }
+    { TokenType::Identifier.name, TokenType::Identifier },
+    { TokenType::Number.name, TokenType::Number },
+    { TokenType::String.name, TokenType::String },
+    { TokenType::Keyword.name, TokenType::Keyword }
 };
+
+TokenType* TokenType::getType(std::string value) {
+    if (value == "") {
+        return nullptr;
+    }
+
+    if (TokenType::s_Values.count(value)) {
+        return &TokenType::s_Values[value];
+    }
+
+    if (isdigit(value[0]) || value[0] == '.') {
+        // What?
+        if (value.length() > 1) {
+            if (value[1] == 'x' or value[1] == 'X') {
+                return &TokenType::Number;
+            }
+        }
+
+        if (value.find('.') != std::string::npos) {
+            return &TokenType::Number;
+        }
+        return &TokenType::Number;
+    }
+    else if ((value[0] == '"' && value.back() == '"') || (value[0] == '\'' && value.back() == '\'')) {
+        return &TokenType::String;
+    }
+
+    // Check if string is keyword
+    if (Keywords::s_Values.count(value)) {
+        return &TokenType::Keyword;
+    }
+
+    // Nothing else, must be identifier
+    return &TokenType::Identifier;
+}
+
+bool TokenType::hasValue(std::string value) {
+    return TokenType::s_Values.count(value);
+}
+
+LexerToken* LexerToken::NONE = new LexerToken("", &TokenType::NoneToken);
