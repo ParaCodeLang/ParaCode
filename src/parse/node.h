@@ -88,6 +88,8 @@ public:
             return Util::format("AstNode[{%s}]", this->type->name.c_str());
         }
     }
+
+    virtual bool hasValue() { return false; }
 };
 
 class NodeNone : public AstNode {
@@ -124,6 +126,8 @@ public:
             this->value = std::stoi(boost::any_cast<std::string>(token->value), nullptr, 0);
         }
     }
+
+    virtual bool hasValue() { return true; }
 };
 
 class NodeString : public AstNode {
@@ -133,6 +137,8 @@ public:
     NodeString(LexerToken* token) : AstNode(&NodeType::String, token) {
         this->value = Util::toString(token->value).substr(1, -1);
     }
+
+    virtual bool hasValue() { return true; }
 };
 
 // Unary node; switches signage for values, '!' operator
@@ -185,16 +191,22 @@ public:
         this->value = value;
         this->allowCasting = allowCasting;
     }
+
+    virtual bool hasValue() { return true; }
 };
 
 class NodeImport : public AstNode {
 public:
     std::vector<AstNode*> children;
-    SourceLocation* sourceLocation;
+    SourceLocation sourceLocation;
     
-    NodeImport(LexerToken* filename, SourceLocation* sourceLocation) : AstNode(&NodeType::Import, filename) {
+    NodeImport(LexerToken* filename, SourceLocation sourceLocation) : AstNode(&NodeType::Import, filename) {
         this->children = {};
         this->sourceLocation = sourceLocation;
+    }
+    NodeImport(LexerToken* filename, SourceLocation* sourceLocation) : AstNode(&NodeType::Import, filename) {
+        this->children = {};
+        this->sourceLocation = *sourceLocation;
     }
 };
 
@@ -224,9 +236,9 @@ public:
 
 class NodeArgumentList : public AstNode {
 public:
-    std::vector<AstNode*> arguments;
+    std::deque<AstNode*> arguments;
 
-    NodeArgumentList(std::vector<AstNode*> arguments, LexerToken* token) : AstNode(&NodeType::ArgumentList, token) {
+    NodeArgumentList(std::deque<AstNode*> arguments, LexerToken* token) : AstNode(&NodeType::ArgumentList, token) {
         this->arguments = arguments;
     }
 };
@@ -252,6 +264,8 @@ public:
         this->lhs = lhs;
         this->value = value;
     }
+
+    virtual bool hasValue() { return true; }
 };
 
 // Variable node; request value of variable
@@ -266,6 +280,8 @@ public:
         this->value = token->value;
         this->allowCasting = allowCasting;
     }
+
+    virtual bool hasValue() { return true; }
 };
 
 class NodeIfStatement : public AstNode {
@@ -285,12 +301,12 @@ class NodeTryCatch : public AstNode {
 public:
     NodeBlock* block;
     std::vector<NodeBlock*> catchBlock;
-    AstNode* expr;
+    std::vector<boost::any> expr;
     NodeBlock* elseBlock;
     NodeBlock* finallyBlock;
-    NodeDeclare* variable;
+    std::vector<NodeDeclare*> variable;
     
-    NodeTryCatch(NodeBlock* block, std::vector<NodeBlock*> catchBlock, AstNode* expr, NodeBlock* elseBlock, NodeBlock* finallyBlock, LexerToken* token, NodeDeclare* variable) : AstNode(&NodeType::Try, token) {
+    NodeTryCatch(NodeBlock* block, std::vector<NodeBlock*> catchBlock, std::vector<boost::any> expr, NodeBlock* elseBlock, NodeBlock* finallyBlock, LexerToken* token, std::vector<NodeDeclare*> variable) : AstNode(&NodeType::Try, token) {
         this->block = block;
         this->catchBlock = catchBlock;
         this->expr = expr;

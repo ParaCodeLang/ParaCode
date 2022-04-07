@@ -141,4 +141,16 @@ namespace Util {
     bool isSpaces(const std::string &str) {
         return std::all_of(str.begin(), str.end(), ::isspace);
     }
+
+    std::string getExtension(const std::string& str) {
+        unsigned found = str.find_last_of(".");
+        return str.substr(found + 1);
+    }
+
+    std::string readFile(std::string filename) {
+        std::ifstream t(filename);
+        std::stringstream buffer;
+        buffer << t.rdbuf();
+        return buffer.str();
+    }
 }

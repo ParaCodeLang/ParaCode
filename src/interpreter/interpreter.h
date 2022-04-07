@@ -16,10 +16,9 @@ public:
     }
 };
 
-class Interpreter
-{
+class Interpreter {
 public:
-    SourceLocation* sourceLocation;
+    SourceLocation sourceLocation;
     ErrorList* errorList;
     //Stack* stack;
     
@@ -28,7 +27,7 @@ public:
     Scope* globalScope;
 
     Interpreter() = default;
-    Interpreter(SourceLocation* sourceLocation) {
+    Interpreter(SourceLocation sourceLocation) {
         this->sourceLocation = sourceLocation;
         this->errorList = new ErrorList();
         // declare scopes + global scope
@@ -38,5 +37,19 @@ public:
 
         this->globalScope = new Scope(nullptr);
         // this->m_TopLevelScope = nullptr;
+    }
+    Interpreter(SourceLocation* sourceLocation) {
+        this->sourceLocation = *sourceLocation;
+        this->errorList = new ErrorList();
+        // declare scopes + global scope
+        //this->stack = new Stack();
+
+        this->inTry = false;
+
+        this->globalScope = new Scope(nullptr);
+        // this->m_TopLevelScope = nullptr;
+    }
+
+    BasicValue* visit(boost::any node, bool allowCasting = false) {
     }
 };

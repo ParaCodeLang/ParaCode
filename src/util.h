@@ -58,16 +58,8 @@ namespace Util {
     std::string ljustCopy(std::string s, int amount);
     bool isDigits(const std::string &str);
     bool isSpaces(const std::string &str);
-}
 
-template <typename T>
-inline std::vector<T> operator+(const std::vector<T> & a, const std::vector<T> & b) {
-    std::vector<T> res = a;
-    res.insert(res.end(), b.begin(), b.end());
-    return res;
+    std::string getExtension(const std::string& str);
+
+    std::string readFile(std::string filename);
 }
-// template <typename T>
-// std::vector<T>& operator +(std::vector<T>& vector1, const std::vector<T>& vector2) {
-//     vector1.insert(vector1.end(), vector2.begin(), vector2.end());
-//     return vector1;
-// }

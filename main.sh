@@ -19,4 +19,5 @@ cp -r examples build/examples
 cp -r std build/std
 cd build
 cmake ../ && cmake --build . && ./ParaCode "$@"
+# cmake -DCMAKE_BUILD_TYPE=Debug ../ && cmake --build .
 cd ..

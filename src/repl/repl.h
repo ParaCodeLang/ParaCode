@@ -4,6 +4,7 @@
 #include "ParaCode.h"
 #include "error.h"
 #include "interpreter/interpreter.h"
+#include "interpreter/env/builtins.h"
 #include "lexer.h"
 
 #include <cpr/cpr.h>
@@ -29,6 +30,7 @@ public:
     std::map<std::string, std::tuple<std::string, std::string>> m_WalkthroughMessages;
     std::string m_WelcomeMessage = "";
 
+    Interpreter* interpreter = nullptr;
     ParaCode* paraCode = nullptr;
 
     Repl() = default;
@@ -97,7 +99,7 @@ public:
             // )"""".format("\n  ".join(map(lambda key: "{}--  {}".format(key.ljust(16), this->m_WalkthroughMessages[key][0]),this->.m_WalkthroughMessages)))
 
         this->paraCode = paraCode;
-        // this->interpreter = Interpreter(SourceLocation(Repl::REPL_FILENAME));
+        this->interpreter = new Interpreter(new SourceLocation(Repl::REPL_FILENAME));
         
         std::cout << this->m_WelcomeMessage << std::endl;
 
@@ -112,14 +114,18 @@ public:
     }
 
     void replImportDefaults() {
-        // // generate import nodes
-        // replImportNodes = [
-        //     Parser.importFile(Parser, "std/__core__.para"),
-        //     Parser.importFile(Parser, "std/__repl__.para")
-        // ]
+        std::cout << "A" << std::endl;
+        Parser* parser = new Parser();
+        
+        // Generate import nodes
+        std::cout << "B" << std::endl;
+        std::vector<NodeImport*> replImportNodes = {
+            parser->importFile("std/__core__.para"),
+            parser->importFile("std/__repl__.para")
+        };
 
-        // // eval asts
-        // this->evalLineAst(replImportNodes)
+        // Eval asts
+        this->evalLineAst(replImportNodes);
     }
 
     void loop() {
@@ -193,8 +199,6 @@ public:
         line = std::string(line);
         std::string trimmed = Util::trimCopy(line);
 
-        // boost::filesystem::is_regular_file
-        // boost::algorithm::ends_with
         if (boost::filesystem::is_regular_file(trimmed) && (boost::algorithm::ends_with(trimmed, ".para") || boost::algorithm::ends_with(trimmed, ".paracode"))) {
             this->paraCode->evalFile(trimmed);
             return;
@@ -244,46 +248,51 @@ public:
             commentType = std::get<3>(counts);
         }
 
-        // (lineAst, errorList) = this->parseLine(line);
+        // std::tuple<std::vector<AstNode*>, ErrorList*> parseResults = this->parseLine(line);
+        // std::vector<AstNode*> lineAst = std::get<0>(parseResults);
+        // ErrorList* errorList = std::get<1>(parseResults);
 
-        // // for node in lineAst:
-        // //     AstPrinter().printAst(node)
+        // // for (auto& node : lineAst) {
+        // //     new AstPrinter()->printAst(node);
+        // // }
 
-        // if (errorList.errors.length > 0) {
-        //     errorList.printErrors();
+        // if (errorList->errors.length > 0) {
+        //     errorList->printErrors();
         //     return;
         // }
 
         // this->evalLineAst(lineAst);
     }
 
-    // void evalLineAst(lineAst) {
-    //     lastValue = nullptr
-    //     lastNode = nullptr
+    void evalLineAst(std::vector<NodeImport*> lineAst) {
+        BasicValue* lastValue = nullptr;
+        NodeImport* lastNode = nullptr;
 
-    //     for (node : lineAst):
-    //         lastNode = node;
-    //         try {
-    //             last_value = this->interpreter.visit(node);
-    //         }
-    //         catch InterpreterError {
-    //             this->interpreter.errorList.clear_errors();
-    //             continue;
-    //         }
+        for (auto& node : lineAst) {
+            lastNode = node;
+            try {
+                lastValue = this->interpreter->visit(node);
+            }
+            catch (const InterpreterError &) {
+                this->interpreter->errorList->clearErrors();
+                continue;
+            }
+        }
 
-    //     if (lastValue != nullptr) {
-    //         objStr = obj_to_string(this->interpreter, lastNode, lastValue)
+        if (lastValue != nullptr) {
+    //         std::string objStr = objToString(this->interpreter, lastNode, lastValue);
     //         std::cout << LogColor::Info << objStr << LogColor::Default << std::endl;
-    //     }
-    // }
+        }
+    }
 
-    // def parseLine(std::string line):
-    //     Lexer lexer = Lexer(line, SourceLocation(Repl::REPL_FILENAME));
-    //     tokens = lexer.lex();
+    std::tuple<std::vector<AstNode*>, ErrorList*> parseLine(std::string line) {
+        Lexer* lexer = new Lexer(line, SourceLocation(Repl::REPL_FILENAME));
+        std::vector<LexerToken*> tokens = lexer->lex();
 
-    //     Parser parser = Parser(tokens, lexer.sourceLocation);
+        Parser* parser = new Parser(tokens, lexer->sourceLocation);
 
-    //     return (parser.parse(), parser.errorList);
+        return std::make_tuple(parser->parse(), parser->errorList);
+    }
 
     std::tuple<int, int, int, std::string> countContinuationTokens(std::string line) {
         int braceCounter = 0;

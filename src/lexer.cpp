@@ -193,3 +193,7 @@ bool TokenType::hasValue(std::string value) {
 }
 
 LexerToken* LexerToken::NONE = new LexerToken("", &TokenType::NoneToken);
+
+namespace Util {
+    template<> std::string toString(const TokenType& t) { return t.toString(); }
+}

@@ -8,6 +8,7 @@
 #include <typeinfo>
 #include <bitset>
 #include <vector>
+#include <deque>
 #include <string>
 #include <regex>
 #include <tuple>

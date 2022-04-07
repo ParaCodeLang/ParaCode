@@ -1,5 +1,10 @@
 #include "parser.h"
 
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+
 NodeArrayExpression* Parser::parseArrayExpression() {
     bool isDictionary = false;
     std::vector<AstNode*> members;
@@ -105,7 +110,7 @@ NodeDeclare* Parser::parseVariableDeclaration(bool requireKeyword) {
         }
     }
     else if (this->peekToken(0, &TokenType::Keyword) && this->peekToken(0)->value == "func") {
-        // return this->parseFuncDeclaration();
+        return this->parseFuncDeclaration();
     }
 
     LexerToken* name = this->currentToken();
@@ -288,4 +293,385 @@ AstNode* Parser::parseTerm() {
         node = new NodeBinOp(node, token, this->parseFactor());
     }
     return node;
+}
+
+NodeIfStatement* Parser::parseIfStatement() {
+    // Eat `if`
+    LexerToken* ifToken = this->currentToken();
+    if (this->eat(&TokenType::Keyword) == nullptr) {
+        return nullptr;
+    }
+
+    AstNode* expr = this->parseExpression();
+
+    if (expr == nullptr) {
+        return nullptr;
+    }
+
+    NodeBlock* block = this->parseBlockStatement();
+
+    if (block == nullptr) {
+        return nullptr;
+    }
+
+    AstNode* elseBlock = nullptr;
+    
+    LexerToken* token = this->currentToken();
+
+    if (token->type == &TokenType::Keyword) {
+        if (new Keywords(token->value) == &Keywords::Else) {
+            // Eat else
+            this->eat(&TokenType::Keyword);
+            elseBlock = this->parseBlockStatement();
+        }
+        else if (new Keywords(token->value) == &Keywords::Elif) {
+            elseBlock = this->parseIfStatement();
+        }
+    }
+
+    return new NodeIfStatement(expr, block, elseBlock, ifToken);
+}
+
+NodeDeclare* Parser::parseFuncDeclaration() {
+    // func NAME(...) { ... }
+    
+    // Eat func keyword
+    LexerToken* type = this->currentToken();
+    this->eat(&TokenType::Keyword);
+    // Eat function name
+    LexerToken* name = this->currentToken();
+    if (this->eat(&TokenType::Identifier) == nullptr) {
+        return nullptr;
+    }
+
+    NodeArgumentList* argumentList = this->parseArgumentList();
+    if (argumentList == nullptr) {
+        return nullptr;
+    }
+
+    NodeBlock* block = this->parseBlockStatement();
+    if (block == nullptr) {
+        return nullptr;
+    }
+
+    NodeFunctionExpression* funExpr = new NodeFunctionExpression(argumentList, block);
+    
+    // Parse assignment, parenthesis, etc.
+    NodeAssign* valNode = new NodeAssign(new NodeVariable(name), funExpr);
+    NodeVariable* typeNode = new NodeVariable(new LexerToken("Func", &TokenType::Identifier));
+    NodeDeclare* node = new NodeDeclare(typeNode, name, valNode);
+    
+    return node;
+}
+
+NodeImport* Parser::importFile(std::string filename, LexerToken* filenameToken) {
+    std::string data;
+    try {
+        data = Util::readFile(filename);
+        if (!boost::algorithm::ends_with(filename, ".para") && !boost::algorithm::ends_with(filename, ".paracode")) {
+            this->error(Util::format("source file '%s's file extension ('.%s') is not a valid ParaCode extension", filename.c_str(), Util::getExtension(filename).c_str()));
+            return nullptr;
+        }
+    }
+    catch (std::ifstream::failure &readErr) {
+        this->error(Util::format("source file '%s' does not exist", filename.c_str()));
+        return nullptr;
+    }
+    
+    // Lex loaded file data
+    SourceLocation sourceLocation = SourceLocation(filename);
+
+    Lexer lexer = Lexer(data, sourceLocation);
+    std::cout << "R" << std::endl;
+    std::vector<LexerToken*> tokens = lexer.lex();
+    while (true) {
+        std::cout << "T" << std::endl;
+    }
+    
+    Parser* parser = new Parser(tokens, sourceLocation);
+    std::cout << "Y" << std::endl;
+    
+    // An import node acts similar to a block and holds all variables and functions
+    // in a tree. A parser is passed for getting various information in the interpreter
+    if (filenameToken == nullptr) {
+        filenameToken = new LexerToken(Util::format("\"%s\"", filename.c_str()));
+    }
+    std::cout << "U" << std::endl;
+    
+    NodeImport* node = new NodeImport(filenameToken, sourceLocation);
+    node->children = parser->getStatements();
+    std::cout << "I" << std::endl;
+
+    for (auto& error : parser->errorList->errors) {
+        this->errorList->pushError(error);
+    }
+    std::cout << "O" << std::endl;
+    
+    return node;
+}
+
+NodeImport* Parser::parseImport() {
+    this->eat(&TokenType::Keyword);
+    
+    std::string filename = "";
+    LexerToken* filenameToken = this->currentToken();
+    
+    // Check for path after import
+    this->expectToken(&TokenType::String, 0, filenameToken);
+    
+    // Trim off ""
+    filename = this->currentToken()->value;
+    filename = filename.substr(1, filename.size() - 2);
+    if (!boost::filesystem::exists(filename)) {
+        if (boost::filesystem::exists("pkg_data/" + filename)) {
+            filename = "pkg_data/" + filename;
+        }
+    }
+    this->eat(&TokenType::String);
+    return this->importFile(filename, filenameToken);
+}
+
+NodeFunctionReturn* Parser::parseReturn() {
+    this->eat(&TokenType::Keyword);
+    AstNode* valueNode = this->parseExpression();
+    return new NodeFunctionReturn(valueNode, this->currentToken());
+}
+
+NodeWhile* Parser::parseWhile() {
+    // Eat while keyword
+    LexerToken* token = this->currentToken();
+    if (!this->eat(&TokenType::Keyword)) {
+        return nullptr;
+    }
+
+    AstNode* expression = this->parseExpression();
+
+    if (expression == nullptr) {
+        return nullptr;
+    }
+
+    NodeBlock* block = this->parseBlockStatement();
+
+    if (block == nullptr) {
+        return nullptr;
+    }
+    
+    return new NodeWhile(expression, block, token);
+}
+
+NodeFor* Parser::parseFor() {
+    // Eat for keyword
+    LexerToken* token = this->currentToken();
+    if (!this->eat(&TokenType::Keyword)) {
+        return nullptr;
+    }
+
+    // Get var name of iter
+    LexerToken* varToken = this->currentToken();
+    this->eat(&TokenType::Identifier);
+    if (varToken == nullptr) {
+        return nullptr;
+    }
+
+    // Eat in keyword
+    LexerToken* inKeyword = this->currentToken();
+    this->eat(&TokenType::Keyword);
+    if (inKeyword == nullptr || inKeyword->value != "in") {
+        this->error("for loop expects syntax `for <var> in <expr> { ... }`");
+        return nullptr;
+    }
+
+    AstNode* expression = this->parseExpression();
+    if (expression == nullptr) {
+        return nullptr;
+    }
+
+    NodeBlock* block = this->parseBlockStatement();
+
+    if (block == nullptr) {
+        return nullptr;
+    }
+
+    return new NodeFor(varToken, expression, block, token);
+}
+
+NodeDeclare* Parser::parseMacro() {
+    LexerToken* token = this->currentToken();
+    this->eat(&TokenType::Keyword);
+
+    // Eat macro name
+    LexerToken* name = this->currentToken();
+    if (this->eat(&TokenType::Identifier) == nullptr) {
+        return nullptr;
+    }
+
+    NodeArgumentList* argumentList = nullptr;
+
+    // Eat optional arguments
+    if (this->peekToken(0, &TokenType::LParen)) {
+        argumentList = this->parseArgumentList();
+
+        if (argumentList == nullptr) {
+            return nullptr;
+        }
+    }
+
+    // Parse block
+    NodeBlock* block = this->parseBlockStatement();
+    if (block == nullptr) {
+        return nullptr;
+    }
+
+    // Add self argument
+    NodeDeclare* macroSelfArgument = new NodeDeclare(nullptr, new LexerToken("__macro_self", &TokenType::Identifier), new NodeNone(token));
+
+    if (argumentList == nullptr) {
+        argumentList = new NodeArgumentList(
+            {macroSelfArgument},
+            token
+        );
+    }
+    else {
+        argumentList->arguments.push_front(macroSelfArgument);
+    }
+
+    NodeFunctionExpression* funExpr = new NodeFunctionExpression(argumentList, block);
+    //NodeMacro* macroExpr = new NodeMacro(funExpr, token);
+
+    NodeVariable* macroVar = new NodeVariable(new LexerToken("Macro", &TokenType::Identifier));
+
+    NodeCall* memberAccessCallNode = new NodeCall(
+        new NodeMemberExpression(
+            macroVar,
+            new LexerToken("new", &TokenType::Identifier),
+            macroVar->token
+        ),
+        new NodeArgumentList(
+            {funExpr},
+            macroVar->token
+        )
+    );
+    
+    // Parse assignment, parenthesis, etc.
+    NodeAssign* valNode = new NodeAssign(new NodeVariable(name), new NodeMacro(memberAccessCallNode, token));
+    NodeVariable* typeNode = new NodeVariable(new LexerToken("Macro", &TokenType::Identifier));
+    NodeDeclare* node = new NodeDeclare(typeNode, name, valNode);
+    
+    return node;
+}
+
+NodeMixin* Parser::parseMixin() {
+    // TODO: Error if not in macro
+    // Eat keyword
+    LexerToken* token = this->currentToken();
+    this->eat(&TokenType::Keyword);
+
+    // Eat tokens in block
+    if (this->eat(&TokenType::LBrace) == nullptr) {
+        return nullptr;
+    }
+
+    std::vector<LexerToken*> tokens = {};
+
+    int braceLevel = 1;
+
+    while (braceLevel > 0 && this->currentToken() != LexerToken::NONE) {
+        if (this->currentToken()->type == &TokenType::LBrace) {
+            braceLevel += 1;
+        }
+        else if (this->currentToken()->type == &TokenType::RBrace) {
+            braceLevel -= 1;
+        }
+
+        tokens.push_back(this->currentToken());
+
+        this->eat();
+    }
+
+    return new NodeMixin(tokens, token);
+}
+
+NodeTryCatch* Parser::parseTry() {
+    // Eat `try`
+    LexerToken* tryToken = this->currentToken();
+    if (this->eat(&TokenType::Keyword) == nullptr) {
+        return nullptr;
+    }
+
+    NodeBlock* block = this->parseBlockStatement();
+
+    if (block == nullptr) {
+        return nullptr;
+    }
+
+    std::vector<NodeBlock*> catchBlock = {};
+    
+    LexerToken* token = this->currentToken();
+    std::vector<boost::any> expr = {};
+    std::vector<NodeDeclare*> variable = {};
+
+    NodeBlock* elseBlock = nullptr;
+    NodeBlock* finallyBlock = nullptr;
+
+    while (token->type == &TokenType::Keyword && new Keywords(token->value) == &Keywords::Catch) {
+        // Eat catch
+        this->eat(&TokenType::Keyword);
+
+        if (this->currentToken()->type == &TokenType::LBracket) {
+            std::vector<NodeString*> values = {};
+            while (this->currentToken()->type != &TokenType::RBracket) {
+                if (this->currentToken()->type != &TokenType::Comma && this->currentToken()->type != &TokenType::LBracket) {
+                    values.push_back(new NodeString(this->currentToken()));
+                }
+                this->eat(this->currentToken()->type);
+            }
+            this->eat(this->currentToken()->type);
+            expr.push_back(values);
+
+            if (this->currentToken()->type == &TokenType::Identifier) {
+                AstNode* e = this->parseExpression();
+                std::cout << e << std::endl;
+            }
+        }
+        else if (this->currentToken()->type == &TokenType::LBrace) {
+            expr.push_back(new NodeString(new LexerToken("Exception")));
+        }
+        else if (this->currentToken()->type == &TokenType::Identifier) {
+            expr.push_back(this->parseExpression());
+
+            if (this->currentToken()->type == &TokenType::Identifier) {
+                AstNode* e = this->parseExpression();
+                NodeAssign* valNode = new NodeAssign(new NodeVariable(boost::any_cast<LexerToken>(e->token)), expr[expr.size() - 1]);
+                NodeVariable* typeNode = new NodeVariable(new LexerToken("Exception", &TokenType::Identifier));
+                // LexerToken* typeNodeToken = this->currentToken();
+                // AstNode* typeNode = this->parseFactor();
+                NodeDeclare* n = new NodeDeclare(typeNode, boost::any_cast<LexerToken>(e->token), valNode);
+                variable.push_back(n);
+            }
+            else if (this->currentToken()->type == &TokenType::LBrace) {
+                variable.push_back(nullptr);
+            }
+        }
+
+        catchBlock.push_back(this->parseBlockStatement());
+        token = this->currentToken();
+    }
+    if (token->type == &TokenType::Keyword && new Keywords(token->value) == &Keywords::Else) {
+        // Eat else
+        this->eat(&TokenType::Keyword);
+
+        elseBlock = this->parseBlockStatement();
+        
+        token = this->currentToken();
+    }
+    if (token->type == &TokenType::Keyword && new Keywords(token->value) == &Keywords::Finally) {
+        // Eat finally
+        this->eat(&TokenType::Keyword);
+
+        finallyBlock = this->parseBlockStatement();
+        
+        token = this->currentToken();
+    }
+    
+    return new NodeTryCatch(block, catchBlock, expr, elseBlock, finallyBlock, tryToken, variable);
 }

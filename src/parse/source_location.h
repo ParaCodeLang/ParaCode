@@ -1,14 +1,12 @@
 #pragma once
 
-#include <tuple>
-
-class SourceLocation
-{
+class SourceLocation {
 public:
-    std::string filename;
+    std::string filename = "";
     int col = 1;
     int row = 1;
 
+    SourceLocation() = default;
     SourceLocation(std::string filename, int col = 1, int row = 1) {
         this->filename = filename;
         this->col = col;
