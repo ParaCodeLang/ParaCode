@@ -2,40 +2,41 @@
 
 #include "util.h"
 
+#include <boost/any.hpp>
+
 class Scope;
 
-class BasicValue
-{
+class BasicValue {
 public:
-    void* value;
+    boost::any value;
     
-    BasicValue(void* value) {
+    BasicValue(boost::any value) {
         this->assignValue(value);
     }
 
     bool compareValue(BasicValue* other) {
-        return this->extractValue() == other->extractValue();
+        return Util::anyEquals(this->extractValue(), other->extractValue());
     }
 
-    void assignValue(void* value) {
+    void assignValue(boost::any value) {
         this->value = value;
     }
 
     BasicValue* extractBasicValue() {
-        if (this->value != nullptr && Util::isType<BasicValue>(this->value))
-            return ((BasicValue*) this->value)->extractBasicValue();
+        if (!this->value.empty() && Util::isType<BasicValue>(this->value))
+            return boost::any_cast<BasicValue*>(this->value)->extractBasicValue();
 
         return this;
     }
 
-    void* extractValue() {
+    boost::any extractValue() {
         if (Util::isType<BasicValue>(this->value))
-            return ((BasicValue*) this->value)->extractValue();
+            return boost::any_cast<BasicValue*>(this->value)->extractValue();
 
         return this->value;
     }
 
-    void* lookupType(Scope* globalScope) {
+    BasicType* lookupType(Scope* globalScope) {
         return nullptr;
     }
 

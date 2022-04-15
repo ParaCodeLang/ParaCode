@@ -55,3 +55,7 @@ std::map<std::string, NodeType> NodeType::s_Values = {
     { NodeType::MemberExpression.name, NodeType::MemberExpression },
     { NodeType::ArrayAccessExpression.name, NodeType::ArrayAccessExpression }
 };
+
+namespace Util {
+    template<> std::string toString(const AstNode& t) { return t.toString(); }
+}

@@ -1,35 +1,9 @@
 #pragma once
 
 #include "util.h"
+#include "parse/node.h"
 
 #include <stdexcept>
-
-class InterpreterError : public std::runtime_error {
-public:
-    std::string m;
-    // node = nullptr;
-    // t = nullptr;
-    std::string message;
-    bool cont;
-    std::string name;
-    std::vector<std::string> classnames;
-    void* object = nullptr;
-    
-    InterpreterError() = default;
-    // InterpreterError(std::string m, node = nullptr, t = nullptr, std::string message = "", bool cont = false, std::string name = nullptr, std::vector<std::string> classnames = nullptr, void* object = nullptr) {
-    //     this->node = node;
-    //     this->t = t;
-    //     this->message = message;
-    //     this->cont = cont;
-    //     this->name = name;
-    //     this->classnames = classnames;
-    //     this->object = object;
-    // }
-
-    virtual const char* what() const noexcept {
-        return message.c_str();
-    }
-};
 
 enum ErrorType {
     Exception = 1,
@@ -42,8 +16,35 @@ enum ErrorType {
     InterruptedError = 8
 };
 
-class Error
-{
+class InterpreterError : public std::runtime_error {
+public:
+    std::string m;
+    AstNode* node;
+    ErrorType type;
+    std::string message;
+    bool cont;
+    std::string name;
+    std::vector<std::string> classnames;
+    boost::any object;
+    
+    InterpreterError() = default;
+    InterpreterError(std::string m, AstNode* node = nullptr, ErrorType type = ErrorType::Exception, std::string message = "", bool cont = false, std::string name = "", std::vector<std::string> classnames = {}, boost::any object = boost::any()) : std::runtime_error(m) {
+        this->m = m;
+        this->node = node;
+        this->type = type;
+        this->message = message;
+        this->cont = cont;
+        this->name = name;
+        this->classnames = classnames;
+        this->object = object;
+    }
+
+    virtual const char* what() const noexcept {
+        return m.c_str();
+    }
+};
+
+class Error {
 public:
     ErrorType type;
     std::string filename;
@@ -84,7 +85,7 @@ public:
 
 class ErrorList {
 public:
-    std::vector<Error*> errors;
+    std::vector<Error> errors;
 
     ErrorList() = default;
 
@@ -92,17 +93,17 @@ public:
         this->errors.clear();
     }
 
-    void pushError(Error* error) {
+    void pushError(Error error) {
         this->errors.push_back(error);
     }
 
     void printErrors() {
-        for (auto& error : this->errors) {
-            std::cout << error << std::endl;
+        for (Error error : this->errors) {
+            std::cout << Util::toString(error) << std::endl;
         }
     }
 
-    std::vector<Error*> getErrors() {
+    std::vector<Error> getErrors() {
         return this->errors;
     }
 };

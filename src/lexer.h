@@ -167,15 +167,14 @@ public:
     }
 
     // Return character and progress through buffer
-    const char* readChar(int amt = 1) {
+    const char readChar(int amt = 1) {
         if (this->index+amt > this->data.length()) {
-            // std::cout << "A" << std::endl;
-            return "";
+            return '\0';
         }
-        char* rval = &this->data[this->index];
+        char rval = this->data[this->index];
         this->index += amt;
         this->sourceLocation.col += 1;
-        if (rval == "\n") {
+        if (rval == '\n') {
             this->sourceLocation.col = 1;
             this->sourceLocation.row += 1;
         }
@@ -183,12 +182,12 @@ public:
     }
 
     // Return character and keep index
-    const char* peekChar(int offset = 1) {
+    const char peekChar(int offset = 1) {
         int idx = this->index + offset;
         if (idx >= this->data.length() || idx < 0) {
-            return "";
+            return '\0';
         }
-        return &this->data[idx];
+        return this->data[idx];
     }
 
     void pushToken() {
@@ -202,8 +201,8 @@ public:
     }
 
     bool skipWhitespace() {
-        if (Util::isSpaces(this->peekChar(0))) {
-            while (Util::isSpaces(this->peekChar(0))) {
+        if (Util::isSpaces(std::string(1, this->peekChar(0)))) {
+            while (Util::isSpaces(std::string(1, this->peekChar(0)))) {
                 this->readChar();
             }
             return true;
@@ -212,7 +211,6 @@ public:
     }
 
     std::vector<LexerToken*> lex() {
-        // std::cout << "L" << std::endl;
         std::string splitables = "(){}[];:+-*/=.,!?|&~<>^%";
         std::vector<std::string> multicharSplitables = {
             "**", "<=>", "<<=", ">>=",
@@ -223,35 +221,29 @@ public:
             "&&", "||", "<<", ">>"
         };
 
-        std::map<const char*, char> escapeChars = {
-            { "n", '\n' },
-            { "b", '\b' },
-            { "t", '\t' },
-            { "v", '\v' },
-            { "a", '\a' },
-            { "r", '\r' },
-            { "f", '\f' },
-            // { "s", '\s' },
-            { "033", '\033' },
-            { "\\", '\\' },
-            { "'", '\'' },
-            { "\"", '\"' },
+        std::map<char, char> escapeChars = {
+            { 'n', '\n' },
+            { 'b', '\b' },
+            { 't', '\t' },
+            { 'v', '\v' },
+            { 'a', '\a' },
+            { 'r', '\r' },
+            { 'f', '\f' },
+            // { 's', '\s' },
+            // { "033", '\033' },
+            { '\\', '\\' },
+            { '\'', '\'' },
+            { '"', '"' },
         };
-        // std::cout << "X" << std::endl;
-
         this->skipWhitespace();
-        // std::cout << "C" << std::endl;
+        
+        char stringType = '\0';
 
-        const char* stringType = nullptr;
-
-        // std::cout << "V" << std::endl;
-        while (this->peekChar(0) != "") {
-            std::cout << this->peekChar(0) << std::endl;
-            if (stringType && this->peekChar(0) == "\\") {
-                std::cout << "Q" << std::endl;
+        while (this->peekChar(0) != '\0') {
+            if (stringType && this->peekChar(0) == '\\') {
                 // Skip '/'
                 this->readChar();
-                const char* escapeChar = this->readChar();
+                char escapeChar = this->readChar();
                 if (escapeChars.count(escapeChar)) {
                     this->tokenData += escapeChars[escapeChar];
                 }
@@ -262,20 +254,18 @@ public:
             }
 
             // Comments
-            if (stringType == nullptr && (this->peekChar(0) == "#" || (this->peekChar(0) == "/" && this->peekChar(1) == "/") or (this->peekChar(0) == "/" and this->peekChar(1) == "*"))) {
-                std::cout << "W" << std::endl;
+            if (stringType == '\0' && (this->peekChar(0) == '#' || (this->peekChar(0) == '/' && this->peekChar(1) == '/') or (this->peekChar(0) == '/' and this->peekChar(1) == '*'))) {
                 this->readChar();
-                if (this->peekChar(-1) == "#" && this->peekChar(0) == "*") {
+                if (this->peekChar(-1) == '#' && this->peekChar(0) == '*') {
                     // Multiline comment
 
                     // Skip '*' character
                     this->readChar();
 
                     // Read until '*#'
-                    while (this->readChar() != "*" && this->peekChar(1) != "#") {
-                        std::cout << "WW" << std::endl;
+                    while (this->readChar() != '*' && this->peekChar(1) != '#') {
                         // EOF
-                        if (this->peekChar(0) == "") {
+                        if (this->peekChar(0) == '\0') {
                             break;
                         }
                     }
@@ -289,17 +279,16 @@ public:
                     }
                     this->skipWhitespace();
                 }
-                else if (this->peekChar(-1) == "/" && this->peekChar(0) == "*") {
+                else if (this->peekChar(-1) == '/' && this->peekChar(0) == '*') {
                     // Multiline comment
 
                     // Skip '*' character
                     this->readChar();
 
                     // Read until '*/'
-                    while (this->readChar() != "*" && this->peekChar(1) != "/") {
-                        std::cout << "WWW" << std::endl;
+                    while (this->readChar() != '*' && this->peekChar(1) != '/') {
                         // EOF
-                        if (this->peekChar(0) == "") {
+                        if (this->peekChar(0) == '\0') {
                             break;
                         }
                     }
@@ -314,10 +303,9 @@ public:
                     this->skipWhitespace();
                 }
                 else {
-                    while (this->readChar() != "\n") {
-                        std::cout << "WWWW" << std::endl;
+                    while (this->readChar() != '\n') {
                         // EOF
-                        if (this->peekChar(0) == "") {
+                        if (this->peekChar(0) == '\0') {
                             break;
                         }
                         // Skip any whitespace after comment
@@ -328,21 +316,19 @@ public:
             }
 
             // Encountered whitespace and not in string, push token
-            else if (stringType == nullptr && this->skipWhitespace()) {
-                std::cout << "E" << std::endl;
+            else if (stringType == '\0' && this->skipWhitespace()) {
                 this->pushToken();
                 continue;
             }
 
-            else if (splitables.find(this->peekChar(0)) != std::string::npos && stringType == nullptr) {
-                std::cout << "R" << std::endl;
-                if (!Util::isSpaces(this->peekChar(-1)) && splitables.find(this->peekChar(-1)) == std::string::npos && this->tokenData.length() > 0) {
+            else if (splitables.find(this->peekChar(0)) != std::string::npos && stringType == '\0') {
+                if (!Util::isSpaces(std::string(1, this->peekChar(-1))) && splitables.find(this->peekChar(-1)) == std::string::npos && this->tokenData.length() > 0) {
                     this->pushToken();
                 }
 
                 bool multichar = false;
                 for (std::string tok : multicharSplitables) {
-                    int idx = this->data.find(tok.substr(this->index, this->index+tok.length()));
+                    int idx = this->data.find(this->data.substr(this->index, this->index+tok.length()));
                     if (idx != std::string::npos) {
                         for (int i = 0; i < tok.length(); ++i) {
                             this->tokenData += this->readChar();
@@ -366,19 +352,17 @@ public:
                 continue;
             }
 
-            else if (Util::isDigits(this->peekChar(0)) && stringType == nullptr) {
-                std::cout << "T" << std::endl;
+            else if (Util::isDigits(std::string(1, this->peekChar(0))) && stringType == '\0') {
                 bool isFloat = false;
 
-                while (Util::isDigits(this->peekChar(0))) {
-                    std::cout << "TT" << std::endl;
+                while (Util::isDigits(std::string(1, this->peekChar(0)))) {
                     this->tokenData += this->readChar();
 
-                    if (!isFloat && this->peekChar(0) == ".") {
+                    if (!isFloat && this->peekChar(0) == '.') {
                         // if next char is identifier, its not float,
                         // rather it could be something like
                         // `1.to_str()`
-                        if (!Util::isDigits(this->peekChar(1))) {
+                        if (!Util::isDigits(std::string(1, this->peekChar(1)))) {
                             break;
                         }
 
@@ -393,37 +377,32 @@ public:
             }
 
             // Check if string character
-            if (this->peekChar(0) == "\"") {
-                std::cout << "Y" << std::endl;
+            if (this->peekChar(0) == '"') {
                 // If currently in double quotes string, end and set stringType to null
-                if (stringType == "\"") {
-                    stringType = nullptr;
+                if (stringType == '"') {
+                    stringType = '\0';
                 }
                 // If no string is open, open a new one
-                else if (stringType == nullptr) {
-                    stringType = "\"";
+                else if (stringType == '\0') {
+                    stringType = '"';
                 }
                 // If currently in single quotes string, ignore
             }
-            else if (this->peekChar(0) == "\'") {
-                std::cout << "U" << std::endl;
-                if (stringType == "\'") {
-                    stringType = nullptr;
+            else if (this->peekChar(0) == '\'') {
+                if (stringType == '\'') {
+                    stringType = '\0';
                 }
-                else if (stringType == nullptr) {
-                    stringType = "\'";
+                else if (stringType == '\0') {
+                    stringType = '\'';
                 }
             }
 
-            // std::cout << "I" << std::endl;
             this->tokenData += this->readChar();
         }
-        std::cout << "N" << std::endl;
         // Still some data left in tokenData, push to end
         if (this->tokenData != "") {
             this->pushToken();
         }
-        // std::cout << "M" << std::endl;
 
         return this->tokens;
     }

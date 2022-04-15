@@ -69,10 +69,10 @@ public:
         this->type = type;
         this->token = &token;
         try {
-            this->location = boost::any_cast<LexerToken>(token).location;
+            this->location = boost::any_cast<LexerToken*>(token)->location;
         }
         catch (const boost::bad_any_cast &) {
-            this->location = boost::any_cast<AstNode>(token).location;
+            this->location = boost::any_cast<AstNode*>(token)->location;
         }
     }
 
@@ -80,7 +80,7 @@ public:
         return *this;
     }
 
-    std::string toString() {
+    std::string toString() const {
         try {
             return Util::format("AstNode[{%s}, {%s}]", this->type->name.c_str(), boost::any_cast<LexerToken*>(this->token));
         }
@@ -182,10 +182,10 @@ class NodeDeclare : public AstNode {
 public:
     AstNode* typeNode;
     LexerToken* name;
-    AstNode* value;
+    boost::any value;
     bool allowCasting;
     
-    NodeDeclare(AstNode* type, LexerToken* name, AstNode* value, bool allowCasting = false) : AstNode(&NodeType::Declare, name) {
+    NodeDeclare(AstNode* type, LexerToken* name, boost::any value, bool allowCasting = false) : AstNode(&NodeType::Declare, name) {
         this->typeNode = type;
         this->name = name;
         this->value = value;

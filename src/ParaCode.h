@@ -10,8 +10,7 @@
 #include "interpreter/interpreter.h"
 #include "error.h"
 
-class ParaCode
-{
+class ParaCode {
 public:
     std::string data = "";
     bool initialized = false;

@@ -153,4 +153,28 @@ namespace Util {
         buffer << t.rdbuf();
         return buffer.str();
     }
+
+    bool anyEquals(const boost::any& lhs, const boost::any& rhs) {
+        if (lhs.type() != rhs.type()) {
+            return false;
+        }
+
+        else if (lhs.type() == typeid(std::string)) {
+            return boost::any_cast<std::string>(lhs) == boost::any_cast<std::string>(rhs);
+        }
+        else if (lhs.type() == typeid(int)) {
+            return boost::any_cast<int>(lhs) == boost::any_cast<int>(rhs);
+        }
+
+        throw std::runtime_error("comparison of any unimplemented for type");
+    }
+}
+
+std::string operator*(const std::string& s, size_t n) {
+    std::string result;
+    result.reserve(s.size() * n);
+    for (size_t i = 0; i < n; ++i) {
+        result += s;
+    }
+    return result;
 }

@@ -382,30 +382,22 @@ NodeImport* Parser::importFile(std::string filename, LexerToken* filenameToken) 
     SourceLocation sourceLocation = SourceLocation(filename);
 
     Lexer lexer = Lexer(data, sourceLocation);
-    std::cout << "R" << std::endl;
     std::vector<LexerToken*> tokens = lexer.lex();
-    while (true) {
-        std::cout << "T" << std::endl;
-    }
     
-    Parser* parser = new Parser(tokens, sourceLocation);
-    std::cout << "Y" << std::endl;
+    Parser parser = Parser(tokens, sourceLocation);
     
     // An import node acts similar to a block and holds all variables and functions
     // in a tree. A parser is passed for getting various information in the interpreter
     if (filenameToken == nullptr) {
         filenameToken = new LexerToken(Util::format("\"%s\"", filename.c_str()));
     }
-    std::cout << "U" << std::endl;
     
     NodeImport* node = new NodeImport(filenameToken, sourceLocation);
-    node->children = parser->getStatements();
-    std::cout << "I" << std::endl;
+    node->children = parser.getStatements();
 
-    for (auto& error : parser->errorList->errors) {
-        this->errorList->pushError(error);
+    for (auto& error : parser.errorList.errors) {
+        this->errorList.pushError(error);
     }
-    std::cout << "O" << std::endl;
     
     return node;
 }
@@ -630,7 +622,6 @@ NodeTryCatch* Parser::parseTry() {
 
             if (this->currentToken()->type == &TokenType::Identifier) {
                 AstNode* e = this->parseExpression();
-                std::cout << e << std::endl;
             }
         }
         else if (this->currentToken()->type == &TokenType::LBrace) {

@@ -18,6 +18,10 @@ cp -r doc build/doc
 cp -r examples build/examples
 cp -r std build/std
 cd build
-cmake ../ && cmake --build . && ./ParaCode "$@"
-# cmake -DCMAKE_BUILD_TYPE=Debug ../ && cmake --build .
+
+if [ "$debug" = true ] ; then
+    cmake -DCMAKE_BUILD_TYPE=Debug ../ && cmake --build . && gdb ./ParaCode "$@"
+else
+    cmake ../ && cmake --build . && ./ParaCode "$@"
+fi
 cd ..

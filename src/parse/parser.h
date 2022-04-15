@@ -29,7 +29,7 @@ public:
     std::vector<LexerToken*> tokens;
     int tokenIndex;
     LexerToken* m_CurrentToken;
-    ErrorList* errorList;
+    ErrorList errorList;
 
     SourceLocation sourceLocation;
 
@@ -39,7 +39,7 @@ public:
         this->tokens = tokens;
         this->tokenIndex = 0;
         this->m_CurrentToken = this->nextToken();
-        this->errorList = new ErrorList();
+        this->errorList = ErrorList();
 
         this->sourceLocation = sourceLocation;
     }
@@ -47,7 +47,7 @@ public:
         this->tokens = tokens;
         this->tokenIndex = 0;
         this->m_CurrentToken = this->nextToken();
-        this->errorList = new ErrorList();
+        this->errorList = ErrorList();
 
         this->sourceLocation = *sourceLocation;
     }
@@ -146,8 +146,8 @@ public:
     void error(std::string message) {
         // Tokens have locations attached from the lexer, pass to this->error
         // if an error occurs
-        Error* error = new Error(ErrorType::Syntax, this->currentToken()->location, message, this->filename(), "Syntax Error");
-        this->errorList->pushError(error);
+        Error error = Error(ErrorType::Syntax, this->currentToken()->location, message, this->filename(), "Syntax Error");
+        this->errorList.pushError(error);
     }
 
     // Read next token and error if token->type != passed in token type
@@ -197,7 +197,8 @@ public:
             
             // Check if node is function block, exempt from semicolon
             if (node->type == &NodeType::Declare && (((NodeDeclare*) node)->value != nullptr && ((NodeDeclare*) node)->value->type == &NodeType::Assign)) {
-                AstNode* rhs = boost::any_cast<AstNode*>(boost::any_cast<NodeAssign*>(((NodeDeclare*) node)->value)->value);
+                NodeAssign* a = boost::any_cast<NodeAssign*>(((NodeDeclare*) node)->value);
+                AstNode* rhs = boost::any_cast<AstNode*>(a->value);
                 if (rhs->type == &NodeType::FunctionExpression || rhs->type == &NodeType::Macro) {
                     return node;
                 }

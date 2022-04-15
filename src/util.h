@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/any.hpp>
+
 class LogColor {
 public:
     static std::string Default;
@@ -62,4 +64,8 @@ namespace Util {
     std::string getExtension(const std::string& str);
 
     std::string readFile(std::string filename);
+
+    bool anyEquals(const boost::any& lhs, const boost::any& rhs);
 }
+
+std::string operator*(const std::string& s, size_t n);

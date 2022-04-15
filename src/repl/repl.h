@@ -6,6 +6,7 @@
 #include "interpreter/interpreter.h"
 #include "interpreter/env/builtins.h"
 #include "lexer.h"
+#include "ast_printer.h"
 
 #include <cpr/cpr.h>
 #include "rapidjson/document.h"
@@ -99,7 +100,7 @@ public:
             // )"""".format("\n  ".join(map(lambda key: "{}--  {}".format(key.ljust(16), this->m_WalkthroughMessages[key][0]),this->.m_WalkthroughMessages)))
 
         this->paraCode = paraCode;
-        this->interpreter = new Interpreter(new SourceLocation(Repl::REPL_FILENAME));
+        this->interpreter = new Interpreter(SourceLocation(Repl::REPL_FILENAME));
         
         std::cout << this->m_WelcomeMessage << std::endl;
 
@@ -114,12 +115,10 @@ public:
     }
 
     void replImportDefaults() {
-        std::cout << "A" << std::endl;
         Parser* parser = new Parser();
         
         // Generate import nodes
-        std::cout << "B" << std::endl;
-        std::vector<NodeImport*> replImportNodes = {
+        std::vector<AstNode*> replImportNodes = {
             parser->importFile("std/__core__.para"),
             parser->importFile("std/__repl__.para")
         };
@@ -248,25 +247,26 @@ public:
             commentType = std::get<3>(counts);
         }
 
-        // std::tuple<std::vector<AstNode*>, ErrorList*> parseResults = this->parseLine(line);
-        // std::vector<AstNode*> lineAst = std::get<0>(parseResults);
-        // ErrorList* errorList = std::get<1>(parseResults);
+        std::tuple<std::vector<AstNode*>, ErrorList> parseResults = this->parseLine(line);
+        std::vector<AstNode*> lineAst = std::get<0>(parseResults);
+        ErrorList errorList = std::get<1>(parseResults);
 
-        // // for (auto& node : lineAst) {
-        // //     new AstPrinter()->printAst(node);
-        // // }
-
-        // if (errorList->errors.length > 0) {
-        //     errorList->printErrors();
-        //     return;
+        // AstPrinter printer = AstPrinter();
+        // for (auto& node : lineAst) {
+        //     printer.printAst(node);
         // }
 
-        // this->evalLineAst(lineAst);
+        if (errorList.errors.size() > 0) {
+            errorList.printErrors();
+            return;
+        }
+
+        this->evalLineAst(lineAst);
     }
 
-    void evalLineAst(std::vector<NodeImport*> lineAst) {
+    void evalLineAst(std::vector<AstNode*> lineAst) {
         BasicValue* lastValue = nullptr;
-        NodeImport* lastNode = nullptr;
+        AstNode* lastNode = nullptr;
 
         for (auto& node : lineAst) {
             lastNode = node;
@@ -274,24 +274,24 @@ public:
                 lastValue = this->interpreter->visit(node);
             }
             catch (const InterpreterError &) {
-                this->interpreter->errorList->clearErrors();
+                this->interpreter->errorList.clearErrors();
                 continue;
             }
         }
 
         if (lastValue != nullptr) {
-    //         std::string objStr = objToString(this->interpreter, lastNode, lastValue);
-    //         std::cout << LogColor::Info << objStr << LogColor::Default << std::endl;
+            std::string objStr = objToString(this->interpreter, lastNode, lastValue);
+            std::cout << LogColor::Info << objStr << LogColor::Default << std::endl;
         }
     }
 
-    std::tuple<std::vector<AstNode*>, ErrorList*> parseLine(std::string line) {
-        Lexer* lexer = new Lexer(line, SourceLocation(Repl::REPL_FILENAME));
-        std::vector<LexerToken*> tokens = lexer->lex();
+    std::tuple<std::vector<AstNode*>, ErrorList> parseLine(std::string line) {
+        Lexer lexer = Lexer(line, SourceLocation(Repl::REPL_FILENAME));
+        std::vector<LexerToken*> tokens = lexer.lex();
 
-        Parser* parser = new Parser(tokens, lexer->sourceLocation);
+        Parser parser = Parser(tokens, lexer.sourceLocation);
 
-        return std::make_tuple(parser->parse(), parser->errorList);
+        return std::make_tuple(parser.parse(), parser.errorList);
     }
 
     std::tuple<int, int, int, std::string> countContinuationTokens(std::string line) {
