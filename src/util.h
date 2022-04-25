@@ -1,6 +1,12 @@
 #pragma once
 
 #include <boost/any.hpp>
+#include <boost/predef.h>
+#include <boost/algorithm/string.hpp>
+
+#if BOOST_COMP_GNUC
+#include <cxxabi.h>
+#endif
 
 class LogColor {
 public:
@@ -28,6 +34,79 @@ namespace Util {
         //     stream << "0x" << std::hex << pointer[i];
         // }
         return stream.str();
+    }
+
+    template<typename T>
+    bool isTuple(const T& t) {
+#if BOOST_COMP_GNUC
+        int status;
+        char* demangled = abi::__cxa_demangle(typeid(t).name(), 0, 0, &status);
+        bool result = std::string(demangled).rfind("std::tuple", 0) == 0;
+        free(demangled);
+        return result;
+#else
+        return std::string(typeid(t).name()).rfind("std::tuple", 0) == 0;
+#endif
+    }
+    template<typename T>
+    bool isVector(const T& t) {
+#if BOOST_COMP_GNUC
+        int status;
+        char* demangled = abi::__cxa_demangle(typeid(t).name(), 0, 0, &status);
+        bool result = std::string(demangled).rfind("std::vector", 0) == 0;
+        free(demangled);
+        return result;
+#else
+        return std::string(typeid(t).name()).rfind("std::vector", 0) == 0;
+#endif
+    }
+    template<typename T>
+    bool isList(const T& t) {
+#if BOOST_COMP_GNUC
+        int status;
+        char* demangled = abi::__cxa_demangle(typeid(t).name(), 0, 0, &status);
+        bool result = std::string(demangled).rfind("std::list", 0) == 0;
+        free(demangled);
+        return result;
+#else
+        return std::string(typeid(t).name()).rfind("std::list", 0) == 0;
+#endif
+    }
+    template<typename T>
+    bool isMap(const T& t) {
+#if BOOST_COMP_GNUC
+        int status;
+        char* demangled = abi::__cxa_demangle(typeid(t).name(), 0, 0, &status);
+        bool result = std::string(demangled).rfind("std::map", 0) == 0;
+        free(demangled);
+        return result;
+#else
+        return std::string(typeid(t).name()).rfind("std::map", 0) == 0;
+#endif
+    }
+    template<typename T, typename K>
+    bool isMap(const T& t) {
+#if BOOST_COMP_GNUC
+        int status;
+        char* demangled = abi::__cxa_demangle(typeid(t).name(), 0, 0, &status);
+        bool result = std::string(demangled).rfind("std::map", 0) == 0;
+        free(demangled);
+        return result;
+#else
+        return std::string(typeid(t).name()).rfind("std::map", 0) == 0;
+#endif
+    }
+    template<typename T, typename K>
+    bool isMap(const T& t, const K& k) {
+#if BOOST_COMP_GNUC
+        int status;
+        char* demangled = abi::__cxa_demangle(typeid(t).name(), 0, 0, &status);
+        bool result = std::string(demangled).rfind("std::map", 0) == 0;
+        free(demangled);
+        return result;
+#else
+        return std::string(typeid(t).name()).rfind("std::map", 0) == 0;
+#endif
     }
 
     std::string replaceAll(const std::string& str, const std::string& toReplace, const std::string& replaceWith);

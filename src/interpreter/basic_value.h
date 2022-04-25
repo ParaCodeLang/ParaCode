@@ -5,6 +5,7 @@
 #include <boost/any.hpp>
 
 class Scope;
+class BasicType;
 
 class BasicValue {
 public:
@@ -36,9 +37,7 @@ public:
         return this->value;
     }
 
-    BasicType* lookupType(Scope* globalScope) {
-        return nullptr;
-    }
+    BasicValue* lookupType(Scope* globalScope);
 
     BasicValue* clone() {
         return new BasicValue(this->value);

@@ -120,8 +120,7 @@ public:
     static bool hasValue(std::string value);
 
     std::string toString() const {
-        std::string result = "TokenType::" + name;
-        return result;
+        return "TokenType::" + name;
     }
 };
 

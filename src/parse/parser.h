@@ -196,7 +196,7 @@ public:
             }
             
             // Check if node is function block, exempt from semicolon
-            if (node->type == &NodeType::Declare && (((NodeDeclare*) node)->value != nullptr && ((NodeDeclare*) node)->value->type == &NodeType::Assign)) {
+            if (node->type == &NodeType::Declare && (!((NodeDeclare*) node)->value.empty() && boost::any_cast<AstNode*>(((NodeDeclare*) node)->value)->type == &NodeType::Assign)) {
                 NodeAssign* a = boost::any_cast<NodeAssign*>(((NodeDeclare*) node)->value);
                 AstNode* rhs = boost::any_cast<AstNode*>(a->value);
                 if (rhs->type == &NodeType::FunctionExpression || rhs->type == &NodeType::Macro) {
@@ -326,7 +326,7 @@ public:
                     break;
                 }
                 bool anyDefault = false;
-                if (!Util::isType<NodeSplatArgument*>(argument) && (boost::any_cast<NodeDeclare*>(argument))->value->hasValue()) {
+                if (!Util::isType<NodeSplatArgument*>(argument) && (boost::any_cast<AstNode*>(boost::any_cast<NodeDeclare*>(argument)->value)->hasValue())) {
                     anyDefault = true;
                 }
                 else {

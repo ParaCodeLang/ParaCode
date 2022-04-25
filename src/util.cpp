@@ -42,6 +42,59 @@ namespace Util {
     template<> std::string toString(const double& t) { return std::to_string(t); }
     template<> std::string toString(const std::string& t) { return std::string(t); }
 
+    template<typename T>
+    bool isTuple(const boost::any& t) {
+#if BOOST_COMP_GNUC
+        int status;
+        char* demangled = abi::__cxa_demangle(t.type().name(), 0, 0, &status);
+        bool result = std::string(demangled).rfind("std::tuple", 0) == 0;
+        free(demangled);
+        return result;
+#else
+        return std::string(t.type().name()).rfind("std::tuple", 0) == 0;
+#endif
+    }
+    template<typename T> bool isTuple(const std::tuple<T>& t) { return true; }
+    template<typename T>
+    bool isVector(const boost::any& t) {
+#if BOOST_COMP_GNUC
+        int status;
+        char* demangled = abi::__cxa_demangle(t.type().name(), 0, 0, &status);
+        bool result = std::string(demangled).rfind("std::vector", 0) == 0;
+        free(demangled);
+        return result;
+#else
+        return std::string(t.type().name()).rfind("std::vector", 0) == 0;
+#endif
+    }
+    template<typename T> bool isVector(const std::vector<T>& t) { return true; }
+    template<typename T>
+    bool isList(const boost::any& t) {
+#if BOOST_COMP_GNUC
+        int status;
+        char* demangled = abi::__cxa_demangle(t.type().name(), 0, 0, &status);
+        bool result = std::string(demangled).rfind("std::list", 0) == 0;
+        free(demangled);
+        return result;
+#else
+        return std::string(t.type().name()).rfind("std::list", 0) == 0;
+#endif
+    }
+    template<typename T> bool isList(const std::list<T>& t) { return true; }
+    template<typename T, typename K>
+    bool isMap(const boost::any& t) {
+#if BOOST_COMP_GNUC
+        int status;
+        char* demangled = abi::__cxa_demangle(t.type().name(), 0, 0, &status);
+        bool result = std::string(demangled).rfind("std::map", 0) == 0;
+        free(demangled);
+        return result;
+#else
+        return std::string(t.type().name()).rfind("std::map", 0) == 0;
+#endif
+    }
+    template<typename T, typename K> bool isMap(const std::map<T, K>& t) { return true; }
+
     std::string replaceAll(const std::string& str, const std::string& toReplace, const std::string& replaceWith) {
         return std::regex_replace(str, std::regex(toReplace), replaceWith);
     }
