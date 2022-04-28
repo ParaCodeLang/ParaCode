@@ -15,7 +15,7 @@ let TimeDelta = Type.extend({
     max
     resolution
 
-    func __construct__(self, _weeks, _days, _hours, _minutes, _seconds, _milliseconds, _microseconds) {
+    func __construct__(self, _weeks = 0, _days = 0, _hours = 0, _minutes = 0, _seconds = 0, _milliseconds = 0, _microseconds = 0) {
         if _weeks != null && _weeks > 0 {
             self.days += __intern_to_int__(_weeks) * 7;
         }

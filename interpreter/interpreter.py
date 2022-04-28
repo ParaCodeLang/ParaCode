@@ -449,7 +449,7 @@ class Interpreter():
                 given_arg_count = len(collected_args)
                 original_given_arg_count = given_arg_count
 
-                if isinstance(target.argument_list.arguments[-1], NodeSplatArgument):
+                if len(target.argument_list.arguments) > 0 and isinstance(target.argument_list.arguments[-1], NodeSplatArgument):
                     if given_arg_count > 0:
                         new_collected_args = []
                         for i in range(0, given_arg_count):
