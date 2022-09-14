@@ -20,11 +20,11 @@ std::string objToString(Interpreter* interpreter, AstNode* node, boost::any obj)
     obj = interpreter->basicValueToObject(node, obj);
 
     if (Util::isType<BasicObject>(obj)) {
-        meth = obj.lookupMember(BasicType::REPR_FUNCTION_NAME);
+        meth = boost::any_cast<BasicObject*>(obj)->lookupMember(BasicType::REPR_FUNCTION_NAME);
 
-        basic_value_repr = None
+        basic_value_repr = nullptr;
 
-        if meth is not None:
+        if (meth != nullptr):
             if isinstance(meth.value, BuiltinFunction):
                 basic_value_repr = interpreter.call_builtin_function(meth.value, obj, [], node)
             else:
@@ -53,7 +53,7 @@ BasicValue* builtinTypeExtend(BuiltinFunctionArguments arguments) {
     if (arguments.arguments.size()) > 0) {
         BasicValue* providedArgs = arguments.arguments[0];
 
-        if (!Util::isType<BasicObject*>(providedArgs) {
+        if (!Util::isType<BasicObject>(providedArgs) {
             interpreter->error(Util::format("provided args to Type.extend must be an instance of BasicObject, got %s", Util::toString(providedArgs).c_str()));
             return nullptr;
         }

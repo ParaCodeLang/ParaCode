@@ -1,8 +1,9 @@
 .git/
 .vs/
+.vscode/
 venv/
 .idea/
-__pycache__/
+**/__pycache__/
 build/
 dist/
 *.bat
@@ -10,4 +11,10 @@ dist/
 .env
 .breakpoints
 PCPM
+pkg_data/
 .replit
+replit.nix
+poetry.lock
+pyproject.toml
+*.deb
+ParaCode/

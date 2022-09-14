@@ -22,6 +22,14 @@ namespace Util {
 
     template<typename T, typename K>
     bool isType(const K &k) {
+        if (typeid(K) == typeid(boost::any) && typeid(T) != typeid(boost::any)) {
+            return boost::replace_all_copy(std::string(boost::core::demangle(typeid(T).name())), std::string("*"), std::string("")).find(boost::replace_all_copy(std::string(boost::core::demangle(k.type().name())), std::string("*"), std::string(""))) != std::string::npos;
+        }
+        return std::is_same<typename std::remove_pointer<T>::type, typename std::remove_pointer<typename std::remove_reference<typename std::remove_cv<K>::type>::type>::type>();
+    }
+
+    template<typename T, typename K>
+    bool isTypeStrict(const K &k) {
         return typeid(T).hash_code() == typeid(k).hash_code();
     }
 
@@ -33,6 +41,7 @@ namespace Util {
         // {
         //     stream << "0x" << std::hex << pointer[i];
         // }
+        stream << t;
         return stream.str();
     }
 

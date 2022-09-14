@@ -127,7 +127,7 @@ NodeDeclare* Parser::parseVariableDeclaration(bool requireKeyword) {
         LexerToken* typeNodeToken = this->currentToken();
         typeNode = this->parseFactor();
 
-        if (typeNode == nullptr || (!Util::isType<NodeVariable*>(typeNode) && !Util::isType<NodeMemberExpression*>(typeNode))) {
+        if (typeNode == nullptr || (!Util::isType<NodeVariable>(typeNode) && !Util::isType<NodeMemberExpression>(typeNode))) {
             this->error(Util::format("Declaration type should either be an identifier or member access, got %s", Util::toString(typeNodeToken)));
             return nullptr;
         }

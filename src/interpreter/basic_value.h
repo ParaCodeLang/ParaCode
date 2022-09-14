@@ -15,7 +15,7 @@ public:
         this->assignValue(value);
     }
 
-    bool compareValue(BasicValue* other) {
+    virtual bool compareValue(BasicValue* other) {
         return Util::anyEquals(this->extractValue(), other->extractValue());
     }
 
@@ -23,27 +23,27 @@ public:
         this->value = value;
     }
 
-    BasicValue* extractBasicValue() {
+    virtual BasicValue* extractBasicValue() {
         if (!this->value.empty() && Util::isType<BasicValue>(this->value))
             return boost::any_cast<BasicValue*>(this->value)->extractBasicValue();
 
         return this;
     }
 
-    boost::any extractValue() {
+    virtual boost::any extractValue() {
         if (Util::isType<BasicValue>(this->value))
             return boost::any_cast<BasicValue*>(this->value)->extractValue();
 
         return this->value;
     }
 
-    BasicValue* lookupType(Scope* globalScope);
+    virtual BasicValue* lookupType(Scope* globalScope);
 
-    BasicValue* clone() {
+    virtual BasicValue* clone() {
         return new BasicValue(this->value);
     }
 
-    std::string toString() const {
+    virtual std::string toString() const {
         std::string result = Util::toString(this->value);
         return result;
     }

@@ -326,7 +326,7 @@ public:
                     break;
                 }
                 bool anyDefault = false;
-                if (!Util::isType<NodeSplatArgument*>(argument) && (boost::any_cast<AstNode*>(boost::any_cast<NodeDeclare*>(argument)->value)->hasValue())) {
+                if (!Util::isType<NodeSplatArgument>(argument) && (boost::any_cast<AstNode*>(boost::any_cast<NodeDeclare*>(argument)->value)->hasValue())) {
                     anyDefault = true;
                 }
                 else {
@@ -382,7 +382,7 @@ public:
     
         std::deque<AstNode*> arguments = {};
 
-        if (Util::isType<NodeVariable*>(node)) {
+        if (Util::isType<NodeVariable>(node)) {
             arguments.push_back(new NodeDeclare(nullptr, boost::any_cast<LexerToken>(node->token), new NodeNone(token)));
         }
 

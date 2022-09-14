@@ -16,7 +16,7 @@ public:
     bool initialized = false;
 
     // Language Info
-    std::string version = "2.1.0";
+    std::string version = "3.0.0";
     std::string releaseStage = "development";
 
     ParaCode() = default;
@@ -25,16 +25,19 @@ public:
     BasicValue* evalFile(std::string filename);
     BasicValue* evalData(std::string data);
 
-    // void callFunction(functionName, arguments=[]) {
-    //     // if (!this->initialized)
-    //     //   this->eval()
-    //     if (this->interpreter == nullptr)
-    //         raise Exception("ParaCode not initialized! please run ")
-    //     if (type(arguments) != list)
-    //         raise Exception("Arguments type is not list!")
+    void callFunction(functionName, arguments=[]) {
+        if (!this->initialized) {
+            this->eval();
+        }
+        if (this->interpreter == nullptr) {
+            throw std::runtime_error("ParaCode not initialized! please run ");
+        }
+        if (!Util::isVector(arguments)) {
+            throw std::runtime_error("Arguments type is not vector!");
+        }
 
-    //     return this->interpreter.callFunction(functionName, arguments)
-    // }
+        return this->interpreter->callFunction(functionName, arguments);
+    }
 
     void repl();
 };

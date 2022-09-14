@@ -143,33 +143,29 @@ public:
             return boost::any_cast<BasicValue*>(node);
         }
 
-        VisitMethod caller;
-        if (this->visitMethods.count(callerName)) {
-            std::string callerName = Util::format("visit%s", Util::toString(node->type.name));
-        }
-        else {
-            throw std::runtime_error("No visitor function defined for node %s", Util::toString(node).c_str());
-        }
-        
+        std::string callerName = Util::format("visit%s", Util::toString(node->type.name));
         if (callerName == "visitBlock") {
             return this->visitBlock(node);
         }
         else if (callerName == "visitAssign") {
             return this->visitAssign(node, allowCasting);
         }
+        else if (!this->visitMethods.count(callerName)) {
+            throw std::runtime_error("No visitor function defined for node %s", Util::toString(node).c_str());
+        }
+        
         return this->visitMethods[callerName](node);
     }
 
     boost::any visitUnaryOp(AstNode* node) {
         std::string funstr = "__noop__";
         
-        boost::any val;
         if (node->token.type == &TokenType::Plus) {
-            val = this->visit(node->expression);
+            boost::any val = this->visit(node->expression);
             return new BasicValue(val->value);
         }
         else if (node->token->type == &TokenType::Minus) {
-            val = this->visit(node->expression)
+            boost::any val = this->visit(node->expression)
             return new BasicValue(-val->value);
         }
             
@@ -276,7 +272,7 @@ public:
                 {node->right},
                 node->token
             )
-        )
+        );
         return this->visit(memberAccessCallNode);
     }
         
@@ -419,41 +415,91 @@ public:
         return std::make_tuple(true, nullptr);
     }
 
+    SymbolInfo* walkVariable(NodeVariable* node) {
+        SymbolInfo* var = this->currentScope.findVariableInfo(node->value);
+        if (var == nullptr) {
+            this->error(node, ErrorType::DoesNotExist, Util::format("Referencing undefined variable '%s'", node->value.c_str()));
+            return nullptr;
+        }
+
+        return var;
+    }
+
+    def basicValueToObject(node, target) {
+        target = (new BasicValue(target))->extractBasicValue();
+
+        if (!Util::isType<BasicObject>(target)) {
+            target_type_object = target.lookup_type(this->global_scope).extractBasicValue()
+
+            if target_type_object is None {
+                this->error(node, ErrorType::TypeError, "invalid member access: target {} is not a BasicObject".format(target))
+                return None;
+            }
+
+            // for a string this would basically mean:
+            // "hello ".append("world")
+            // -> Str.new("hello ").append("world")
+            target = builtinObjectNew(BuiltinFunctionArguments(interpreter=self, this_object=target_type_object, arguments=[target], node=node));
+        }
+
+        return target;
+    }
+
+    std::tuple<BasicObject*, ObjectMember> walkMemberExpression(AstNode* node) {
+        target = this->visit(node.lhs);
+
+        target = this->basicValueToObject(node, target)
+
+        member = target.lookupMember(node->identifier-value)
+
+        if (member == nullptr) {
+            this->error(node, ErrorType.TypeError, "{} has no direct or inherited member `{}`".format(objToString(this, node, target), node->identifier->value))
+        }
+
+        return (target, member)
+
     boost::any visitAssign(AstNode* node, bool allowCasting = false) {
         if (Util::isType<NodeVariable>(node->lhs)) {
             node->allowCasting = allowCasting;
-            targetInfo = this->walkVariable(node->lhs);
-            targetValue = targetInfo.value_wrapper
+            SymbolInfo* targetInfo = this->walkVariable(node->lhs);
+            BasicValue* targetValue = targetInfo->valueWrapper;
 
-            value = this->visit(node->value)
+            value = this->visit(node->value);
             // TYPE CHECK
-            if targetInfo.decltype is not None:
-                typecheckValue, value = this->assignment_typecheck(node->lhs, targetInfo.decltype, value, True, allowCasting)
+            if (targetInfo->declltype != nullptr) {
+                std::tuple<bool, BasicValue*> typecheck = this->assignmentTypecheck(node->lhs, targetInfo->declltype, value, true, allowCasting);
+                bool typecheckValue = std::get<0>(typecheck);
+                BasicValue* value = std::get<1>(typecheck);
 
-                if typecheckValue is not True:
-                    return None
+                if (!typecheckValue) {
+                    return boost::any();
+                }
+            }
 
-            targetValue.assign_value(value)
+            targetValue->assignValue(value);
             return value;
         }
-
-        elif isinstance(node->lhs, NodeMemberExpression):
-            (target, member) = this->walk_member_expression(node->lhs)
+        else if (isinstance(node->lhs, NodeMemberExpression)) {
+            std::tuple<bool, BasicValue*> typecheck = this->assignmentTypecheck(node->lhs, targetInfo->declltype, value, true, allowCasting);
+            bool typecheckValue = std::get<0>(typecheck);
+            BasicValue* value = std::get<1>(typecheck);
+            (target, member) = this->walk_member_expression(node->lhs);
 
             if not isinstance(target, BasicObject):
-                this->error(node, ErrorType.TypeError, 'member expression not assignable')
-                return None
+                this->error(node, ErrorType.TypeError, "member expression not assignable");
+                return boost::any();
 
-            target_type = target.parent
+            target_type = target.parent;
 
-            value = this->visit(node->value)
-            target.assign_member(member.name, value)
-            return value
+            value = this->visit(node->value);
+            target.assignMember(member.name, value);
+            return value;
+        }
         elif isinstance(node->lhs, NodeArrayAccessExpression):
             member_access_call_node = NodeCall(
                 NodeMemberExpression(
                     node->lhs.lhs,
-                    LexerToken('__set__', TokenType.Identifier),
+                    LexerToken("__set__", &TokenType::Identifier),
                     node->lhs.token
                 ),
                 NodeArgumentList(
@@ -466,9 +512,9 @@ public:
             return this->visit(member_access_call_node)
 
         else {
-            this->error(node, ErrorType.TypeError, 'cannot assign {}'.format(node->lhs))
+            this->error(node, ErrorType::TypeError, "cannot assign {}".format(node->lhs))
 
-            return None
+            return boost::any();
         }
     }
 };

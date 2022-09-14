@@ -53,8 +53,8 @@ public:
             )"""", (color + (Util::upper(paraCode->releaseStage) + " v" + paraCode->version) + LogColor::Default).c_str());
 
         // Version checking.
-        // latestVersion = get("https://api.github.com/repos/DaRubyMiner360/ParaCode/releases/latest")
-        cpr::Response r = cpr::Get(cpr::Url{"https://api.github.com/repos/DaRubyMiner360/ParaCode/releases/latest"});
+        // latestVersion = get("https://api.github.com/repos/ParaCodeLang/ParaCode/releases/latest")
+        cpr::Response r = cpr::Get(cpr::Url{"https://api.github.com/repos/ParaCodeLang/ParaCode/releases/latest"});
         if (r.status_code == 200) {
             rapidjson::Document document;
             document.Parse(r.text.c_str());
@@ -87,8 +87,7 @@ public:
         this->m_WelcomeMessage += Util::format(R""""(
         
 
-        Welcome to ParaCode Rewrite
-        (codenamed Peaches).
+        Welcome to ParaCode Rewrite.
         
         Let's get started!
         To learn more about ParaCode,

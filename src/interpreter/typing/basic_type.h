@@ -20,7 +20,7 @@ public:
 
     std::string friendlyTypename() {
         if (this->members.count("name")) {
-            if (Util::isType<BasicValue*>(this->members["name"])) {
+            if (Util::isType<BasicValue>(this->members["name"])) {
                 return boost::any_cast<std::string>(boost::any_cast<BasicValue*>(this->members["name"])->extractValue());
             }
             else {
@@ -73,7 +73,7 @@ public:
         return this->parent->getPropertyType(name);
     }
 
-    std::string toString() {
+    virtual std::string toString() const override {
         return Util::format("BasicType(%s)", Util::toString(this->members).c_str());
     }
 };

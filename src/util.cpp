@@ -6,6 +6,8 @@ std::string LogColor::Warning = "\033[33m";
 std::string LogColor::Info = "\033[34m";
 std::string LogColor::Bold = "\033[1m";
 
+class BasicValue;
+
 namespace Util {
     int versionCompare(std::string v1, std::string v2) {
         int vnum1 = 0, vnum2 = 0;
@@ -217,6 +219,33 @@ namespace Util {
         }
         else if (lhs.type() == typeid(int)) {
             return boost::any_cast<int>(lhs) == boost::any_cast<int>(rhs);
+        }
+        else if (lhs.type() == typeid(long)) {
+            return boost::any_cast<long>(lhs) == boost::any_cast<long>(rhs);
+        }
+        else if (lhs.type() == typeid(long long)) {
+            return boost::any_cast<long long>(lhs) == boost::any_cast<long long>(rhs);
+        }
+        else if (lhs.type() == typeid(unsigned)) {
+            return boost::any_cast<unsigned>(lhs) == boost::any_cast<unsigned>(rhs);
+        }
+        else if (lhs.type() == typeid(unsigned long)) {
+            return boost::any_cast<unsigned long>(lhs) == boost::any_cast<unsigned long>(rhs);
+        }
+        else if (lhs.type() == typeid(unsigned long long)) {
+            return boost::any_cast<unsigned long long>(lhs) == boost::any_cast<unsigned long long>(rhs);
+        }
+        else if (lhs.type() == typeid(float)) {
+            return boost::any_cast<float>(lhs) == boost::any_cast<float>(rhs);
+        }
+        else if (lhs.type() == typeid(double)) {
+            return boost::any_cast<double>(lhs) == boost::any_cast<double>(rhs);
+        }
+        else if (lhs.type() == typeid(long double)) {
+            return boost::any_cast<long double>(lhs) == boost::any_cast<long double>(rhs);
+        }
+        else if (lhs.type() == typeid(BasicValue*)) {
+            return boost::any_cast<BasicValue*>(lhs) == boost::any_cast<BasicValue*>(rhs);
         }
 
         throw std::runtime_error("comparison of any unimplemented for type");

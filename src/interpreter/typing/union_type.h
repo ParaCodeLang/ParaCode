@@ -1,6 +1,6 @@
 #pragma once
 
-#include "interpreter/basic_type.h"
+#include "interpreter/typing/basic_type.h"
 
 #include <boost/any.hpp>
 
@@ -39,7 +39,7 @@ public:
         return boost::any();
     }
 
-    std::string toString() {
+    std::string toString() const override {
         return Util::format("UnionType(%s, %s)", Util::toString(this->lhs).c_str(), Util::toString(this->rhs).c_str());
     }
 };

@@ -22,6 +22,7 @@ set(HEADER_FILES
 set(SOURCE_FILES
     src/util.cpp
     src/interpreter/basic_value.cpp
+    src/interpreter/basic_object.cpp
     src/interpreter/typing/basic_type.cpp
     src/interpreter/variable.cpp
     src/lexer.cpp

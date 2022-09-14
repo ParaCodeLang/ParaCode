@@ -5,11 +5,11 @@ let Time = {
         return __intern_time_now__();
     }
 
-    func sleep(self, seconds) {
-        if seconds <= 0 {
+    func sleep(self, milliseconds) {
+        if milliseconds <= 0 {
             return 0;
         }
-        return __intern_time_sleep__(seconds);
+        return __intern_time_sleep__(milliseconds);
     }
 };
 
