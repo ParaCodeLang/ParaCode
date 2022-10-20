@@ -31,6 +31,11 @@ class BasicObject(BasicValue):
         
         return True
 
+    def extract_value_member(self):
+        if self.lookup_member("_value") is not None:
+            return self.lookup_member("_value").value
+        return self
+
     def extract_value(self):
         return self
 

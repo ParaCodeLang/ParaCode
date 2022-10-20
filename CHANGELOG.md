@@ -1,28 +1,43 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format a slightly altered version of [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## A Look to the Future
 - Support for variables in the `catch` statement
-- More error messages
-- Complete requests HTTP library
-- Better interfacing with python code from ParaCode
 - The ability to use keyword arguments when calling a function
 - **kwargs (Keyword Arguments)
-- More exceptions
+- More exceptions & error messages
+- Better interfacing with python code from ParaCode
+- An entire interfacing module for ParaCode/C++ communication to maintain parity and compatibility with the C++ port (Python interfacing probably won't be added to the port)
+- A complete requests HTTP module
+- A unit tests module
+- A better icon
 
 ## [2.1.0] - CURRENTLY UNRELEASED
 ### Added
 - Easy use of default parameters in functions
 - *args (Non-Keyword Arguments)
 - Complete regex support
+- Some basic exceptions
+- A reflection module
 - Enums
 
 ### Changed
 - Made the repl slightly nicer to look at
 - Made dictionaries more internal.
+
+### Fixed
+- Fixed TimeDelta not working with optional arguments
+- Fixed scenarios like `my_number != null && my_number > 0` crashing from the right side being evaluated even when the left side is false
+
+### Removed
+- PCPM executable (in the future, it will be installed via the ParaCode Installer)
+- `installDependencies.py` as it has been unneeded for quite a while
+
+### Security
+- PCPM now supports publishing packages more securely and supports authentication. For examples on how to implement this in a package repository, see the changes made to the CDN
 
 ## [2.0.1] - 2021-10-18
 ### Fixed
@@ -54,7 +69,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - PCPM package uploading doesn't require a login
 
-[Unreleased]: https://github.com/DaRubyMiner360/ParaCode/compare/2.1.0...HEAD
-[2.1.0]: https://github.com/DaRubyMiner360/ParaCode/compare/2.0.1...2.1.0
-[2.0.1]: https://github.com/DaRubyMiner360/ParaCode/compare/2.0.0...2.0.1
-[2.0.0]: https://github.com/DaRubyMiner360/ParaCode/releases/tag/2.0.0
+[2.1.0]: https://github.com/ParaCodeLang/ParaCode/compare/2.0.1...rewrite
+[2.0.1]: https://github.com/ParaCodeLang/ParaCode/compare/2.0.0...2.0.1
+[2.0.0]: https://github.com/ParaCodeLang/ParaCode/releases/tag/2.0.0

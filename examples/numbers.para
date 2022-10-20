@@ -1,7 +1,7 @@
 let x = 10;
 
 print("Initial value: "+x);
-// set and add 10
+// Set and add 10
 x += 10;
 print("Value after addition: "+x);
 // Multiply x by 2

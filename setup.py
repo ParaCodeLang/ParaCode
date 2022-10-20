@@ -15,7 +15,7 @@ setuptools.setup(
     description="The " + language_name + " Programming Language",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/DaRubyMiner360/ParaCode",
+    url="https://github.com/ParaCodeLang/ParaCode",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

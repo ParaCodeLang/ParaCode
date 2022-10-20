@@ -438,7 +438,12 @@ class Interpreter():
                 return self.call_builtin_function(target, this_value, collected_args, node)
             # user-defined function
             elif isinstance(target, NodeFunctionExpression):
-                collected_args = self.collect_args(node)
+                collected_args = None
+                if isinstance(node.lhs, NodeMemberExpression):
+                    if (node.lhs.identifier.value == "__and__" and not self.check_object_truthy(node.lhs.lhs)) or (node.lhs.identifier.value == "__or__" and self.check_object_truthy(node.lhs.lhs)):
+                        collected_args = [BasicObject(None, {"_value": 0})]
+                if collected_args is None:
+                    collected_args = self.collect_args(node)
                 if is_member_call: # a.b('test') -> pass 'a' in as first argument
                     if this_arg is not None:
                         this_value = this_arg
@@ -615,7 +620,7 @@ class Interpreter():
 
     def visit_Try(self, node):
         if node.catch_block is not None and node.catch_block != [] and node.else_block is None and node.finally_block is None:
-            print("AA")
+            #print("AA")
             try:
                 self.in_try = True
                 return self.visit_Block(node.block)
@@ -644,7 +649,7 @@ class Interpreter():
                                         found = True
                                         self.visit_Block(node.catch_block[i])
                         elif type(node.expr[i].token.value) == str:
-                            print("AAA")
+                            #print("AAA")
                             # print(node.expr[i].token.value)
                             # print(e.object.members["message"])
                             # print(node.expr[i + 1].token.value)
@@ -667,7 +672,7 @@ class Interpreter():
                         elif i == len(node.catch_block) - 1 and not found:
                             self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
         elif node.catch_block is not None and node.catch_block != [] and node.else_block is None and node.finally_block is not None:
-            print("B")
+            #print("B")
             try:
                 self.in_try = True
                 self.visit_Block(node.block)
@@ -711,7 +716,7 @@ class Interpreter():
                 self.in_try = True
                 return self.visit_Block(node.finally_block)
         elif (node.catch_block is not None and node.catch_block != []) and node.else_block is not None and node.finally_block is None:
-            print("C")
+            #print("C")
             try:
                 self.in_try = True
                 self.visit_Block(node.block)
@@ -767,7 +772,7 @@ class Interpreter():
                 found = False
                 for i in range(len(node.catch_block)):
                     if node.expr[i] is None:
-                        print("AB")
+                        #print("AB")
                         if i == len(node.catch_block) - 1:
                             self.in_try = True
                             return self.visit_Block(node.catch_block[i])
@@ -776,7 +781,7 @@ class Interpreter():
                             self.visit_Block(node.catch_block[i])
                     else:
                         if type(node.expr[i]) == list:
-                            print("B")
+                            #print("B")
                             for value in node.expr[i]:
                                 if value.token.value in e.classnames:
                                     if i == len(node.catch_block) - 1:
@@ -786,23 +791,23 @@ class Interpreter():
                                         found = True
                                         self.visit_Block(node.catch_block[i])
                         elif type(node.expr[i].token.value) == str:
-                            print("C")
+                            #print("C")
                             if node.expr[i].token.value in e.classnames:
-                                print("CA")
+                                #print("CA")
                                 if i == len(node.catch_block) - 1:
-                                    print("CAA")
+                                    #print("CAA")
                                     self.in_try = True
                                     return self.visit_Block(node.catch_block[i])
                                 else:
-                                    print("CAB")
+                                    #print("CAB")
                                     # print(node)
                                     found = True
                                     self.visit_Block(node.catch_block[i])
                             elif i == len(node.catch_block) - 1 and not found:
-                                print("CB")
+                                #print("CB")
                                 self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
                         elif i == len(node.catch_block) - 1 and not found:
-                            print("D")
+                            #print("D")
                             self.error(e.node, e.type, e.message, True, e.name, e.classnames, e.object)
             else:
                 self.visit_Block(node.else_block)
@@ -810,7 +815,7 @@ class Interpreter():
                 self.in_try = True
                 return self.visit_Block(node.finally_block)
         elif (node.catch_block is None or node.catch_block == []) and node.else_block is not None and node.finally_block is None:
-            print("E")
+            #print("E")
             try:
                 self.in_try = True
                 return self.visit_Block(node.block)
@@ -824,7 +829,7 @@ class Interpreter():
                 self.in_try = True
                 return self.visit_Block(node.else_block)
         elif (node.catch_block is None or node.catch_block == []) and node.else_block is None and node.finally_block is not None:
-            print("F")
+            #print("F")
             try:
                 self.in_try = True
                 return self.visit_Block(node.block)

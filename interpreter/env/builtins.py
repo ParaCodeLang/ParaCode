@@ -1188,22 +1188,6 @@ def builtin_pyeval(arguments):
 
     return BasicValue(result)
 
-def builtin_object_members(arguments):
-    target = arguments.arguments[0].extract_value()
-
-    # members = {}
-    members = target.members.copy()
-
-    # for key in target.members:
-    #     if isinstance(target.members[key], BasicObject):
-    #         members[key] = target.members[key].clone(parent_override=target)
-    #     else:
-    #         members[key] = target.members[key]
-
-    members = [list(members.keys()), list(members.values())]
-
-    return fixiter(members)
-
 def builtin_object_new(arguments):
     interpreter = arguments.interpreter
     this_object = arguments.this_object
@@ -2658,6 +2642,48 @@ def builtin_macro_expand(arguments):
         interpreter.visit(node)
 
     return BasicValue(None)
+
+def builtin_reflection_get(arguments):
+    interpreter = arguments.interpreter
+    
+    try:
+        if type(arguments.arguments[0]) == BasicValue and arguments.arguments[0].extract_value() is not None:
+            return BasicValue(BasicObject(None, {"_value": arguments.arguments[0].extract_value()}).lookup_member(arguments.arguments[1].extract_value()).value)
+        else:
+            return BasicValue(arguments.arguments[0].lookup_member(arguments.arguments[1].extract_value()).value)
+    except Exception as e:
+        return interpreter.current_scope.find_variable_value(arguments.arguments[1].extract_value()).value
+
+def builtin_reflection_set(arguments):
+    interpreter = arguments.interpreter
+    value = arguments.arguments[2]
+    try:
+        if type(arguments.arguments[0]) == BasicValue and arguments.arguments[0].extract_value() is not None:
+            interpreter.error(node, ErrorType.TypeError, 'argument 1 ({}) is not a BasicObject, cannot set value'.format(arguments.arguments[0]))
+            return BasicValue(None)
+        else:
+            arguments.arguments[0].assign_member(arguments.arguments[1].extract_value(), value)
+    except:
+        interpreter.current_scope.set_variable(arguments.arguments[1].extract_value(), value)
+    
+    return BasicValue(None)
+
+def builtin_reflection_members(arguments):
+    # TODO: Convert to a real dictionary for better performance
+    target = arguments.arguments[0].extract_value()
+
+    # members = {}
+    members = target.members.copy()
+
+    # for key in target.members:
+    #     if isinstance(target.members[key], BasicObject):
+    #         members[key] = target.members[key].clone(parent_override=target)
+    #     else:
+    #         members[key] = target.members[key]
+
+    members = [list(members.keys()), list(members.values())]
+
+    return fixiter(members)
 
 def builtin_import_python(arguments):
     interpreter = arguments.interpreter

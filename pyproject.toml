@@ -5,8 +5,8 @@ description = "The ParaCode Programming Language"
 authors = ["DaRubyMiner360"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/DaRubyMiner360/ParaCode"
-repository = "https://github.com/DaRubyMiner360/ParaCode"
+homepage = "https://github.com/ParaCodeLang/ParaCode"
+repository = "https://github.com/ParaCodeLang/ParaCode"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",

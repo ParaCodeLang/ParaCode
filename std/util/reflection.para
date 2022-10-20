@@ -1,0 +1,33 @@
+let Reflection = Type.extend({
+    name = 'Reflection'
+
+    instance = {
+    }
+
+    func get(self, var, varname) {
+        return __intern_reflection_get__(var, varname);
+    }
+
+    func set(self, var, varname, value) {
+        __intern_reflection_set__(var, varname, value);
+    }
+
+    func members(self, type) {
+        let result = __intern_reflection_members__(type);
+        return Dict.new(result[0], result[1]);
+    }
+});
+
+Object.patch({
+    func getvar(self, varname) {
+        return Reflection.get(self, varname);
+    }
+
+    func setvar(self, varname, value) {
+        Reflection.set(self, varname, value);
+    }
+
+    func varmembers(self) {
+        return Reflection.members(self);
+    }
+});

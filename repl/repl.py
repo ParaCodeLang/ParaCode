@@ -41,7 +41,7 @@ class Repl:
 
         try:
             from requests import get
-            latest_version = get("https://api.github.com/repos/DaRubyMiner360/ParaCode/releases/latest")
+            latest_version = get("https://api.github.com/repos/ParaCodeLang/ParaCode/releases/latest")
             if "tag_name" not in latest_version.json() or latest_version.json()["tag_name"] < paraCode.version:
                 # Using unstable and/or development/beta version
                 self.welcome_message += LogColor.Warning + """

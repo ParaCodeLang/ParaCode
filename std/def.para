@@ -7,11 +7,6 @@ __intern_object_patch__(Object, {
     func __eql__(self, other) {
         return __intern_default_compare__(self, other);
     }
-
-    func members(self) {
-        let result = __intern_object_members__(self);
-        return Dict.new(result[0], result[1]);
-    }
 });
 
 Type.patch({

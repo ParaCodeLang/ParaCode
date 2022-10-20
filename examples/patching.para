@@ -1,6 +1,6 @@
 Int.patch({
-    // overload object being called as a function.
-    // arguments are passed in as an array, so
+    // Overload object being called as a function.
+    // Arguments are passed in as an array, so
     // you need to splat (*) the arguments, expanding
     // from the first (the first argument would be the `Int` type
     // itself)
@@ -10,4 +10,4 @@ Int.patch({
 });
 
 let result = 10(20);
-print(result); // prints 200
+print(result); // Prints 200

@@ -42,6 +42,8 @@ let Enum = Num.extend({
     }
 
     func values(self) {
+        import "std/util/reflection.para";
+
         let result = [:];
 
         if self._value == null {
@@ -52,7 +54,7 @@ let Enum = Num.extend({
             }
         }
         else {
-            for member in self.type().members() {
+            for member in Reflection.members(self.type()) {
                 if member[1].type() == Int {
                     result.append(member);
                 }

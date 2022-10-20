@@ -19,6 +19,10 @@ def main():
         paraCode.repl()
         return
 
+    if sys.argv[1] == "--version":
+        print(paraCode.version)
+        return
+
     filename = sys.argv[1]
     paraCode.eval_file(filename)
 
