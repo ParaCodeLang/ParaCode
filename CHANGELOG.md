@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **kwargs (Keyword Arguments)
 - More exceptions & error messages
 - Better interfacing with python code from ParaCode
-- An entire interfacing module for ParaCode/C++ communication to maintain parity and compatibility with the C++ port (Python interfacing probably won't be added to the port)
+- An entire interfacing module for ParaCode/Rust communication to maintain parity and compatibility with the Rust port (Python interfacing probably won't be added to the port)
 - A complete requests HTTP module
 - A unit tests module
 - A better icon
