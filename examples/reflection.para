@@ -1,0 +1,14 @@
+import "std/util/reflection.para";
+
+let T = Reflection.get(null, "int");
+print(T);
+let t = T.new(1);
+print(t);
+
+// Get and set variables
+print(Reflection.get(T, "name"));
+print(Reflection.get(t, "_value"));
+Reflection.set(T, "name", "RenamedInt");
+Reflection.set(t, "_value", 5);
+print(Reflection.get(T, "name"));
+print(Reflection.get(t, "_value"));

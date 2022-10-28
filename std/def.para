@@ -29,7 +29,7 @@ func print(message="", end="\n") {
     io.write(message, end);
 }
 
-let pyimport = __intern_import_python__;
+let cimport = __intern_import_cpp__;
 
 
 import "std/types/null.para";

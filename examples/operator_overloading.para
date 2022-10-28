@@ -2,16 +2,16 @@ let Person = Type.extend({
     instance = {
         name: str
 
-        // overload the | operator
+        // Overload the | operator
         func __bitor__(self, other) {
             return Person.new(self.name + ' ' + other.name);
         }
 
-        // example of lambdas
+        // Example of lambdas
         to_str: Func = self -> "Person [name: " + self.name + "]"
     }
 
-    // constructor
+    // Constructor
     func __construct__(self, name) {
         self.name = name;
     }

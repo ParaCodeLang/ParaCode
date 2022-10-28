@@ -2,7 +2,7 @@ import subprocess
 import sys
 
 rcmd = "( find ./ -type d -name .git -prune -o -name '*.%s' -not -path './build/**' -print0 | xargs -0 cat ) | wc {}"
-types = ['c', 'cpp', 'h', 'hpp', 'py', 'para', 'paracode', 'sh']
+types = ['c', 'cpp', 'h', 'hpp', 'rs', 'py', 'para', 'paracode', 'sh']
 
 if len(sys.argv) > 1:
     if sys.argv[1].lower() == "lines":
@@ -26,12 +26,14 @@ if len(sys.argv) > 2:
         types = ['cpp', 'h', 'hpp']
     elif sys.argv[2].lower() == "allc":
         types = ['c', 'cpp', 'h', 'hpp']
+    elif sys.argv[2].lower() == "rust" or sys.argv[2].lower() == "rs":
+        types = ['rs']
     elif sys.argv[2].lower() == "python" or sys.argv[2].lower() == "py":
         types = ['py']
     elif sys.argv[2].lower() == "paracode" or sys.argv[2].lower() == "para":
         types = ['para', 'paracode']
     elif sys.argv[2].lower() == "main":
-        types = ['c', 'cpp', 'h', 'hpp', 'py', 'para', 'paracode']
+        types = ['rs', 'py', 'para', 'paracode']
     elif sys.argv[2].lower() == "sh":
         types = ['sh']
 

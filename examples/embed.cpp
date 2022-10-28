@@ -1,5 +1,7 @@
 #include "../src/ParaCode.h"
 
+#include <vector>
+
 void exampleEmbed(ParaCode paraCode) {
-    paraCode.callFunction("print", ["Hello from embed.cpp!"]);
+    paraCode.callFunction("print", std::vector<["Hello from embed.cpp!"]);
 }

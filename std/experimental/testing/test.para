@@ -1,0 +1,21 @@
+let Test = Type.extend({
+    name = 'Test'
+
+    instance = {
+        statement,
+        expected_result
+
+        func is_truthy(self) {
+            return self.statement == self.expected_result;
+        }
+
+        func __bool__(self) {
+            return self.is_truthy();
+        }
+    }
+
+    func __construct__(self, statement, expected_result) {
+        self.statement = statement;
+        self.expected_result = expected_result;
+    }
+});

@@ -7,22 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## A Look to the Future
 - Shorts, unsigned shorts, unsigned integers (uint), longs, unsigned longs (ulong), and doubles
 - Support for variables in the `catch` statement
-- More error messages
 - The ability to use keyword arguments when calling a function
 - **kwargs (Keyword Arguments)
-- More exceptions
-- Complete requests HTTP module
-- An entire interfacing module for ParaCode/C++ communication
-- A reflection module
+- More exceptions & error messages
+- An entire interfacing module for ParaCode/Rust communication
+- A superior, modular language structure allowing for true extension creation (ie. lower-level methods written in Rust for use in ParaCode or even custom keywords and operators)
+- A complete requests HTTP module
 - A graphics module
+- A more advanced unit tests module
 - Tab completion in the repl
 - A better icon
 
 ## [3.0.0] - CURRENTLY UNRELEASED
 ### Changed
-- Ported the entire language to C++
-- Converted the examples and documentation to use C++ instead of Python
+- Ported the entire language to Rust
+- Converted the examples and documentation to use Rust instead of Python
 - `Time.sleep` now takes in milliseconds instead of seconds
+- BasicValue is now a Rust `trait` and all primitive types implement it.
 - Moved scripts (build, dataCounter, etc.) into the `scripts` directory
 
 ### Removed
@@ -34,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - *args (Non-Keyword Arguments)
 - Complete regex support
 - Some basic exceptions
+- A reflection module
+- A basic unit tests module
 - Enums
 
 ### Changed
@@ -49,7 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `installDependencies.py` as it has been unneeded for quite a while
 
 ### Security
-- PCPM now supports publishing packages securely. For examples on how to implement this in a package repository, see the changes made to the CDN
+- PCPM now supports publishing packages more securely and supports authentication. For examples on how to implement this in a package repository, see the changes made to the CDN
 
 ## [2.0.1] - 2021-10-18
 ### Fixed
@@ -81,7 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - PCPM package uploading doesn't require a login
 
-[3.0.0]: https://github.com/ParaCodeLang/ParaCode/compare/rewrite...rewrite-cpp
+[3.0.0]: https://github.com/ParaCodeLang/ParaCode/compare/rewrite...rewrite-rust
 
 [2.1.0]: https://github.com/ParaCodeLang/ParaCode/compare/2.0.1...rewrite
 [2.0.1]: https://github.com/ParaCodeLang/ParaCode/compare/2.0.0...2.0.1

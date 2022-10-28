@@ -1,0 +1,2 @@
+[workspace]
+members = ["paracode", "paracode-repl"]

@@ -1,13 +1,17 @@
 cd "${0%/*}"
 cd ..
 
-sh scripts/build.sh
-cd build
+# sh scripts/build.sh
+# echo "" && echo ""
 
-if [ "$debug" = true ] ; then
-    gdb ./ParaCode "$@"
+# cd build/
+# ./ParaCode "$@"
+# cd ..
+
+test=true
+cargo test -- "$@" || exit
+if [ "$test" = true ] ; then
+    exit
 else
-    ./ParaCode "$@"
+    clear && cargo run -- "$@"
 fi
-
-cd ..
