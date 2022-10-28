@@ -27,3 +27,18 @@ impl fmt::Display for BasicValue {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn null_is_null() {
+      assert_eq!(BasicValue::Null.is_null(), true);
+    }
+
+    #[test]
+    fn is_null() {
+      assert_eq!(BasicValue::Int(1).is_null(), false);
+    }
+}
