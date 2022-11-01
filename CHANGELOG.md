@@ -23,8 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ported the entire language to Rust
 - Converted the examples and documentation to use Rust instead of Python
 - `Time.sleep` now takes in milliseconds instead of seconds
-- BasicValue is now a Rust `trait` and all primitive types implement it.
+- BasicValue is now a Rust `trait` and all primitive types implement it. There's also a BasicWrapper type that acts as a container for values, objects, and types.
 - Moved scripts (build, dataCounter, etc.) into the `scripts` directory
+- Separated the language and repl to be mostly independent
 
 ### Removed
 - Everything related to NumPara, SciPara, or Tk. Replacements might be added in the future.
