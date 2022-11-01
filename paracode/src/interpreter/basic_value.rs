@@ -65,6 +65,7 @@ impl_basicvalue!(f32);
 impl_basicvalue!(bool);
 impl_basicvalue!(String);
 
+// TODO: Try to move the "where ..." into the macro
 impl<K, V, S> BasicValue for HashMap<K, V, S> where K: Clone + Debug, V: Clone + Debug, S: Clone + Debug {
     fn clone(&self) -> Self {
         return Clone::clone(self);
@@ -75,7 +76,22 @@ impl<K, V, S> BasicValue for HashMap<K, V, S> where K: Clone + Debug, V: Clone +
     }
 
     fn get_detailed_string(&self) -> String {
-        return format!("Type: {}, Value: {:?}", stringify!($typename), self);
+        return format!("Type: HashMap, Value: {:?}", self);
+    }
+}
+
+// TODO: Try to move the "where ..." into the macro
+impl<T> BasicValue for Vec<T> where T: Clone + Debug {
+    fn clone(&self) -> Self {
+        return Clone::clone(self);
+    }
+
+    fn to_string(&self) -> String {
+        return format!("{:?}", self);
+    }
+
+    fn get_detailed_string(&self) -> String {
+        return format!("Type: Vec, Value: {:?}", self);
     }
 }
 
