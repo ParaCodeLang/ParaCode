@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Some basic exceptions
 - A reflection module
 - A basic unit tests module
+- An events system
 - Enums
 
 ### Changed

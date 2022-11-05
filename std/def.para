@@ -59,3 +59,7 @@ import "std/types/exceptions/notimplementederror.para";
 import "std/types/exceptions/lookuperror.para";
 import "std/types/exceptions/arraylookuperror.para";
 import "std/types/exceptions/dictlookuperror.para";
+
+import "std/types/events/eventhandler.para";
+import "std/types/events/event.para";
+

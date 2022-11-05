@@ -1,17 +1,17 @@
 func raise(exception, name="") {
     let classnames = [];
     let current = exception.type();
-    while current != Exception {
+    while current != Type {
         classnames.append(current.to_str());
         current = current.type();
     }
-    classnames.append("Exception");
-    if name != "" {
-        return __intern_exception_raise__(name, exception.message, classnames, exception);
+    if name == "" {
+        name = exception.type().name;
     }
-    else {
-        return __intern_exception_raise__(exception.type().name, exception.message, classnames, exception);
-    }
+
+    ExceptionEvent.new(name, exception).trigger();
+
+    return __intern_exception_raise__(name, exception.message, classnames, exception);
 }
 
 let Exception = Type.extend({

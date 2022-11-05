@@ -1,6 +1,6 @@
+use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Debug;
-use std::collections::HashMap;
 
 //use crate::interpreter::basic_object::BasicObject;
 //use crate::interpreter::typing::basic_type::BasicType;
@@ -10,6 +10,7 @@ pub trait BasicValue: Debug {
         return self.get_detailed_string() == other.get_detailed_string();
     }
 
+    // Needs BasicType
     // lookup_type
 
     fn is_null(&self) -> bool {
@@ -34,21 +35,21 @@ impl fmt::Display for dyn BasicValue {
 
 #[macro_export]
 macro_rules! impl_basicvalue {
-    ( $name:ident $(< $( $lt:tt $( : $clt:tt $(+ $dlt:tt )* )? ),+ >)? ) => {
+    ($name:ident $(< $($lt:tt $(: $clt:tt $(+ $dlt:tt)*)?),+ >)?) => {
         impl $(< $( $lt $( : $clt $(+ $dlt )* )? ),+ >)? BasicValue for $name $(< $( $lt ),+ >)? {
             fn is_null(&self) -> bool {
                 return stringify!($name) == "Null";
             }
-            
+
             fn is_object(&self) -> bool {
                 return stringify!($name) == "Empty";
             }
-            
-            
+
+
             fn clone(&self) -> Self {
                 return Clone::clone(self);
             }
-    
+
             fn to_string(&self) -> String {
                 return format!("{}", self);
             }
@@ -66,7 +67,10 @@ impl_basicvalue!(bool);
 impl_basicvalue!(String);
 
 // TODO: Try to move the "where ..." into the macro
-impl<K, V, S> BasicValue for HashMap<K, V, S> where K: Clone + Debug, V: Clone + Debug, S: Clone + Debug {
+impl<K, V, S> BasicValue
+    for HashMap<K, V, S>
+    where K: Clone + Debug, V: Clone + Debug, S: Clone + Debug
+{
     fn clone(&self) -> Self {
         return Clone::clone(self);
     }
