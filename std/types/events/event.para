@@ -1,0 +1,16 @@
+let Event = Type.extend({
+    name = 'Event'
+
+    instance = {
+        func trigger(self) {
+            return EventHandler.trigger(self);
+        }
+    }
+
+    func __construct__(self) {
+    }
+
+    func handle(self, handler, method) {
+        return handler.handle(self, method);
+    }
+});

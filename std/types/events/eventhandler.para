@@ -1,0 +1,50 @@
+let EventHandler = Type.extend({
+    name = 'EventHandler'
+
+    handlers = []
+
+    instance = {
+        handled_events = []
+
+        func handle(self, event, method=null) {
+            if method == null && event.type() == HandledEvent {
+                self.handled_events.append(event);
+                return event;
+            }
+            else {
+                let handled = HandledEvent.new(event, method);
+                self.handled_events.append(handled);
+                return handled;
+            }
+        }
+    }
+
+    func __construct__(self) {
+        EventHandler.handlers.append(self);
+        return self;
+    }
+
+    func trigger(self, event) {
+        for handler in EventHandler.handlers {
+            for handled in handler.handled_events {
+                handled.method(event);
+            }
+        }
+    }
+});
+
+let HandledEvent = Type.extend({
+    name = 'HandledEvent'
+
+    instance = {
+        event_type
+        method
+    }
+
+    func __construct__(self, event_type, method) {
+        self.event_type = event_type;
+        self.method = method;
+
+        return self;
+    }
+});

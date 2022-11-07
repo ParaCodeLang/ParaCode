@@ -1,0 +1,11 @@
+let LangInfo = Type.extend({
+    name = "LangInfo"
+
+    func get_version() {
+        return "2.1.0";
+    }
+
+    func get_extension_language() {
+        return "Python";
+    }
+});

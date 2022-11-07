@@ -57,6 +57,7 @@ let Str = Array.extend({
     func center(self, width, fillchar=" ") {
         return __intern_str_center__(self._value, width, fillchar);
     }
+
     func color(_, num) {
         return __intern_get_color__(num) + self;
     }

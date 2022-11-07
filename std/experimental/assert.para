@@ -1,0 +1,22 @@
+let FailedAssertionError = Exception.extend({
+    name = 'FailedAssertionError'
+
+    instance = {
+        func raise(self) {
+            // TODO: Add the line number
+            return raise(self, "Assertion Failed");
+        }
+    }
+
+    func __construct__(self, _message) {
+        self.message = _message;
+    }
+});
+
+// TODO: Integrate into ParaCode so the condition and line number will be accessible and printable directly
+func assert(condition, message) {
+    if !condition {
+        FailedAssertionError.new(message).raise();
+    }
+    return condition;
+}

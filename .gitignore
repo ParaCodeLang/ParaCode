@@ -1,8 +1,7 @@
-.git/
 .vs/
 venv/
 .idea/
-__pycache__/
+**/__pycache__/
 build/
 dist/
 *.bat

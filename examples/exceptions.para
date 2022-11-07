@@ -1,5 +1,5 @@
 try {
-    // Comment below line, change the exception to MultipleDefinitionError, TypeError, ArgumentError, MacroExpansionError, or Exception
+    // Try commenting out the below line or changing the exception type
     MultipleDefinitionError.new("AIEVN").raise();
     print("TRY");
 }

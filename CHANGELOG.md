@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Better interfacing with python code from ParaCode
 - An entire interfacing module for ParaCode/Rust communication to maintain parity and compatibility with the Rust port (Python interfacing probably won't be added to the port)
 - A complete requests HTTP module
-- A unit tests module
+- A more advanced unit tests module
 - A better icon
 
 ## [2.1.0] - CURRENTLY UNRELEASED
@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complete regex support
 - Some basic exceptions
 - A reflection module
+- A basic unit tests module
+- An events system
 - Enums
 
 ### Changed

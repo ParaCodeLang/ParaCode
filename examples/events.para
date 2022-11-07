@@ -1,0 +1,12 @@
+import "std/types/events/exceptionevent.para";
+
+print(EventHandler.handlers);
+let handler = EventHandler.new();
+print(EventHandler.handlers);
+print(handler.handled_events);
+func m(handled_event, event) { print("EVENT TRIGGERED: " + handled_event.to_str() + " " + event.to_str()); }
+handler.handle(ExceptionEvent, m);
+print(handler.handled_events);
+
+let a = [];
+print(a[1]); // Will trigger an out-of-bounds error.

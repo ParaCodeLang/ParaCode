@@ -1,0 +1,21 @@
+let ExceptionEvent = Event.extend({
+    name = 'ExceptionEvent'
+
+    instance = {
+        name
+        exception
+
+        func trigger(self) {
+            return EventHandler.trigger(self);
+        }
+    }
+
+    func __construct__(self, name, exception) {
+        self.name = name;
+        self.exception = exception;
+    }
+
+    func handle(self, handler, method) {
+        return handler.handle(self, method);
+    }
+});
