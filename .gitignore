@@ -9,3 +9,9 @@ dist/
 .env
 .breakpoints
 PCPM
+
+.replit
+replit.nix
+poetry.lock
+pyproject.toml
+requirements.txt

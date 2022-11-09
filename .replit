@@ -1,1 +1,0 @@
-run = "py3clean . & python3 main.py"
