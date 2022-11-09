@@ -1,2 +1,0 @@
-import "std/experimental/testing/test.para";
-import "std/experimental/testing/assert.para";

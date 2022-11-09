@@ -1,3 +1,5 @@
+use uuid::Uuid;
+
 use crate::interpreter::basic_value::{ BasicValue, Empty };
 use crate::interpreter::basic_object::BasicObject;
 use crate::interpreter::typing::basic_type::BasicType;
@@ -5,8 +7,11 @@ use crate::interpreter::typing::basic_type::BasicType;
 #[derive(Debug)]
 pub struct BasicWrapper {
     value: Box<dyn BasicValue>,
+    
     object: Option<Box<BasicObject>>,
     type_object: Option<Box<BasicType>>,
+
+    uuid: Uuid,
 }
 impl BasicWrapper {
     pub fn from_value(value: Box<dyn BasicValue>) -> BasicWrapper {
@@ -14,6 +19,7 @@ impl BasicWrapper {
             value: value,
             object: None,
             type_object: None,
+            uuid: Uuid::new_v4(),
         };
     }
 
@@ -22,6 +28,7 @@ impl BasicWrapper {
             value: Box::new(Empty::new()),
             object: Some(object),
             type_object: None,
+            uuid: Uuid::new_v4(),
         };
     }
 
@@ -30,6 +37,7 @@ impl BasicWrapper {
             value: Box::new(Empty::new()),
             object: Some(object),
             type_object: Some(type_object),
+            uuid: Uuid::new_v4(),
         };
     }
 
@@ -73,5 +81,9 @@ impl BasicWrapper {
 
     pub fn compare_value(&self, other: Box<BasicWrapper>) -> bool {
         return self.get_detailed_string() == other.get_detailed_string();
+    }
+
+    pub fn get_uuid(&self) -> Uuid {
+        return self.uuid;
     }
 }

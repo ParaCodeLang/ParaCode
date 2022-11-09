@@ -1,7 +1,5 @@
 use std::fmt;
 
-use uuid::Uuid;
-
 #[derive(Debug)]
 pub struct BasicObject {}
 impl BasicObject {

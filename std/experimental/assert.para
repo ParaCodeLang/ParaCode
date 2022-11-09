@@ -13,10 +13,10 @@ let FailedAssertionError = Exception.extend({
     }
 });
 
-// TODO: Integrate into ParaCode so the condition will be accessible and printable directly
+// TODO: Integrate into ParaCode so the condition and line number will be accessible and printable directly
 func assert(condition, message) {
     if !condition {
-        FailedAssertionError.new(message);
+        FailedAssertionError.new(message).raise();
     }
     return condition;
 }

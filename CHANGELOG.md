@@ -5,7 +5,6 @@ The format a slightly altered version of [Keep a Changelog](https://keepachangel
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## A Look to the Future
-- Shorts, unsigned shorts, unsigned integers (uint), longs, unsigned longs (ulong), and doubles
 - Support for variables in the `catch` statement
 - The ability to use keyword arguments when calling a function
 - **kwargs (Keyword Arguments)
