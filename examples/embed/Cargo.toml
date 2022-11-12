@@ -1,13 +1,10 @@
 [package]
-name = "paracode-repl"
-version = "3.0.0"
+name = "paracode-embedding-example"
+version = "1.0.0"
 authors = ["DaRubyMiner360"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-paracode = {path = "../paracode"}
-rustyline = "10.0.0"
-signal-hook = "0.3.14"
-quit = "1.1.4"
+paracode = {path = "../../paracode"}
