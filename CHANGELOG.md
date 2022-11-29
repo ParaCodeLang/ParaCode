@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A complete requests HTTP module
 - A graphics module
 - A more advanced unit tests module
+- Async functionality
 - Tab completion in the repl
 - A better icon
 
@@ -22,9 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ported the entire language to Rust
 - Converted the examples and documentation to use Rust instead of Python
 - `Time.sleep` now takes in milliseconds instead of seconds
-- BasicValue is now a Rust `trait` and all primitive types implement it. There's also a BasicWrapper type that acts as a container for values, objects, and types.
+- `BasicValue` is now a Rust `trait` and all primitive types implement it. There's also a `BasicWrapper` type that acts as a container for values and objects
+- `BasicType` is now `BasicTyping` and is a utility for managing types since `BasicType` didn't contain any information itself
+- `AstNode` is now a Rust `trait` and all nodes implement it
 - Moved scripts (build, dataCounter, etc.) into the `scripts` directory
-- Separated the language and repl to be mostly independent
+- Separated the language and repl to be mostly independent and make the language more modular as a whole
 
 ### Removed
 - Everything related to NumPara, SciPara, or Tk. Replacements might be added in the future.

@@ -2,15 +2,13 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Debug;
 
-//use crate::interpreter::basic_object::BasicObject;
-//use crate::interpreter::typing::basic_type::BasicType;
+use dyn_clone::DynClone;
 
-pub trait BasicValue: Debug {
+pub trait BasicValue: Debug + DynClone {
     fn compare_value(&self, other: Box<dyn BasicValue>) -> bool {
         return self.get_detailed_string() == other.get_detailed_string();
     }
 
-    // Needs BasicType
     // lookup_type
 
     fn is_null(&self) -> bool {
@@ -21,17 +19,17 @@ pub trait BasicValue: Debug {
         return false;
     }
 
-    fn clone(&self) -> Self where Self: Sized;
+    // fn clone(&self) -> Self where Self: Sized;
 
     fn to_string(&self) -> String;
     fn get_detailed_string(&self) -> String;
 }
-
 impl fmt::Display for dyn BasicValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         return write!(f, "{}", self.to_string());
     }
 }
+dyn_clone::clone_trait_object!(BasicValue);
 
 #[macro_export]
 macro_rules! impl_basicvalue {
@@ -45,10 +43,9 @@ macro_rules! impl_basicvalue {
                 return stringify!($name) == "Empty";
             }
 
-
-            fn clone(&self) -> Self {
-                return Clone::clone(self);
-            }
+            // fn clone(&self) -> Self {
+            //     return Clone::clone(self);
+            // }
 
             fn to_string(&self) -> String {
                 return format!("{}", self);
@@ -71,9 +68,9 @@ impl<K, V, S> BasicValue
     for HashMap<K, V, S>
     where K: Clone + Debug, V: Clone + Debug, S: Clone + Debug
 {
-    fn clone(&self) -> Self {
-        return Clone::clone(self);
-    }
+    // fn clone(&self) -> Self {
+    //     return Clone::clone(self);
+    // }
 
     fn to_string(&self) -> String {
         return format!("{:?}", self);
@@ -86,9 +83,9 @@ impl<K, V, S> BasicValue
 
 // TODO: Try to move the "where ..." into the macro
 impl<T> BasicValue for Vec<T> where T: Clone + Debug {
-    fn clone(&self) -> Self {
-        return Clone::clone(self);
-    }
+    // fn clone(&self) -> Self {
+    //     return Clone::clone(self);
+    // }
 
     fn to_string(&self) -> String {
         return format!("{:?}", self);

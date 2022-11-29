@@ -2,41 +2,27 @@ use uuid::Uuid;
 
 use crate::interpreter::basic_value::{ BasicValue, Empty };
 use crate::interpreter::basic_object::BasicObject;
-use crate::interpreter::typing::basic_type::BasicType;
 
 #[derive(Debug)]
-pub struct BasicWrapper {
+pub struct BasicWrapper<'a> {
     value: Box<dyn BasicValue>,
-    
-    object: Option<Box<BasicObject>>,
-    type_object: Option<Box<BasicType>>,
+    object: Option<Box<BasicObject<'a>>>,
 
     uuid: Uuid,
 }
-impl BasicWrapper {
-    pub fn from_value(value: Box<dyn BasicValue>) -> BasicWrapper {
+impl<'a> BasicWrapper<'a> {
+    pub fn from_value(value: Box<dyn BasicValue>) -> BasicWrapper<'a> {
         return BasicWrapper {
             value: value,
             object: None,
-            type_object: None,
             uuid: Uuid::new_v4(),
         };
     }
 
-    pub fn from_object(object: Box<BasicObject>) -> BasicWrapper {
+    pub fn from_object(object: Box<BasicObject<'a>>) -> BasicWrapper<'a> {
         return BasicWrapper {
             value: Box::new(Empty::new()),
             object: Some(object),
-            type_object: None,
-            uuid: Uuid::new_v4(),
-        };
-    }
-
-    pub fn from_type(object: Box<BasicObject>, type_object: Box<BasicType>) -> BasicWrapper {
-        return BasicWrapper {
-            value: Box::new(Empty::new()),
-            object: Some(object),
-            type_object: Some(type_object),
             uuid: Uuid::new_v4(),
         };
     }
@@ -49,8 +35,8 @@ impl BasicWrapper {
     }
 
     pub fn is_type(&self) -> bool {
-        return match self.type_object {
-            Some(_) => true,
+        return match &self.object {
+            Some(object) => object.is_type(),
             None => false,
         };
     }
@@ -59,10 +45,18 @@ impl BasicWrapper {
         return self.value.is_null();
     }
 
+    pub fn clone(&self, parent_override: Option<&'a Box<BasicWrapper<'a>>>) -> BasicWrapper<'a> {
+        if self.is_object() {
+            return BasicWrapper::from_object(match &self.object {
+                Some(object) => Box::new(BasicObject::clone(object, parent_override)),
+                None => unreachable!(),
+            });
+        }
+        return BasicWrapper::from_value(self.value.clone());
+    }
+
     pub fn to_string(&self) -> String {
-        if self.is_type() {
-            return self.type_object.as_ref().unwrap().to_string();
-        } else if self.is_object() {
+        if self.is_object() {
             return self.object.as_ref().unwrap().to_string();
         } else {
             return self.value.to_string();
@@ -70,16 +64,14 @@ impl BasicWrapper {
     }
 
     pub fn get_detailed_string(&self) -> String {
-        if self.is_type() {
-            return self.type_object.as_ref().unwrap().get_detailed_string();
-        } else if self.is_object() {
+        if self.is_object() {
             return self.object.as_ref().unwrap().get_detailed_string();
         } else {
             return self.value.get_detailed_string();
         }
     }
 
-    pub fn compare_value(&self, other: Box<BasicWrapper>) -> bool {
+    pub fn compare_value(&self, other: Box<BasicWrapper<'a>>) -> bool {
         return self.get_detailed_string() == other.get_detailed_string();
     }
 

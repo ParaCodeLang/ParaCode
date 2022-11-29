@@ -1,7 +1,12 @@
+use std::path::Path;
+use std::collections::HashMap;
+
 use rustyline::error::ReadlineError;
 use rustyline::{Editor, Result};
 
 use paracode::paracode::ParaCode;
+use paracode::parse::source_location::SourceLocation;
+use paracode::lexer::Lexer;
 use paracode::utils::LogColor;
 
 pub struct Repl {
@@ -10,15 +15,18 @@ pub struct Repl {
     
     last_input: String,
     rl: Editor::<()>,
+
+    walkthrough_messages: HashMap<String, (String, String)>,
 }
 
 impl Repl {
     pub fn filename() -> String {
         return "<repl>".to_string();
     }
-    
+
+    // Needs load_walkthrough_messages
     pub fn new(paracode: ParaCode) -> Repl {
-        // load_walkthrough_messages
+        let walkthrough_messages = HashMap::<String, (String, String)>::new();//self.load_walkthrough_messages();
         
         let mut color = LogColor::default();
         if paracode.release_stage() == "alpha" {
@@ -48,7 +56,9 @@ impl Repl {
             welcome_message: welcome_message,
             
             last_input: "".to_string(),
-            rl: Editor::<()>::new().unwrap()
+            rl: Editor::<()>::new().unwrap(),
+
+            walkthrough_messages: walkthrough_messages
         };
 
         println!("{}", repl.welcome_message);
@@ -76,7 +86,7 @@ impl Repl {
 
     // load_walkthrough_messages
 
-    pub fn accept_input(&mut self) -> Result<()> {
+    pub fn accept_input(&mut self) -> Result<(), String> {
         let line = match self.rl.readline(">>> ") {
             Ok(line) => line,
             Err(ReadlineError::Interrupted) => {
@@ -97,13 +107,54 @@ impl Repl {
             self.last_input = line.as_str().to_string();
         }
 
+        let trimmed = line.trim();
+        if Path::new(trimmed).is_file() && (trimmed.ends_with(".para") || trimmed.ends_with(".paracode")) {
+            // self.paracode.eval_file(trimmed);
+
+            return Ok(());
+        }
+        else if self.walkthrough_messages.contains_key(trimmed) || (trimmed.ends_with(".md") && self.walkthrough_messages.contains_key(&trimmed.replace(".md", ""))) || (trimmed.ends_with(".md/") && self.walkthrough_messages.contains_key(&trimmed.replace(".md/", ""))) {
+            // println!(self.walkthrough_messages[trimmed][1].replace("```\n", "").replace("```javascript\n", "").replace('```js\n', '').replace('```typescript\n', '').replace('```ts\n', '').replace('```shell\n', '').replace('```bash\n', '').replace('`', ''))
+
+            return Ok(());
+        }
+        else if trimmed == "doc" || trimmed == "docs" || trimmed == "documentation" || trimmed == "documentations" || trimmed == "walkthrough" || trimmed == "walkthroughs" {
+            let walkthroughs = vec![];
+            for (key, value) in &self.walkthrough_messages {
+                walkthroughs.push(format!("{}--  {}", format!("{: >16}", key), value.0));
+            }
+            println!("
+  {}", walkthroughs.join("\n  "));
+
+            return Ok(());
+        }
+
+        let (brace_counter, bracket_counter, paren_counter, comment_type) = self.count_continuation_tokens(line);
+
+        while brace_counter > 0 || bracket_counter > 0 || paren_counter > 0 || comment_type != "" {
+            //
+        }
+
+        let (line_ast, error_list) = self.parse_line(line)?;
+
+        //
+
         return Result::Ok(());
         // todo!("Handle received input");
     }
 
     // eval_line_ast
 
-    // parse_line
+    // Needs Parser
+    pub fn parse_line(&self, line: String) -> Result<((), ()), String> {
+        let mut lexer = Lexer::new(&line, SourceLocation::new(Repl::filename(), 1, 1));
+        let tokens = lexer.lex()?;
+
+        // let parser = Parser::new(tokens, lexer.source_location);
+
+        // return Ok(parser.parse(), parser.error_list);
+        return Ok(((), ()));
+    }
 
     pub fn count_continuation_tokens(&self, line: String) -> (i32, i32, i32, String) {
         let mut brace_counter = 0;

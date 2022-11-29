@@ -14,4 +14,3 @@ let Event = Type.extend({
         return handler.handle(self, method);
     }
 });
-

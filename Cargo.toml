@@ -1,2 +1,2 @@
 [workspace]
-members = ["paracode", "paracode-repl"]
+members = ["paracode", "paracode-macros", "paracode-repl"]
