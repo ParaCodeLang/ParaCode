@@ -8,7 +8,7 @@ cd ..
 # ./ParaCode "$@"
 # cd ..
 
-test=true
+test=false
 cargo test -- "$@" || exit
 if [ "$test" = true ] ; then
     exit

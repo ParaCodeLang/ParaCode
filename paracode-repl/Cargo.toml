@@ -6,6 +6,6 @@ edition = "2021"
 
 [dependencies]
 paracode = {path = "../paracode"}
-rustyline = "*"
 signal-hook = "0.3.14"
 quit = "1.1.4"
+rustyline = "10.0.0"

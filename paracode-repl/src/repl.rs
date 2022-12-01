@@ -2,7 +2,7 @@ use std::path::Path;
 use std::collections::HashMap;
 
 use rustyline::error::ReadlineError;
-use rustyline::{Editor, Result};
+use rustyline::Editor;
 
 use paracode::paracode::ParaCode;
 use paracode::parse::source_location::SourceLocation;
@@ -41,9 +41,9 @@ impl Repl {
         else if paracode.release_stage() == "stable" {
             color = "\x1b[92m".to_string();
         }
-        let welcome_message = format!(" \
-            ----- P a r a C o d e ----- \
-                {} \
+        let welcome_message = format!("
+            ----- P a r a C o d e -----
+                {}
             ", format!("{}{}{}", color, format!("{} v{}", paracode.release_stage().to_uppercase(), paracode.version()), LogColor::default()));
 
         // TODO: Version checking.
@@ -119,7 +119,7 @@ impl Repl {
             return Ok(());
         }
         else if trimmed == "doc" || trimmed == "docs" || trimmed == "documentation" || trimmed == "documentations" || trimmed == "walkthrough" || trimmed == "walkthroughs" {
-            let walkthroughs = vec![];
+            let mut walkthroughs = vec![];
             for (key, value) in &self.walkthrough_messages {
                 walkthroughs.push(format!("{}--  {}", format!("{: >16}", key), value.0));
             }
@@ -129,7 +129,7 @@ impl Repl {
             return Ok(());
         }
 
-        let (brace_counter, bracket_counter, paren_counter, comment_type) = self.count_continuation_tokens(line);
+        let (brace_counter, bracket_counter, paren_counter, comment_type) = self.count_continuation_tokens(&line);
 
         while brace_counter > 0 || bracket_counter > 0 || paren_counter > 0 || comment_type != "" {
             //
@@ -139,7 +139,7 @@ impl Repl {
 
         //
 
-        return Result::Ok(());
+        return Ok(());
         // todo!("Handle received input");
     }
 
@@ -156,7 +156,7 @@ impl Repl {
         return Ok(((), ()));
     }
 
-    pub fn count_continuation_tokens(&self, line: String) -> (i32, i32, i32, String) {
+    pub fn count_continuation_tokens(&self, line: &String) -> (i32, i32, i32, String) {
         let mut brace_counter = 0;
         let mut bracket_counter = 0;
         let mut paren_counter = 0;

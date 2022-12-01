@@ -158,10 +158,10 @@ impl TokenType {
             return Some(TokenType::from_str(value.as_str()).unwrap());
         }
 
-        if value.chars().nth(0).unwrap().is_numeric() || value.get(0..1).unwrap() == ".".to_string() {
+        if value.chars().nth(0).unwrap().is_numeric() || value.chars().nth(0).unwrap() == '.' {
             // What?
             if value.len() > 1 {
-                if value.get(1..2).unwrap() == "x".to_string() || value.get(1..2).unwrap() == "X".to_string() {
+                if value.chars().nth(1).unwrap() == 'x' || value.chars().nth(1).unwrap() == 'X' {
                     return Some(TokenType::Number);
                 }
             }
@@ -172,7 +172,7 @@ impl TokenType {
             return Some(TokenType::Number);
         }
         
-        else if (value.get(0..1).unwrap() == "\"".to_string() && value.chars().last().unwrap() == '"') || (value.get(0..1).unwrap() == "'".to_string() && value.chars().last().unwrap() == '\'') {
+        else if (value.chars().nth(0).unwrap() == '"' && value.chars().last().unwrap() == '"') || (value.chars().nth(0).unwrap() == '\'' && value.chars().last().unwrap() == '\'') {
             return Some(TokenType::String);
         }
         
@@ -261,7 +261,7 @@ impl<'a> Lexer<'a> {
         if ((self.index + amt) as usize) > self.data.len() {
             return "".to_string();
         }
-        let rval = self.data.get((self.index as usize)..((self.index + 1) as usize)).unwrap().to_string();
+        let rval = self.data.chars().take((self.index + 1) as usize).skip(self.index as usize).collect();
         self.index += amt;
         self.source_location.col += 1;
         if rval == "\n" {
@@ -293,8 +293,8 @@ impl<'a> Lexer<'a> {
     }
 
     pub fn skip_whitespace(&mut self) -> bool {
-        if self.peek_char(0).chars().all(|c| c.is_whitespace()) {
-            while self.peek_char(0).chars().all(|c| c.is_whitespace()) {
+        if self.peek_char(0).len() > 0 && self.peek_char(0).chars().all(|c| c.is_whitespace()) {
+            while self.peek_char(0).len() > 0 && self.peek_char(0).chars().all(|c| c.is_whitespace()) {
                 self.read_char(1);
             }
             return true;
@@ -415,16 +415,16 @@ impl<'a> Lexer<'a> {
             }
 
             else if splitables.contains(self.peek_char(0).as_str()) && string_type == "" {
-                if !self.peek_char(-1).chars().all(|c| c.is_whitespace()) && !splitables.contains(self.peek_char(-1).as_str()) && self.token_data.len() > 0 {
+                if !(self.peek_char(-1).len() > 0 && self.peek_char(-1).chars().all(|c| c.is_whitespace())) && !splitables.contains(self.peek_char(-1).as_str()) && self.token_data.len() > 0 {
                     self.push_token()?;
                 }
 
                 let mut multichar = false;
 
                 for tok in &multichar_splitables {
-                    let idx = &self.data[(self.index as usize)..((self.index as usize) + tok.len())].find(tok);
+                    let idx = &self.data.chars().take(self.index as usize).skip((self.index as usize) + tok.len()).collect::<String>().find(tok);
                     if idx.is_some() {
-                        for _ in 0..tok.len() {
+                        for _ in 0..tok.chars().count() {
                             let char = &self.read_char(1);
                             self.token_data += char;
                         }
@@ -433,7 +433,7 @@ impl<'a> Lexer<'a> {
                     }
                 }
                 
-                // if self.peek_char(-1).chars().all(|c| c.is_numeric()) && self.peek_char(0) == "." {
+                // if (self.peek_char(-1).chars().count() > 0 && self.peek_char(-1).chars().all(|c| c.is_numeric())) && self.peek_char(0) == "." {
                 //     let char = &self.read_char(1);
                 //     self.token_data += char;
                 //     continue;
@@ -447,10 +447,10 @@ impl<'a> Lexer<'a> {
                 self.skip_whitespace();
                 continue;
             }
-            else if self.peek_char(0).chars().all(|c| c.is_numeric()) && string_type == "" {
+            else if (self.peek_char(0).len() > 0 && self.peek_char(0).chars().all(|c| c.is_numeric())) && string_type == "" {
                 let mut is_float = false;
 
-                while self.peek_char(0).chars().all(|c| c.is_numeric()) {
+                while self.peek_char(0).len() > 0 && self.peek_char(0).chars().all(|c| c.is_numeric()) {
                     let char = &self.read_char(1);
                     self.token_data += char;
 
@@ -458,7 +458,7 @@ impl<'a> Lexer<'a> {
                         // If next char is identifier, its not float,
                         // rather it could be something like
                         // `1.to_str()`
-                        if !self.peek_char(1).chars().all(|c| c.is_numeric()) {
+                        if !(self.peek_char(1).len() > 0 && self.peek_char(1).chars().all(|c| c.is_numeric())) {
                             break;
                         }
 
