@@ -2,8 +2,8 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Debug;
 
-use dyn_clone::DynClone;
 use downcast_rs::Downcast;
+use dyn_clone::DynClone;
 
 pub trait BasicValue: Debug + DynClone + Downcast {
     fn compare_value(&self, other: Box<dyn BasicValue>) -> bool {
@@ -59,9 +59,11 @@ impl_basicvalue!(f32);
 impl_basicvalue!(bool);
 impl_basicvalue!(String);
 
-impl<K, V, S> BasicValue
-    for HashMap<K, V, S>
-    where K: Clone + Debug + 'static, V: Clone + Debug + 'static, S: Clone + Debug + 'static
+impl<K, V, S> BasicValue for HashMap<K, V, S>
+where
+    K: Clone + Debug + 'static,
+    V: Clone + Debug + 'static,
+    S: Clone + Debug + 'static,
 {
     fn to_string(&self) -> String {
         return format!("{:?}", self);
@@ -72,7 +74,10 @@ impl<K, V, S> BasicValue
     }
 }
 
-impl<T> BasicValue for Vec<T> where T: Clone + Debug + 'static {
+impl<T> BasicValue for Vec<T>
+where
+    T: Clone + Debug + 'static,
+{
     fn to_string(&self) -> String {
         return format!("{:?}", self);
     }
@@ -136,11 +141,11 @@ mod tests {
 
     #[cfg(test)]
     use pretty_assertions::assert_eq;
-    
+
     #[test]
     fn cast_checking() {
         let mut basic_val: Box<dyn BasicValue> = Box::new(127);
-        
+
         assert_eq!(basic_val.is::<i32>(), true);
         assert_eq!(basic_val.is::<f32>(), false);
     }

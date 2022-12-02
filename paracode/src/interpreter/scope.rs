@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use crate::interpreter::basic_wrapper::BasicWrapper;
 use crate::interpreter::basic_value::Null;
+use crate::interpreter::basic_wrapper::BasicWrapper;
 
 #[derive(Debug)]
 pub struct SymbolInfo<'a> {
@@ -11,7 +11,12 @@ pub struct SymbolInfo<'a> {
     pub allow_casting: bool,
 }
 impl<'a> SymbolInfo<'a> {
-    pub fn new(varname: &'a String, decltype: Box<BasicWrapper<'a>>, value: Box<BasicWrapper<'a>>, allow_casting: bool) -> SymbolInfo<'a> {
+    pub fn new(
+        varname: &'a String,
+        decltype: Box<BasicWrapper<'a>>,
+        value: Box<BasicWrapper<'a>>,
+        allow_casting: bool,
+    ) -> SymbolInfo<'a> {
         return SymbolInfo {
             varname: varname,
             decltype: decltype,
@@ -27,15 +32,31 @@ pub struct Scope<'a> {
     pub parent: Box<Scope<'a>>,
 }
 impl<'a> Scope<'a> {
-    pub fn new(variables: &'a mut HashMap<&'a String, SymbolInfo<'a>>, parent: Box<Scope<'a>>) -> Scope<'a> {
+    pub fn new(
+        variables: &'a mut HashMap<&'a String, SymbolInfo<'a>>,
+        parent: Box<Scope<'a>>,
+    ) -> Scope<'a> {
         return Scope {
             variables: variables,
             parent: parent,
         };
     }
 
-    pub fn declare_variable(&mut self, name: &'a String, decltype: Box<BasicWrapper<'a>>, allow_casting: bool) -> &Box<BasicWrapper> {
-        self.variables.insert(name, SymbolInfo::new(name, decltype, Box::new(BasicWrapper::from_value(Box::new(Null::new()))), allow_casting));
+    pub fn declare_variable(
+        &mut self,
+        name: &'a String,
+        decltype: Box<BasicWrapper<'a>>,
+        allow_casting: bool,
+    ) -> &Box<BasicWrapper> {
+        self.variables.insert(
+            name,
+            SymbolInfo::new(
+                name,
+                decltype,
+                Box::new(BasicWrapper::from_value(Box::new(Null::new()))),
+                allow_casting,
+            ),
+        );
 
         return &self.variables[name].value_wrapper;
     }

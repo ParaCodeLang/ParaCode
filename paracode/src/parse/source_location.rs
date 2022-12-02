@@ -1,7 +1,7 @@
 pub struct SourceLocation {
     pub filename: String,
     pub col: i32,
-    pub row: i32
+    pub row: i32,
 }
 impl SourceLocation {
     pub fn new(filename: String, col: i32, row: i32) -> SourceLocation {

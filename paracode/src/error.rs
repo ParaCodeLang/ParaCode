@@ -1,7 +1,7 @@
 use std::fmt;
 
-use crate::parse::node::AstNode;
 use crate::interpreter::basic_wrapper::BasicWrapper;
+use crate::parse::node::AstNode;
 use crate::utils::LogColor;
 
 pub struct InterpreterError<'a> {
@@ -14,7 +14,15 @@ pub struct InterpreterError<'a> {
     object: Option<&'a BasicWrapper<'a>>,
 }
 impl<'a> InterpreterError<'a> {
-    pub fn new(node: &'a dyn AstNode<'a>, ty: ErrorType, message: String, cont: bool, name: String, classnames: Vec<String>, object: Option<&'a BasicWrapper<'a>>) -> InterpreterError<'a> {
+    pub fn new(
+        node: &'a dyn AstNode<'a>,
+        ty: ErrorType,
+        message: String,
+        cont: bool,
+        name: String,
+        classnames: Vec<String>,
+        object: Option<&'a BasicWrapper<'a>>,
+    ) -> InterpreterError<'a> {
         return InterpreterError {
             node: node,
             ty: ty,
@@ -22,7 +30,7 @@ impl<'a> InterpreterError<'a> {
             cont: cont,
             name: name,
             classnames: classnames,
-            object: object
+            object: object,
         };
     }
 }
@@ -34,22 +42,22 @@ impl<'a> fmt::Display for InterpreterError<'a> {
 
 #[derive(Eq, PartialEq, Debug, EnumString, strum_macros::Display, AsRefStr)]
 pub enum ErrorType {
-    #[strum(serialize="Exception", serialize="1")]
+    #[strum(serialize = "Exception", serialize = "1")]
     Exception,
-    #[strum(serialize="Syntax", serialize="2")]
+    #[strum(serialize = "Syntax", serialize = "2")]
     Syntax,
-    #[strum(serialize="DoesNotExist", serialize="3")]
+    #[strum(serialize = "DoesNotExist", serialize = "3")]
     DoesNotExist,
-    #[strum(serialize="TypeError", serialize="4")]
+    #[strum(serialize = "TypeError", serialize = "4")]
     TypeError,
-    #[strum(serialize="MultipleDefinition", serialize="5")]
+    #[strum(serialize = "MultipleDefinition", serialize = "5")]
     MultipleDefinition,
-    #[strum(serialize="ArgumentError", serialize="6")]
+    #[strum(serialize = "ArgumentError", serialize = "6")]
     ArgumentError,
-    #[strum(serialize="MacroExpansionError", serialize="7")]
+    #[strum(serialize = "MacroExpansionError", serialize = "7")]
     MacroExpansionError,
-    #[strum(serialize="InterruptedError", serialize="8")]
-    InterruptedError
+    #[strum(serialize = "InterruptedError", serialize = "8")]
+    InterruptedError,
 }
 
 pub struct Error {
@@ -60,13 +68,19 @@ pub struct Error {
     name: String,
 }
 impl Error {
-    pub fn new(ty: ErrorType, location: (i32, i32), message: String, filename: String, name: String) -> Error {
+    pub fn new(
+        ty: ErrorType,
+        location: (i32, i32),
+        message: String,
+        filename: String,
+        name: String,
+    ) -> Error {
         return Error {
             ty: ty,
             filename: filename,
             message: message,
             location: location,
-            name: name
+            name: name,
         };
     }
 
@@ -88,12 +102,27 @@ impl Error {
 }
 impl<'a> fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let nstr = format!("{}:{}:{}: {}{}:{}", self.location_filename(), self.location_row(), self.location_col(), LogColor::error(), self.name, LogColor::default());
+        let nstr = format!(
+            "{}:{}:{}: {}{}:{}",
+            self.location_filename(),
+            self.location_row(),
+            self.location_col(),
+            LogColor::error(),
+            self.name,
+            LogColor::default()
+        );
         // let mut nstr = format!("{}:{}:{}: {}{} error:{}", self.location_filename(), self.location_row(), self.location_col(), LogColor::error($, self.type.name, LogColor::default());
         // if self.type == ErrorType::Exception {
         //     nstr = format!("{}:{}:{}: {}{}:{}", self.location_filename(), self.location_row(), self.location_col(), LogColor::error(), self.name, LogColor::default());
         // }
-        return write!(f, "{}{}{} {}", LogColor::bold(), nstr, LogColor::default(), self.message);
+        return write!(
+            f,
+            "{}{}{} {}",
+            LogColor::bold(),
+            nstr,
+            LogColor::default(),
+            self.message
+        );
     }
 }
 impl<'a> fmt::Debug for Error {
@@ -107,9 +136,7 @@ pub struct ErrorList {
 }
 impl ErrorList {
     pub fn new() -> ErrorList {
-        return ErrorList {
-            errors: Vec::new()
-        };
+        return ErrorList { errors: Vec::new() };
     }
 
     pub fn clear_errors(&mut self) {

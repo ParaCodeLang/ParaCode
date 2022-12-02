@@ -1,5 +1,4 @@
-pub struct LogColor {
-}
+pub struct LogColor {}
 impl LogColor {
     pub fn default() -> String {
         return "\x1b[0m".to_string();

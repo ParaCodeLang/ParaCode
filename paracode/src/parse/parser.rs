@@ -1,4 +1,2 @@
-pub struct Parser {
-}
-impl Parser {
-}
+pub struct Parser {}
+impl Parser {}

@@ -1,8 +1,8 @@
 pub mod error;
-pub mod lexer;
-pub mod parse;
 pub mod interpreter;
+pub mod lexer;
 pub mod paracode;
+pub mod parse;
 pub mod utils;
 
 extern crate strum;

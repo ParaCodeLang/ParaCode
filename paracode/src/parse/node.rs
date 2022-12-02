@@ -1,5 +1,5 @@
-use std::fmt;
 use std::convert::AsRef;
+use std::fmt;
 
 use strum_macros::AsRefStr;
 
@@ -14,58 +14,58 @@ pub enum NumberType {
 
 #[derive(Eq, PartialEq, Debug, EnumString, strum_macros::Display, AsRefStr)]
 pub enum NodeType {
-    #[strum(serialize="Empty", serialize="1")]
+    #[strum(serialize = "Empty", serialize = "1")]
     Empty,
-    #[strum(serialize="BinOp", serialize="2")]
+    #[strum(serialize = "BinOp", serialize = "2")]
     BinOp,
-    #[strum(serialize="Number", serialize="3")]
+    #[strum(serialize = "Number", serialize = "3")]
     Number,
-    #[strum(serialize="String", serialize="4")]
+    #[strum(serialize = "String", serialize = "4")]
     String,
-    #[strum(serialize="UnaryOp", serialize="5")]
+    #[strum(serialize = "UnaryOp", serialize = "5")]
     UnaryOp,
-    #[strum(serialize="Block", serialize="6")]
+    #[strum(serialize = "Block", serialize = "6")]
     Block,
-    #[strum(serialize="Assign", serialize="7")]
+    #[strum(serialize = "Assign", serialize = "7")]
     Assign,
-    #[strum(serialize="Variable", serialize="8")]
+    #[strum(serialize = "Variable", serialize = "8")]
     Variable,
-    #[strum(serialize="Type", serialize="9")]
+    #[strum(serialize = "Type", serialize = "9")]
     Type,
-    #[strum(serialize="Declare", serialize="10")]
+    #[strum(serialize = "Declare", serialize = "10")]
     Declare,
-    #[strum(serialize="Call", serialize="11")]
+    #[strum(serialize = "Call", serialize = "11")]
     Call,
-    #[strum(serialize="Import", serialize="12")]
+    #[strum(serialize = "Import", serialize = "12")]
     Import,
-    #[strum(serialize="While", serialize="13")]
+    #[strum(serialize = "While", serialize = "13")]
     While,
-    #[strum(serialize="For", serialize="14")]
+    #[strum(serialize = "For", serialize = "14")]
     For,
-    #[strum(serialize="IfStatement", serialize="15")]
+    #[strum(serialize = "IfStatement", serialize = "15")]
     IfStatement,
-    #[strum(serialize="Try", serialize="16")]
+    #[strum(serialize = "Try", serialize = "16")]
     Try,
-    #[strum(serialize="ArgumentList", serialize="17")]
+    #[strum(serialize = "ArgumentList", serialize = "17")]
     ArgumentList,
-    #[strum(serialize="SplatArgument", serialize="18")]
+    #[strum(serialize = "SplatArgument", serialize = "18")]
     SplatArgument,
-    #[strum(serialize="FunctionReturn", serialize="19")]
+    #[strum(serialize = "FunctionReturn", serialize = "19")]
     FunctionReturn,
-    #[strum(serialize="FunctionExpression", serialize="20")]
+    #[strum(serialize = "FunctionExpression", serialize = "20")]
     FunctionExpression,
-    #[strum(serialize="Macro", serialize="21")]
+    #[strum(serialize = "Macro", serialize = "21")]
     Macro,
-    #[strum(serialize="Mixin", serialize="22")]
+    #[strum(serialize = "Mixin", serialize = "22")]
     Mixin,
-    #[strum(serialize="ArrayExpression", serialize="23")]
+    #[strum(serialize = "ArrayExpression", serialize = "23")]
     ArrayExpression,
-    #[strum(serialize="ObjectExpression", serialize="24")]
+    #[strum(serialize = "ObjectExpression", serialize = "24")]
     ObjectExpression,
-    #[strum(serialize="MemberExpression", serialize="25")]
+    #[strum(serialize = "MemberExpression", serialize = "25")]
     MemberExpression,
-    #[strum(serialize="ArrayAccessExpression", serialize="26")]
-    ArrayAccessExpression
+    #[strum(serialize = "ArrayAccessExpression", serialize = "26")]
+    ArrayAccessExpression,
 }
 
 #[derive(Clone)]
@@ -78,7 +78,7 @@ impl<'a> fmt::Display for NodeTokenType<'a> {
         return match self {
             NodeTokenType::Token(tok) => write!(f, "{}", tok),
             NodeTokenType::Node(node) => write!(f, "{}", node),
-        }
+        };
     }
 }
 impl<'a> fmt::Debug for NodeTokenType<'a> {
@@ -86,7 +86,7 @@ impl<'a> fmt::Debug for NodeTokenType<'a> {
         return match self {
             NodeTokenType::Token(tok) => write!(f, "{:?}", tok),
             NodeTokenType::Node(node) => write!(f, "{:?}", node),
-        }
+        };
     }
 }
 
@@ -103,7 +103,7 @@ macro_rules! impl_astnode {
             fn node_type(&self) -> &NodeType {
                 return &self.ty;
             }
-            
+
             fn token(&self) -> &Option<NodeTokenType<'a>> {
                 return &self.tok;
             }
@@ -121,7 +121,7 @@ macro_rules! impl_astnode__ref_token {
             fn node_type(&self) -> &NodeType {
                 return &self.ty;
             }
-            
+
             fn token(&self) -> &Option<NodeTokenType<'a>> {
                 return self.tok;
             }
@@ -140,7 +140,7 @@ macro_rules! impl_astnode_displays {
                 return match self.token() {
                     Some(tok) => write!(f, "AstNode[{}, {}]", self.node_type().as_ref(), tok),
                     None => write!(f, "AstNode[{}]", self.node_type().as_ref()),
-                }
+                };
             }
         }
         impl<'a> std::fmt::Debug for $name<'a> {
@@ -161,8 +161,8 @@ impl<'a> NodeNone<'a> {
         return NodeNone {
             ty: NodeType::Empty,
             tok: Some(NodeTokenType::Token(token)),
-            loc: token.location
-        }
+            loc: token.location,
+        };
     }
 }
 impl_astnode!(NodeNone);
@@ -178,15 +178,19 @@ pub struct NodeBinOp<'a> {
     right: &'a dyn AstNode<'a>,
 }
 impl<'a> NodeBinOp<'a> {
-    pub fn new(left: &'a dyn AstNode<'a>, token: &'a LexerToken, right: &'a dyn AstNode<'a>) -> NodeBinOp<'a> {
+    pub fn new(
+        left: &'a dyn AstNode<'a>,
+        token: &'a LexerToken,
+        right: &'a dyn AstNode<'a>,
+    ) -> NodeBinOp<'a> {
         return NodeBinOp {
             ty: NodeType::BinOp,
             tok: Some(NodeTokenType::Token(token)),
             loc: token.location,
 
             left: left,
-            right: right
-        }
+            right: right,
+        };
     }
 }
 impl_astnode!(NodeBinOp);
@@ -204,8 +208,7 @@ impl<'a> NodeNumber<'a> {
         let value: NumberType;
         if token.value.contains(".") {
             value = NumberType::Float(lexical::parse::<f32, _>(&token.value).unwrap());
-        }
-        else {
+        } else {
             value = NumberType::Int(lexical::parse::<i32, _>(&token.value).unwrap());
         }
         return NodeNumber {
@@ -213,8 +216,8 @@ impl<'a> NodeNumber<'a> {
             tok: Some(NodeTokenType::Token(token)),
             loc: token.location,
 
-            value: value
-        }
+            value: value,
+        };
     }
 }
 impl_astnode!(NodeNumber);
@@ -234,8 +237,8 @@ impl<'a> NodeString<'a> {
             tok: Some(NodeTokenType::Token(token)),
             loc: token.location,
 
-            value: token.value[1..token.value.len() - 1].to_string()
-        }
+            value: token.value[1..token.value.len() - 1].to_string(),
+        };
     }
 }
 impl_astnode!(NodeString);
@@ -256,8 +259,8 @@ impl<'a> NodeUnaryOp<'a> {
             tok: Some(NodeTokenType::Token(token)),
             loc: token.location,
 
-            expression: expression
-        }
+            expression: expression,
+        };
     }
 }
 impl_astnode!(NodeUnaryOp);
@@ -278,8 +281,8 @@ impl<'a> NodeBlock<'a> {
             tok: Some(NodeTokenType::Token(token)),
             loc: token.location,
 
-            children: vec![]
-        }
+            children: vec![],
+        };
     }
 }
 impl_astnode!(NodeBlock);
@@ -296,15 +299,15 @@ impl<'a> NodeVarType<'a> {
         return NodeVarType {
             ty: NodeType::Type,
             tok: Some(NodeTokenType::Token(token)),
-            loc: token.location
-        }
+            loc: token.location,
+        };
     }
 
     pub fn is_type_type(&self) -> bool {
         return match self.tok.as_ref().unwrap() {
             NodeTokenType::Token(tok) => tok.value == "type",
             NodeTokenType::Node(_) => unreachable!(),
-        }
+        };
     }
 }
 impl_astnode!(NodeVarType);
@@ -322,7 +325,12 @@ pub struct NodeDeclare<'a> {
     allow_casting: bool,
 }
 impl<'a> NodeDeclare<'a> {
-    pub fn new(ty: Option<&'a dyn AstNode<'a>>, name: &'a LexerToken, value: &'a dyn AstNode<'a>, allow_casting: bool) -> NodeDeclare<'a> {
+    pub fn new(
+        ty: Option<&'a dyn AstNode<'a>>,
+        name: &'a LexerToken,
+        value: &'a dyn AstNode<'a>,
+        allow_casting: bool,
+    ) -> NodeDeclare<'a> {
         return NodeDeclare {
             ty: NodeType::Declare,
             tok: Some(NodeTokenType::Token(name)),
@@ -331,8 +339,8 @@ impl<'a> NodeDeclare<'a> {
             type_node: ty,
             name: name,
             value: value,
-            allow_casting: allow_casting
-        }
+            allow_casting: allow_casting,
+        };
     }
 }
 impl_astnode!(NodeDeclare);
@@ -352,10 +360,10 @@ impl<'a> NodeImport<'a> {
             ty: NodeType::Import,
             tok: Some(NodeTokenType::Token(filename)),
             loc: filename.location,
-            
+
             children: vec![],
-            source_location: source_location
-        }
+            source_location: source_location,
+        };
     }
 }
 impl_astnode!(NodeImport);
@@ -370,15 +378,19 @@ pub struct NodeWhile<'a> {
     expr: &'a dyn AstNode<'a>,
 }
 impl<'a> NodeWhile<'a> {
-    pub fn new(expr: &'a dyn AstNode<'a>, block: &'a NodeBlock<'a>, token: &'a LexerToken) -> NodeWhile<'a> {
+    pub fn new(
+        expr: &'a dyn AstNode<'a>,
+        block: &'a NodeBlock<'a>,
+        token: &'a LexerToken,
+    ) -> NodeWhile<'a> {
         return NodeWhile {
             ty: NodeType::While,
             tok: Some(NodeTokenType::Token(token)),
             loc: token.location,
 
             block: block,
-            expr: expr
-        }
+            expr: expr,
+        };
     }
 }
 impl_astnode!(NodeWhile);
@@ -394,7 +406,12 @@ pub struct NodeFor<'a> {
     expr: &'a dyn AstNode<'a>,
 }
 impl<'a> NodeFor<'a> {
-    pub fn new(var_token: &'a LexerToken, expr: &'a dyn AstNode<'a>, block: &'a NodeBlock<'a>, token: &'a LexerToken) -> NodeFor<'a> {
+    pub fn new(
+        var_token: &'a LexerToken,
+        expr: &'a dyn AstNode<'a>,
+        block: &'a NodeBlock<'a>,
+        token: &'a LexerToken,
+    ) -> NodeFor<'a> {
         return NodeFor {
             ty: NodeType::For,
             tok: Some(NodeTokenType::Token(token)),
@@ -402,8 +419,8 @@ impl<'a> NodeFor<'a> {
 
             var_token: var_token,
             block: block,
-            expr: expr
-        }
+            expr: expr,
+        };
     }
 }
 impl_astnode!(NodeFor);
@@ -431,8 +448,8 @@ impl<'a> NodeCall<'a> {
             },
 
             lhs: lhs,
-            argument_list: argument_list
-        }
+            argument_list: argument_list,
+        };
     }
 }
 impl_astnode__ref_token!(NodeCall);
@@ -455,8 +472,8 @@ impl<'a> NodeAssign<'a> {
             loc: value.location(),
 
             lhs: lhs,
-            value: value
-        }
+            value: value,
+        };
     }
 }
 impl_astnode!(NodeAssign);
@@ -479,8 +496,8 @@ impl<'a> NodeVariable<'a> {
             loc: token.location,
 
             value: &token.value,
-            allow_casting: allow_casting
-        }
+            allow_casting: allow_casting,
+        };
     }
 }
 impl_astnode!(NodeVariable);
@@ -496,7 +513,12 @@ pub struct NodeIfStatement<'a> {
     else_block: Option<&'a dyn AstNode<'a>>,
 }
 impl<'a> NodeIfStatement<'a> {
-    pub fn new(expr: &'a dyn AstNode<'a>, block: &'a NodeBlock<'a>, else_block: Option<&'a dyn AstNode<'a>>, token: &'a LexerToken) -> NodeIfStatement<'a> {
+    pub fn new(
+        expr: &'a dyn AstNode<'a>,
+        block: &'a NodeBlock<'a>,
+        else_block: Option<&'a dyn AstNode<'a>>,
+        token: &'a LexerToken,
+    ) -> NodeIfStatement<'a> {
         return NodeIfStatement {
             ty: NodeType::IfStatement,
             tok: Some(NodeTokenType::Token(token)),
@@ -504,8 +526,8 @@ impl<'a> NodeIfStatement<'a> {
 
             expr: expr,
             block: block,
-            else_block: else_block
-        }
+            else_block: else_block,
+        };
     }
 }
 impl_astnode!(NodeIfStatement);
@@ -524,7 +546,15 @@ pub struct NodeTryCatch<'a> {
     variable: Option<&'a NodeDeclare<'a>>,
 }
 impl<'a> NodeTryCatch<'a> {
-    pub fn new(block: &'a NodeBlock<'a>, catch_block: Vec<&'a NodeBlock<'a>>, expr: Vec<&'a dyn AstNode<'a>>, else_block: Option<&'a dyn AstNode<'a>>, finally_block: Option<&'a dyn AstNode<'a>>, token: &'a LexerToken, variable: Option<&'a NodeDeclare<'a>>) -> NodeTryCatch<'a> {
+    pub fn new(
+        block: &'a NodeBlock<'a>,
+        catch_block: Vec<&'a NodeBlock<'a>>,
+        expr: Vec<&'a dyn AstNode<'a>>,
+        else_block: Option<&'a dyn AstNode<'a>>,
+        finally_block: Option<&'a dyn AstNode<'a>>,
+        token: &'a LexerToken,
+        variable: Option<&'a NodeDeclare<'a>>,
+    ) -> NodeTryCatch<'a> {
         return NodeTryCatch {
             ty: NodeType::Try,
             tok: Some(NodeTokenType::Token(token)),
@@ -535,8 +565,8 @@ impl<'a> NodeTryCatch<'a> {
             expr: expr,
             else_block: else_block,
             finally_block: finally_block,
-            variable: variable
-        }
+            variable: variable,
+        };
     }
 }
 impl_astnode!(NodeTryCatch);
@@ -556,8 +586,8 @@ impl<'a> NodeArgumentList<'a> {
             tok: Some(NodeTokenType::Token(token)),
             loc: token.location,
 
-            arguments: vec![]
-        }
+            arguments: vec![],
+        };
     }
 }
 impl_astnode!(NodeArgumentList);
@@ -577,8 +607,8 @@ impl<'a> NodeSplatArgument<'a> {
             tok: Some(NodeTokenType::Token(token)),
             loc: token.location,
 
-            expr: expr
-        }
+            expr: expr,
+        };
     }
 }
 impl_astnode!(NodeSplatArgument);
@@ -593,15 +623,18 @@ pub struct NodeFunctionExpression<'a> {
     argument_list: &'a NodeArgumentList<'a>,
 }
 impl<'a> NodeFunctionExpression<'a> {
-    pub fn new(argument_list: &'a NodeArgumentList<'a>, block: &'a NodeBlock<'a>) -> NodeFunctionExpression<'a> {
+    pub fn new(
+        argument_list: &'a NodeArgumentList<'a>,
+        block: &'a NodeBlock<'a>,
+    ) -> NodeFunctionExpression<'a> {
         return NodeFunctionExpression {
             ty: NodeType::FunctionExpression,
             tok: Some(NodeTokenType::Node(block)),
             loc: block.location(),
 
             block: block,
-            argument_list: argument_list
-        }
+            argument_list: argument_list,
+        };
     }
 }
 impl_astnode!(NodeFunctionExpression);
@@ -621,8 +654,8 @@ impl<'a> NodeFunctionReturn<'a> {
             tok: Some(NodeTokenType::Token(token)),
             loc: token.location,
 
-            value_node: value_node
-        }
+            value_node: value_node,
+        };
     }
 }
 impl_astnode!(NodeFunctionReturn);
@@ -642,8 +675,8 @@ impl<'a> NodeMacro<'a> {
             tok: Some(NodeTokenType::Token(token)),
             loc: token.location,
 
-            expr: expr
-        }
+            expr: expr,
+        };
     }
 }
 impl_astnode!(NodeMacro);
@@ -663,8 +696,8 @@ impl<'a> NodeMixin<'a> {
             tok: Some(NodeTokenType::Token(token)),
             loc: token.location,
 
-            tokens: tokens
-        }
+            tokens: tokens,
+        };
     }
 }
 impl_astnode!(NodeMixin);
@@ -679,15 +712,19 @@ pub struct NodeArrayExpression<'a> {
     is_dictionary: bool,
 }
 impl<'a> NodeArrayExpression<'a> {
-    pub fn new(members: Vec<&'a dyn AstNode<'a>>, token: &'a LexerToken, is_dictionary: bool) -> NodeArrayExpression<'a> {
+    pub fn new(
+        members: Vec<&'a dyn AstNode<'a>>,
+        token: &'a LexerToken,
+        is_dictionary: bool,
+    ) -> NodeArrayExpression<'a> {
         return NodeArrayExpression {
             ty: NodeType::ArrayExpression,
             tok: Some(NodeTokenType::Token(token)),
             loc: token.location,
 
             members: members,
-            is_dictionary: is_dictionary
-        }
+            is_dictionary: is_dictionary,
+        };
     }
 }
 impl_astnode!(NodeArrayExpression);
@@ -708,8 +745,8 @@ impl<'a> NodeObjectExpression<'a> {
             tok: None,
             loc: (0, 0),
 
-            members: members
-        }
+            members: members,
+        };
     }
 }
 impl_astnode!(NodeObjectExpression);
@@ -724,15 +761,19 @@ pub struct NodeMemberExpression<'a> {
     identifier: &'a LexerToken,
 }
 impl<'a> NodeMemberExpression<'a> {
-    pub fn new(lhs: &'a dyn AstNode<'a>, identifier: &'a LexerToken, token: &'a LexerToken) -> NodeMemberExpression<'a> {
+    pub fn new(
+        lhs: &'a dyn AstNode<'a>,
+        identifier: &'a LexerToken,
+        token: &'a LexerToken,
+    ) -> NodeMemberExpression<'a> {
         return NodeMemberExpression {
             ty: NodeType::MemberExpression,
             tok: Some(NodeTokenType::Token(token)),
             loc: token.location,
 
             lhs: lhs,
-            identifier: identifier
-        }
+            identifier: identifier,
+        };
     }
 }
 impl_astnode!(NodeMemberExpression);
@@ -747,15 +788,19 @@ pub struct NodeArrayAccessExpression<'a> {
     access_expr: &'a dyn AstNode<'a>,
 }
 impl<'a> NodeArrayAccessExpression<'a> {
-    pub fn new(lhs: &'a dyn AstNode<'a>, access_expr: &'a dyn AstNode<'a>, token: &'a LexerToken) -> NodeArrayAccessExpression<'a> {
+    pub fn new(
+        lhs: &'a dyn AstNode<'a>,
+        access_expr: &'a dyn AstNode<'a>,
+        token: &'a LexerToken,
+    ) -> NodeArrayAccessExpression<'a> {
         return NodeArrayAccessExpression {
             ty: NodeType::ArrayAccessExpression,
             tok: Some(NodeTokenType::Token(token)),
             loc: (0, 0),
 
             lhs: lhs,
-            access_expr: access_expr
-        }
+            access_expr: access_expr,
+        };
     }
 }
 impl_astnode!(NodeArrayAccessExpression);

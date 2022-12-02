@@ -9,7 +9,7 @@ pub mod repl;
 #[quit::main]
 fn main() {
     let paracode = ParaCode::new();
-    
+
     let args: Vec<String> = env::args().collect();
     if args.len() <= 1 {
         let mut repl = Repl::new(paracode);

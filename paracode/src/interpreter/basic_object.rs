@@ -1,5 +1,5 @@
-use std::fmt;
 use std::collections::HashMap;
+use std::fmt;
 
 use crate::interpreter::basic_wrapper::BasicWrapper;
 
@@ -15,11 +15,14 @@ pub struct BasicObject<'a> {
     pub members: HashMap<&'a String, Box<BasicWrapper<'a>>>,
 }
 impl<'a> BasicObject<'a> {
-    pub fn new(parent: Option<&'a Box<BasicWrapper<'a>>>, members: HashMap<&'a String, Box<BasicWrapper<'a>>>) -> BasicObject<'a> {
+    pub fn new(
+        parent: Option<&'a Box<BasicWrapper<'a>>>,
+        members: HashMap<&'a String, Box<BasicWrapper<'a>>>,
+    ) -> BasicObject<'a> {
         return BasicObject {
             parent: parent,
             members: members,
-        }
+        };
     }
 
     // Needs lookup_member
@@ -32,10 +35,13 @@ impl<'a> BasicObject<'a> {
         for (name, value) in &self.members {
             members.insert(name, Box::new(BasicWrapper::clone(value, None)));
         }
-        return BasicObject::new(match &parent_override {
-            Some(_) => parent_override,
-            None => self.parent,
-        }, members);
+        return BasicObject::new(
+            match &parent_override {
+                Some(_) => parent_override,
+                None => self.parent,
+            },
+            members,
+        );
     }
 
     // assign_member
@@ -48,7 +54,7 @@ impl<'a> BasicObject<'a> {
     pub fn is_type(&self) -> bool {
         return self.members.contains_key(&"name".to_string());
     }
-    
+
     pub fn to_string(&self) -> String {
         return format!("{}", self);
     }

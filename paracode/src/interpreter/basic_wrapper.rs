@@ -1,7 +1,7 @@
 use uuid::Uuid;
 
-use crate::interpreter::basic_value::{BasicValue, ObjectStub};
 use crate::interpreter::basic_object::BasicObject;
+use crate::interpreter::basic_value::{BasicValue, ObjectStub};
 
 #[derive(Debug)]
 pub struct BasicWrapper<'a> {
