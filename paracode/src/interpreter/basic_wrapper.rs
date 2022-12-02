@@ -1,6 +1,6 @@
 use uuid::Uuid;
 
-use crate::interpreter::basic_value::{ BasicValue, Empty };
+use crate::interpreter::basic_value::{BasicValue, ObjectStub};
 use crate::interpreter::basic_object::BasicObject;
 
 #[derive(Debug)]
@@ -21,7 +21,7 @@ impl<'a> BasicWrapper<'a> {
 
     pub fn from_object(object: Box<BasicObject<'a>>) -> BasicWrapper<'a> {
         return BasicWrapper {
-            value: Box::new(Empty::new()),
+            value: Box::new(ObjectStub::new()),
             object: Some(object),
             uuid: Uuid::new_v4(),
         };

@@ -3,8 +3,9 @@ use std::fmt;
 use std::fmt::Debug;
 
 use dyn_clone::DynClone;
+use downcast_rs::Downcast;
 
-pub trait BasicValue: Debug + DynClone {
+pub trait BasicValue: Debug + DynClone + Downcast {
     fn compare_value(&self, other: Box<dyn BasicValue>) -> bool {
         return self.get_detailed_string() == other.get_detailed_string();
     }
@@ -19,8 +20,6 @@ pub trait BasicValue: Debug + DynClone {
         return false;
     }
 
-    // fn clone(&self) -> Self where Self: Sized;
-
     fn to_string(&self) -> String;
     fn get_detailed_string(&self) -> String;
 }
@@ -30,6 +29,7 @@ impl fmt::Display for dyn BasicValue {
     }
 }
 dyn_clone::clone_trait_object!(BasicValue);
+impl_downcast!(BasicValue);
 
 #[macro_export]
 macro_rules! impl_basicvalue {
@@ -40,12 +40,8 @@ macro_rules! impl_basicvalue {
             }
 
             fn is_object(&self) -> bool {
-                return stringify!($name) == "Empty";
+                return stringify!($name) == "ObjectStub";
             }
-
-            // fn clone(&self) -> Self {
-            //     return Clone::clone(self);
-            // }
 
             fn to_string(&self) -> String {
                 return format!("{}", self);
@@ -63,15 +59,10 @@ impl_basicvalue!(f32);
 impl_basicvalue!(bool);
 impl_basicvalue!(String);
 
-// TODO: Try to move the "where ..." into the macro
 impl<K, V, S> BasicValue
     for HashMap<K, V, S>
-    where K: Clone + Debug, V: Clone + Debug, S: Clone + Debug
+    where K: Clone + Debug + 'static, V: Clone + Debug + 'static, S: Clone + Debug + 'static
 {
-    // fn clone(&self) -> Self {
-    //     return Clone::clone(self);
-    // }
-
     fn to_string(&self) -> String {
         return format!("{:?}", self);
     }
@@ -81,12 +72,7 @@ impl<K, V, S> BasicValue
     }
 }
 
-// TODO: Try to move the "where ..." into the macro
-impl<T> BasicValue for Vec<T> where T: Clone + Debug {
-    // fn clone(&self) -> Self {
-    //     return Clone::clone(self);
-    // }
-
+impl<T> BasicValue for Vec<T> where T: Clone + Debug + 'static {
     fn to_string(&self) -> String {
         return format!("{:?}", self);
     }
@@ -98,7 +84,7 @@ impl<T> BasicValue for Vec<T> where T: Clone + Debug {
 
 // Rust doesn't have a null type, so create a fake one.
 #[derive(Debug, Clone)]
-pub struct Null;
+pub struct Null {}
 impl Null {
     pub fn new() -> Self {
         return Self {};
@@ -120,19 +106,20 @@ impl PartialEq<dyn BasicValue> for Null {
 }
 impl_basicvalue!(Null);
 
+// A type to be stored in BasicWrapper with BasicObjects
 #[derive(Debug, Clone)]
-pub struct Empty;
-impl Empty {
+pub struct ObjectStub {}
+impl ObjectStub {
     pub fn new() -> Self {
         return Self {};
     }
 }
-impl fmt::Display for Empty {
+impl fmt::Display for ObjectStub {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "Empty");
+        return write!(f, "ObjectStub");
     }
 }
-impl PartialEq<dyn BasicValue> for Empty {
+impl PartialEq<dyn BasicValue> for ObjectStub {
     fn eq(&self, _rhs: &(dyn BasicValue + 'static)) -> bool {
         return self.is_object() && _rhs.is_object();
     }
@@ -141,4 +128,29 @@ impl PartialEq<dyn BasicValue> for Empty {
         return !(self == _rhs);
     }
 }
-impl_basicvalue!(Empty);
+impl_basicvalue!(ObjectStub);
+
+#[cfg(test)]
+mod tests {
+    use crate::interpreter::basic_value::BasicValue;
+
+    #[cfg(test)]
+    use pretty_assertions::assert_eq;
+    
+    #[test]
+    fn cast_checking() {
+        let mut basic_val: Box<dyn BasicValue> = Box::new(127);
+        
+        assert_eq!(basic_val.is::<i32>(), true);
+        assert_eq!(basic_val.is::<f32>(), false);
+    }
+
+    #[test]
+    fn casting() {
+        let mut basic_val: Box<dyn BasicValue> = Box::new(127);
+
+        if let Some(real_val) = basic_val.downcast_ref::<i32>() {
+            assert_eq!(real_val, &127);
+        }
+    }
+}

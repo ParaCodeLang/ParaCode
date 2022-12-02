@@ -8,9 +8,9 @@ cd ..
 # ./ParaCode "$@"
 # cd ..
 
-test=false
+run=false
 cargo test -- "$@" || exit
-if [ "$test" = true ] ; then
+if [ "$run" = false ] ; then
     exit
 else
     clear && cargo run -- "$@"

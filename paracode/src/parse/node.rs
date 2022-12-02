@@ -4,7 +4,6 @@ use std::convert::AsRef;
 use strum_macros::AsRefStr;
 
 use crate::lexer::LexerToken;
-use crate::lexer::TokenType;
 use crate::parse::source_location::SourceLocation;
 
 #[derive(PartialEq, Debug, Clone)]
@@ -15,57 +14,57 @@ pub enum NumberType {
 
 #[derive(Eq, PartialEq, Debug, EnumString, strum_macros::Display, AsRefStr)]
 pub enum NodeType {
-    #[strum(serialize="Empty", serialize="0")]
+    #[strum(serialize="Empty", serialize="1")]
     Empty,
-    #[strum(serialize="BinOp", serialize="1")]
+    #[strum(serialize="BinOp", serialize="2")]
     BinOp,
-    #[strum(serialize="Number", serialize="2")]
+    #[strum(serialize="Number", serialize="3")]
     Number,
-    #[strum(serialize="String", serialize="3")]
+    #[strum(serialize="String", serialize="4")]
     String,
-    #[strum(serialize="UnaryOp", serialize="4")]
+    #[strum(serialize="UnaryOp", serialize="5")]
     UnaryOp,
-    #[strum(serialize="Block", serialize="5")]
+    #[strum(serialize="Block", serialize="6")]
     Block,
-    #[strum(serialize="Assign", serialize="6")]
+    #[strum(serialize="Assign", serialize="7")]
     Assign,
-    #[strum(serialize="Variable", serialize="7")]
+    #[strum(serialize="Variable", serialize="8")]
     Variable,
-    #[strum(serialize="Type", serialize="8")]
+    #[strum(serialize="Type", serialize="9")]
     Type,
-    #[strum(serialize="Declare", serialize="9")]
+    #[strum(serialize="Declare", serialize="10")]
     Declare,
-    #[strum(serialize="Call", serialize="10")]
+    #[strum(serialize="Call", serialize="11")]
     Call,
-    #[strum(serialize="Import", serialize="11")]
+    #[strum(serialize="Import", serialize="12")]
     Import,
-    #[strum(serialize="While", serialize="12")]
+    #[strum(serialize="While", serialize="13")]
     While,
-    #[strum(serialize="For", serialize="13")]
+    #[strum(serialize="For", serialize="14")]
     For,
-    #[strum(serialize="IfStatement", serialize="14")]
+    #[strum(serialize="IfStatement", serialize="15")]
     IfStatement,
-    #[strum(serialize="Try", serialize="15")]
+    #[strum(serialize="Try", serialize="16")]
     Try,
-    #[strum(serialize="ArgumentList", serialize="16")]
+    #[strum(serialize="ArgumentList", serialize="17")]
     ArgumentList,
-    #[strum(serialize="SplatArgument", serialize="17")]
+    #[strum(serialize="SplatArgument", serialize="18")]
     SplatArgument,
-    #[strum(serialize="FunctionReturn", serialize="18")]
+    #[strum(serialize="FunctionReturn", serialize="19")]
     FunctionReturn,
-    #[strum(serialize="FunctionExpression", serialize="19")]
+    #[strum(serialize="FunctionExpression", serialize="20")]
     FunctionExpression,
-    #[strum(serialize="Macro", serialize="20")]
+    #[strum(serialize="Macro", serialize="21")]
     Macro,
-    #[strum(serialize="Mixin", serialize="21")]
+    #[strum(serialize="Mixin", serialize="22")]
     Mixin,
-    #[strum(serialize="ArrayExpression", serialize="22")]
+    #[strum(serialize="ArrayExpression", serialize="23")]
     ArrayExpression,
-    #[strum(serialize="ObjectExpression", serialize="23")]
+    #[strum(serialize="ObjectExpression", serialize="24")]
     ObjectExpression,
-    #[strum(serialize="MemberExpression", serialize="24")]
+    #[strum(serialize="MemberExpression", serialize="25")]
     MemberExpression,
-    #[strum(serialize="ArrayAccessExpression", serialize="25")]
+    #[strum(serialize="ArrayAccessExpression", serialize="26")]
     ArrayAccessExpression
 }
 
