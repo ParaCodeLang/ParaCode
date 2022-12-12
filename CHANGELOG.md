@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - More exceptions & error messages
 - An entire interfacing module for ParaCode/Rust communication
 - A superior, modular language structure allowing for true extension creation (ie. lower-level methods written in Rust for use in ParaCode or even custom keywords and operators)
+- Changes to the standard library to improve consistency, efficiency, and overall readability
 - A complete requests HTTP module
 - A graphics module
 - A more advanced unit tests module
@@ -22,10 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Ported the entire language to Rust
 - Converted the examples and documentation to use Rust instead of Python
-- `Time.sleep` now takes in milliseconds instead of seconds
 - `BasicValue` is now a Rust `trait` and all primitive types implement it. There's also a `BasicWrapper` type that acts as a container for values and objects
 - `BasicType` is now `BasicTyping` and is a utility for managing types since `BasicType` didn't contain any information itself
 - `AstNode` is now a Rust `trait` and all nodes implement it
+- `Time.sleep` now takes in milliseconds instead of seconds
 - Moved scripts (build, dataCounter, etc.) into the `scripts` directory
 - Separated the language and repl to be mostly independent and make the language more modular as a whole
 

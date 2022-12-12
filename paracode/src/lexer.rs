@@ -38,7 +38,7 @@ pub enum Keywords {
     Finally,
 }
 
-#[derive(Eq, PartialEq, Debug, EnumString, strum_macros::Display)]
+#[derive(Eq, PartialEq, Debug, Clone, EnumString, strum_macros::Display)]
 pub enum TokenType {
     #[strum(serialize = "1", serialize = "NoneToken")]
     NoneToken,
@@ -190,17 +190,15 @@ impl TokenType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LexerToken {
     pub token_type: Option<TokenType>,
     pub value: String,
     pub location: (i32, i32),
 }
 impl LexerToken {
-    const EMPTY_STRING: String = String::new();
-
     pub fn none() -> LexerToken {
-        return LexerToken::new(LexerToken::EMPTY_STRING, Some(TokenType::NoneToken));
+        return LexerToken::new(String::new(), Some(TokenType::NoneToken));
     }
 
     pub fn new(value: String, token_type: Option<TokenType>) -> LexerToken {

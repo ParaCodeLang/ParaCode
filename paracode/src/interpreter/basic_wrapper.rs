@@ -5,8 +5,8 @@ use crate::interpreter::basic_value::{BasicValue, ObjectStub};
 
 #[derive(Debug)]
 pub struct BasicWrapper<'a> {
-    value: Box<dyn BasicValue>,
-    object: Option<Box<BasicObject<'a>>>,
+    pub value: Box<dyn BasicValue>,
+    pub object: Option<Box<BasicObject<'a>>>,
 
     uuid: Uuid,
 }
@@ -71,11 +71,20 @@ impl<'a> BasicWrapper<'a> {
         }
     }
 
-    pub fn compare_value(&self, other: Box<BasicWrapper<'a>>) -> bool {
+    pub fn compare_value(&self, other: &'a Box<BasicWrapper<'a>>) -> bool {
         return self.get_detailed_string() == other.get_detailed_string();
     }
 
     pub fn get_uuid(&self) -> Uuid {
         return self.uuid;
+    }
+}
+impl<'a> PartialEq<BasicWrapper<'a>> for BasicWrapper<'a> {
+    fn eq(&self, _rhs: &BasicWrapper<'a>) -> bool {
+        return self.get_detailed_string() == _rhs.get_detailed_string();
+    }
+
+    fn ne(&self, _rhs: &BasicWrapper<'a>) -> bool {
+        return !(self == _rhs);
     }
 }

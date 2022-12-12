@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt;
 
 use crate::interpreter::basic_value::Null;
 use crate::interpreter::basic_wrapper::BasicWrapper;
@@ -26,15 +27,14 @@ impl<'a> SymbolInfo<'a> {
     }
 }
 
-#[derive(Debug)]
 pub struct Scope<'a> {
     pub variables: &'a mut HashMap<&'a String, SymbolInfo<'a>>,
-    pub parent: Box<Scope<'a>>,
+    pub parent: Option<Box<Scope<'a>>>,
 }
 impl<'a> Scope<'a> {
     pub fn new(
         variables: &'a mut HashMap<&'a String, SymbolInfo<'a>>,
-        parent: Box<Scope<'a>>,
+        parent: Option<Box<Scope<'a>>>,
     ) -> Scope<'a> {
         return Scope {
             variables: variables,
@@ -61,13 +61,64 @@ impl<'a> Scope<'a> {
         return &self.variables[name].value_wrapper;
     }
 
-    // set_variable
+    pub fn set_variable(&mut self, name: &'a String, value: Box<BasicWrapper<'a>>) {
+        if let Some(_) = self.find_variable_info(name, false) {
+            let var_ref = self.variables.get_mut(name).unwrap(); // Get a mutable reference to the variable in the scope's variables map.
+            var_ref.value_wrapper = value; // Set the value of the variable.
+        }
+    }
 
-    // find_variable_info
+    pub fn find_variable_info<'b>(
+        &'b mut self,
+        name: &'a String,
+        limit: bool,
+    ) -> Option<&'b SymbolInfo<'a>> {
+        if self.variables.contains_key(name) {
+            return Some(&self.variables[name]);
+        }
 
-    // find_variable_value
+        if !limit && self.parent.is_some() {
+            return self
+                .parent
+                .as_mut()
+                .unwrap()
+                .find_variable_info(name, false);
+        }
 
-    // find_variable_decltype
+        return None;
+    }
 
-    // to_string
+    pub fn find_variable_value<'b>(
+        &'b mut self,
+        name: &'a String,
+        limit: bool,
+    ) -> Option<&'b Box<BasicWrapper<'a>>> {
+        let variable_info = self.find_variable_info(name, limit);
+        if variable_info.is_some() {
+            return Some(&variable_info.unwrap().value_wrapper);
+        }
+        return None;
+    }
+
+    pub fn find_variable_decltype<'b>(
+        &'b mut self,
+        name: &'a String,
+        limit: bool,
+    ) -> Option<&'b Box<BasicWrapper<'a>>> {
+        let variable_info = self.find_variable_info(name, limit);
+        if variable_info.is_some() {
+            return Some(&variable_info.unwrap().decltype);
+        }
+        return None;
+    }
+}
+impl<'a> fmt::Display for Scope<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        return write!(f, "Scope definitions: {:?}", self.variables);
+    }
+}
+impl<'a> fmt::Debug for Scope<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        return write!(f, "{}", self);
+    }
 }
