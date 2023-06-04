@@ -7,18 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## A Look to the Future
 - Support for variables in the `catch` statement
 - The ability to use keyword arguments when calling a function
-- **kwargs (Keyword Arguments)
 - More exceptions & error messages
 - Better interfacing with python code from ParaCode
-- An entire interfacing module for ParaCode/Rust communication to maintain parity and compatibility with the Rust port (Python interfacing probably won't be added to the port)
 - A complete requests HTTP module
-- A more advanced unit tests module
+- A more advanced (and real) unit tests module
+- Async functionality
+- Threading
 - A better icon
+- The rebranding of the entire language from ParaCode to either Jet or Jetstream (JTS)
 
 ## [2.1.0] - CURRENTLY UNRELEASED
 ### Added
 - Easy use of default parameters in functions
-- *args (Non-Keyword Arguments)
+- Non-Keyword Arguments
 - Complete regex support
 - Some basic exceptions
 - A reflection module

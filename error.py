@@ -2,10 +2,10 @@ from enum import Enum, auto
 from util import LogColor
 
 class InterpreterError(Exception):
-    def __init__(self, m, node=None, type=None, message=None, cont=False, name=None, classnames=None, object=None):
+    def __init__(self, m, node=None, ty=None, message=None, cont=False, name=None, classnames=None, object=None):
         super().__init__(m)
         self.node = node
-        self.type = type
+        self.type = ty
         self.message = message
         self.cont = cont
         self.name = name
@@ -23,8 +23,8 @@ class ErrorType(Enum):
     InterruptedError = auto()
 
 class Error():
-    def __init__(self, type, location, message, filename, name="Exception"):
-        self.type = type
+    def __init__(self, ty, location, message, filename, name="Exception"):
+        self.type = ty
         self.filename = filename
         self.message = message
         self.location = location

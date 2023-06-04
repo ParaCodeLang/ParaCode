@@ -25,6 +25,7 @@ class BasicValue:
 
     def lookup_type(self, global_scope):
         from interpreter.basic_object import BasicObject
+        # print(type(global_scope))
 
         if isinstance(self.value, BasicValue):#type(self.value) == BasicValue:
             return self.value.lookup_type(global_scope)

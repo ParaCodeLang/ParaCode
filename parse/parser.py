@@ -600,7 +600,6 @@ class Parser():
         self.eat(TokenType.LParen)
         
         argnames = []
-        arg = None
         last = self.current_token
         
         if self.current_token.type is not TokenType.RParen:
@@ -658,6 +657,7 @@ class Parser():
         arguments = []
 
         if isinstance(node, NodeVariable):
+            print(type(node.token))
             arguments.append(NodeDeclare(None, node.token, NodeNone(token)))
 
         if self.eat(TokenType.Arrow) is None:
