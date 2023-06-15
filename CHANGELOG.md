@@ -5,11 +5,10 @@ The format a slightly altered version of [Keep a Changelog](https://keepachangel
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## A Look to the Future
-- Support for variables in the `catch` statement
+- A better approach to exceptions that is similar to either Rust or Zig
 - The ability to use keyword arguments when calling a function
-- **kwargs (Keyword Arguments)
 - More exceptions & error messages
-- An entire interfacing module for ParaCode/Rust communication
+- An entire interfacing module for ParaCode/Rust communication using wasm-pack (`cargo install wasm-pack`)
 - A superior, modular language structure allowing for true extension creation (ie. lower-level methods written in Rust for use in ParaCode or even custom keywords and operators)
 - Changes to the standard library to improve consistency, efficiency, and overall readability
 - A complete requests HTTP module
@@ -18,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Async functionality
 - Tab completion in the repl
 - A better icon
+- The rebranding of the entire language from ParaCode to either Jet or Jetstream (JTS)
 
 ## [3.0.0] - CURRENTLY UNRELEASED
 ### Changed
@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.1.0] - CURRENTLY UNRELEASED
 ### Added
 - Easy use of default parameters in functions
-- *args (Non-Keyword Arguments)
+- Non-Keyword Arguments
 - Complete regex support
 - Some basic exceptions
 - A reflection module

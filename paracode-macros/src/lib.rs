@@ -16,9 +16,3 @@ pub fn derive_basicvalue(input: TokenStream) -> TokenStream {
     }
     .into()
 }
-
-// #[proc_macro]
-// pub fn generate_native_method(input: TokenStream) -> TokenStream {
-//     // let input = parse_macro_input!(input as DeriveInput);
-//     "fn answer() -> u32 { 42 }".parse().unwrap()
-// }

@@ -1,4 +1,4 @@
-/// Patch `Object` to define `patch` method as well as default compare operator
+// Patch `Object` to define `patch` method as well as default compare operator
 __intern_object_patch__(Object, {
     func patch(self, _patch) {
         return __intern_object_patch__(self, _patch);
@@ -29,7 +29,7 @@ func print(message="", end="\n") {
     io.write(message, end);
 }
 
-let cimport = __intern_import_cpp__;
+let rsimport = __intern_import_rust__;
 
 
 import "std/types/null.para";
@@ -62,4 +62,3 @@ import "std/types/exceptions/dictlookuperror.para";
 
 import "std/types/events/eventhandler.para";
 import "std/types/events/event.para";
-

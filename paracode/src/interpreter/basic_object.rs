@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::fmt;
 
 use crate::interpreter::basic_wrapper::BasicWrapper;
-use crate::interpreter::basic_value::BasicValue;
 
 #[derive(Debug)]
 pub struct ObjectMember<'a> {

@@ -2,6 +2,7 @@ use std::convert::AsRef;
 use std::fmt;
 
 use strum_macros::AsRefStr;
+use dyn_clone::{clone_trait_object, DynClone};
 
 use crate::lexer::LexerToken;
 use crate::parse::source_location::SourceLocation;
@@ -12,7 +13,20 @@ pub enum NumberType {
     Float(f32),
 }
 
-#[derive(Eq, PartialEq, Debug, EnumString, strum_macros::Display, AsRefStr)]
+#[derive(Debug, Clone)]
+pub enum NodeValueType {
+    Number(NumberType),
+    String(String),
+    Node(Box<dyn AstNode>),
+}
+
+#[derive(Debug, Clone)]
+pub enum NodeOrVec {
+    Node(Box<dyn AstNode>),
+    Vec(Vec<Box<dyn AstNode>>),
+}
+
+#[derive(Eq, PartialEq, Debug, Clone, EnumString, strum_macros::Display, AsRefStr)]
 pub enum NodeType {
     #[strum(serialize = "Empty", serialize = "1")]
     Empty,
@@ -69,11 +83,11 @@ pub enum NodeType {
 }
 
 #[derive(Clone)]
-pub enum NodeTokenType<'a> {
-    Token(&'a LexerToken),
-    Node(&'a dyn AstNode<'a>),
+pub enum NodeTokenType {
+    Token(LexerToken),
+    Node(Box<dyn AstNode>),
 }
-impl<'a> fmt::Display for NodeTokenType<'a> {
+impl fmt::Display for NodeTokenType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         return match self {
             NodeTokenType::Token(tok) => write!(f, "{}", tok),
@@ -81,7 +95,7 @@ impl<'a> fmt::Display for NodeTokenType<'a> {
         };
     }
 }
-impl<'a> fmt::Debug for NodeTokenType<'a> {
+impl fmt::Debug for NodeTokenType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         return match self {
             NodeTokenType::Token(tok) => write!(f, "{:?}", tok),
@@ -90,52 +104,21 @@ impl<'a> fmt::Debug for NodeTokenType<'a> {
     }
 }
 
-pub trait AstNode<'a>: fmt::Debug + fmt::Display {
-    fn node_type(&self) -> &NodeType;
-    fn token(&self) -> &Option<NodeTokenType<'a>>;
+pub trait AstNode: fmt::Debug + fmt::Display + DynClone {
+    fn node_type(&self) -> NodeType;
+    fn token(&self) -> Option<NodeTokenType>;
     fn location(&self) -> (i32, i32);
+    fn is_splat(&self) -> bool;   
+    fn get_value(&self) -> Option<NodeValueType>;
+
+    fn as_dyn(&self) -> Box<dyn AstNode>;
 }
+clone_trait_object!(AstNode);
 
-#[macro_export]
-macro_rules! impl_astnode {
-    ($name:ident $(< $($lt:tt $(: $clt:tt $(+ $dlt:tt)*)?),+ >)?) => {
-        impl<'a> AstNode<'a> for $name<'a> {
-            fn node_type(&self) -> &NodeType {
-                return &self.ty;
-            }
-
-            fn token(&self) -> &Option<NodeTokenType<'a>> {
-                return &self.tok;
-            }
-
-            fn location(&self) -> (i32, i32) {
-                return self.loc;
-            }
-        }
-    };
-}
-#[macro_export]
-macro_rules! impl_astnode__ref_token {
-    ($name:ident $(< $($lt:tt $(: $clt:tt $(+ $dlt:tt)*)?),+ >)?) => {
-        impl<'a> AstNode<'a> for $name<'a> {
-            fn node_type(&self) -> &NodeType {
-                return &self.ty;
-            }
-
-            fn token(&self) -> &Option<NodeTokenType<'a>> {
-                return self.tok;
-            }
-
-            fn location(&self) -> (i32, i32) {
-                return self.loc;
-            }
-        }
-    };
-}
 #[macro_export]
 macro_rules! impl_astnode_displays {
     ($name:ident $(< $($lt:tt $(: $clt:tt $(+ $dlt:tt)*)?),+ >)?) => {
-        impl<'a> std::fmt::Display for $name<'a> {
+        impl std::fmt::Display for $name {
             fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
                 return match self.token() {
                     Some(tok) => write!(f, "AstNode[{}, {}]", self.node_type().as_ref(), tok),
@@ -143,7 +126,7 @@ macro_rules! impl_astnode_displays {
                 };
             }
         }
-        impl<'a> std::fmt::Debug for $name<'a> {
+        impl std::fmt::Debug for $name {
             fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
                 return write!(f, "{}", self);
             }
@@ -151,41 +134,67 @@ macro_rules! impl_astnode_displays {
     };
 }
 
-pub struct NodeNone<'a> {
+#[derive(Clone)]
+pub struct NodeNone {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 }
-impl<'a> NodeNone<'a> {
-    pub fn new(token: &'a LexerToken) -> NodeNone<'a> {
+impl NodeNone {
+    pub fn new(token: LexerToken) -> NodeNone {
         return NodeNone {
             ty: NodeType::Empty,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
         };
     }
 }
-impl_astnode!(NodeNone);
+impl AstNode for NodeNone {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeNone);
 
 // Binary op node; LEFT [+-*/] RIGHT
-pub struct NodeBinOp<'a> {
+#[derive(Clone)]
+pub struct NodeBinOp {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    left: &'a dyn AstNode<'a>,
-    right: &'a dyn AstNode<'a>,
+    left: Box<dyn AstNode>,
+    right: Box<dyn AstNode>,
 }
-impl<'a> NodeBinOp<'a> {
+impl NodeBinOp {
     pub fn new(
-        left: &'a dyn AstNode<'a>,
-        token: &'a LexerToken,
-        right: &'a dyn AstNode<'a>,
-    ) -> NodeBinOp<'a> {
+        left: Box<dyn AstNode>,
+        token: LexerToken,
+        right: Box<dyn AstNode>,
+    ) -> NodeBinOp {
         return NodeBinOp {
             ty: NodeType::BinOp,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
 
             left: left,
@@ -193,18 +202,43 @@ impl<'a> NodeBinOp<'a> {
         };
     }
 }
-impl_astnode!(NodeBinOp);
+impl AstNode for NodeBinOp {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeBinOp);
 
-pub struct NodeNumber<'a> {
+#[derive(Clone)]
+pub struct NodeNumber {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
     value: NumberType,
 }
-impl<'a> NodeNumber<'a> {
-    pub fn new(token: &'a LexerToken) -> NodeNumber<'a> {
+impl NodeNumber {
+    pub fn new(token: LexerToken) -> NodeNumber {
         let value: NumberType;
         if token.value.contains(".") {
             value = NumberType::Float(lexical::parse::<f32, _>(&token.value).unwrap());
@@ -213,92 +247,192 @@ impl<'a> NodeNumber<'a> {
         }
         return NodeNumber {
             ty: NodeType::Number,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
 
             value: value,
         };
     }
 }
-impl_astnode!(NodeNumber);
+impl AstNode for NodeNumber {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return Some(NodeValueType::Number(self.value.clone()));
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeNumber);
 
-pub struct NodeString<'a> {
+#[derive(Clone)]
+pub struct NodeString {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
     value: String,
 }
-impl<'a> NodeString<'a> {
-    pub fn new(token: &'a LexerToken) -> NodeString<'a> {
+impl NodeString {
+    pub fn new(token: LexerToken) -> NodeString {
         return NodeString {
             ty: NodeType::String,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
 
             value: token.value[1..token.value.len() - 1].to_string(),
         };
     }
 }
-impl_astnode!(NodeString);
+impl AstNode for NodeString {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return Some(NodeValueType::String(self.value.clone()));
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeString);
 
 // Unary node; switches signage for values, '!' operator
-pub struct NodeUnaryOp<'a> {
+#[derive(Clone)]
+pub struct NodeUnaryOp {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    expression: &'a dyn AstNode<'a>,
+    expression: Box<dyn AstNode>,
 }
-impl<'a> NodeUnaryOp<'a> {
-    pub fn new(token: &'a LexerToken, expression: &'a dyn AstNode<'a>) -> NodeUnaryOp<'a> {
+impl NodeUnaryOp {
+    pub fn new(token: LexerToken, expression: Box<dyn AstNode>) -> NodeUnaryOp {
         return NodeUnaryOp {
             ty: NodeType::UnaryOp,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
 
             expression: expression,
         };
     }
 }
-impl_astnode!(NodeUnaryOp);
+impl AstNode for NodeUnaryOp {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeUnaryOp);
 
 // Block node; parent to multiple nodes
-pub struct NodeBlock<'a> {
+#[derive(Clone)]
+pub struct NodeBlock {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    children: Vec<&'a dyn AstNode<'a>>,
+    pub children: Vec<Box<dyn AstNode>>,
 }
-impl<'a> NodeBlock<'a> {
-    pub fn new(token: &'a LexerToken) -> NodeBlock<'a> {
+impl NodeBlock {
+    pub fn new(token: LexerToken) -> NodeBlock {
         return NodeBlock {
             ty: NodeType::Block,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
 
             children: vec![],
         };
     }
 }
-impl_astnode!(NodeBlock);
+impl AstNode for NodeBlock {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeBlock);
 
 // Type node; Holds type info for variable
-pub struct NodeVarType<'a> {
+#[derive(Clone)]
+pub struct NodeVarType {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 }
-impl<'a> NodeVarType<'a> {
-    pub fn new(token: &'a LexerToken) -> NodeVarType<'a> {
+impl NodeVarType {
+    pub fn new(token: LexerToken) -> NodeVarType {
         return NodeVarType {
             ty: NodeType::Type,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
         };
     }
@@ -310,30 +444,55 @@ impl<'a> NodeVarType<'a> {
         };
     }
 }
-impl_astnode!(NodeVarType);
+impl AstNode for NodeVarType {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeVarType);
 
 // Declare node; declare variable or function
-pub struct NodeDeclare<'a> {
+#[derive(Clone)]
+pub struct NodeDeclare {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    type_node: Option<&'a dyn AstNode<'a>>,
-    name: &'a LexerToken,
-    value: &'a dyn AstNode<'a>,
+    type_node: Option<Box<dyn AstNode>>,
+    name: LexerToken,
+    value: Box<dyn AstNode>,
     allow_casting: bool,
 }
-impl<'a> NodeDeclare<'a> {
+impl NodeDeclare {
     pub fn new(
-        ty: Option<&'a dyn AstNode<'a>>,
-        name: &'a LexerToken,
-        value: &'a dyn AstNode<'a>,
+        ty: Option<Box<dyn AstNode>>,
+        name: LexerToken,
+        value: Box<dyn AstNode>,
         allow_casting: bool,
-    ) -> NodeDeclare<'a> {
+    ) -> NodeDeclare {
         return NodeDeclare {
             ty: NodeType::Declare,
-            tok: Some(NodeTokenType::Token(name)),
+            tok: Some(NodeTokenType::Token(name.clone())),
             loc: name.location,
 
             type_node: ty,
@@ -343,22 +502,47 @@ impl<'a> NodeDeclare<'a> {
         };
     }
 }
-impl_astnode!(NodeDeclare);
+impl AstNode for NodeDeclare {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+    
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+    
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+    
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+    
+    fn get_value(&self) -> Option<NodeValueType> {
+        return Some(NodeValueType::Node(self.value.clone()));
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeDeclare);
 
-pub struct NodeImport<'a> {
+#[derive(Clone)]
+pub struct NodeImport {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    children: Vec<&'a dyn AstNode<'a>>,
+    pub children: Vec<Box<dyn AstNode>>,
     source_location: SourceLocation,
 }
-impl<'a> NodeImport<'a> {
-    pub fn new(filename: &'a LexerToken, source_location: SourceLocation) -> NodeImport<'a> {
+impl NodeImport {
+    pub fn new(filename: LexerToken, source_location: SourceLocation) -> NodeImport {
         return NodeImport {
             ty: NodeType::Import,
-            tok: Some(NodeTokenType::Token(filename)),
+            tok: Some(NodeTokenType::Token(filename.clone())),
             loc: filename.location,
 
             children: vec![],
@@ -366,26 +550,51 @@ impl<'a> NodeImport<'a> {
         };
     }
 }
-impl_astnode!(NodeImport);
+impl AstNode for NodeImport {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeImport);
 
-pub struct NodeWhile<'a> {
+#[derive(Clone)]
+pub struct NodeWhile {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    block: &'a NodeBlock<'a>,
-    expr: &'a dyn AstNode<'a>,
+    block: NodeBlock,
+    expr: Box<dyn AstNode>,
 }
-impl<'a> NodeWhile<'a> {
+impl NodeWhile {
     pub fn new(
-        expr: &'a dyn AstNode<'a>,
-        block: &'a NodeBlock<'a>,
-        token: &'a LexerToken,
-    ) -> NodeWhile<'a> {
+        expr: Box<dyn AstNode>,
+        block: NodeBlock,
+        token: LexerToken,
+    ) -> NodeWhile {
         return NodeWhile {
             ty: NodeType::While,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
 
             block: block,
@@ -393,28 +602,53 @@ impl<'a> NodeWhile<'a> {
         };
     }
 }
-impl_astnode!(NodeWhile);
+impl AstNode for NodeWhile {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeWhile);
 
-pub struct NodeFor<'a> {
+#[derive(Clone)]
+pub struct NodeFor {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    var_token: &'a LexerToken,
-    block: &'a NodeBlock<'a>,
-    expr: &'a dyn AstNode<'a>,
+    var_token: LexerToken,
+    block: NodeBlock,
+    expr: Box<dyn AstNode>,
 }
-impl<'a> NodeFor<'a> {
+impl NodeFor {
     pub fn new(
-        var_token: &'a LexerToken,
-        expr: &'a dyn AstNode<'a>,
-        block: &'a NodeBlock<'a>,
-        token: &'a LexerToken,
-    ) -> NodeFor<'a> {
+        var_token: LexerToken,
+        expr: Box<dyn AstNode>,
+        block: NodeBlock,
+        token: LexerToken,
+    ) -> NodeFor {
         return NodeFor {
             ty: NodeType::For,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
 
             var_token: var_token,
@@ -423,19 +657,44 @@ impl<'a> NodeFor<'a> {
         };
     }
 }
-impl_astnode!(NodeFor);
+impl AstNode for NodeFor {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeFor);
 
-pub struct NodeCall<'a> {
+#[derive(Clone)]
+pub struct NodeCall {
     ty: NodeType,
-    tok: &'a Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    lhs: &'a dyn AstNode<'a>,
-    argument_list: &'a NodeArgumentList<'a>,
+    lhs: Box<dyn AstNode>,
+    argument_list: NodeArgumentList,
 }
-impl<'a> NodeCall<'a> {
-    pub fn new(lhs: &'a dyn AstNode<'a>, argument_list: &'a NodeArgumentList<'a>) -> NodeCall<'a> {
+impl NodeCall {
+    pub fn new(lhs: Box<dyn AstNode>, argument_list: NodeArgumentList) -> NodeCall {
         return NodeCall {
             ty: NodeType::Call,
             tok: lhs.token(),
@@ -452,23 +711,48 @@ impl<'a> NodeCall<'a> {
         };
     }
 }
-impl_astnode__ref_token!(NodeCall);
+impl AstNode for NodeCall {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeCall);
 
 // Assignment node; Var = Value
-pub struct NodeAssign<'a> {
+#[derive(Clone)]
+pub struct NodeAssign {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    lhs: &'a dyn AstNode<'a>,
-    value: &'a dyn AstNode<'a>,
+    lhs: Box<dyn AstNode>,
+    pub value: Box<dyn AstNode>,
 }
-impl<'a> NodeAssign<'a> {
-    pub fn new(lhs: &'a dyn AstNode<'a>, value: &'a dyn AstNode<'a>) -> NodeAssign<'a> {
+impl NodeAssign {
+    pub fn new(lhs: Box<dyn AstNode>, value: Box<dyn AstNode>) -> NodeAssign {
         return NodeAssign {
             ty: NodeType::Assign,
-            tok: Some(NodeTokenType::Node(value)),
+            tok: Some(NodeTokenType::Node(value.clone())),
             loc: value.location(),
 
             lhs: lhs,
@@ -476,52 +760,102 @@ impl<'a> NodeAssign<'a> {
         };
     }
 }
-impl_astnode!(NodeAssign);
+impl AstNode for NodeAssign {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+    
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+    
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+    
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+    
+    fn get_value(&self) -> Option<NodeValueType> {
+        return Some(NodeValueType::Node(self.value.clone()));
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeAssign);
 
 // Variable node; request value of variable
-pub struct NodeVariable<'a> {
+#[derive(Clone)]
+pub struct NodeVariable {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    value: &'a String,
+    value: String,
     allow_casting: bool,
 }
-impl<'a> NodeVariable<'a> {
-    pub fn new(token: &'a LexerToken, allow_casting: bool) -> NodeVariable<'a> {
+impl NodeVariable {
+    pub fn new(token: LexerToken, allow_casting: bool) -> NodeVariable {
         return NodeVariable {
             ty: NodeType::Variable,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
 
-            value: &token.value,
+            value: token.value,
             allow_casting: allow_casting,
         };
     }
 }
-impl_astnode!(NodeVariable);
+impl AstNode for NodeVariable {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return Some(NodeValueType::String(self.value.clone()));
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeVariable);
 
-pub struct NodeIfStatement<'a> {
+#[derive(Clone)]
+pub struct NodeIfStatement {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    expr: &'a dyn AstNode<'a>,
-    block: &'a NodeBlock<'a>,
-    else_block: Option<&'a dyn AstNode<'a>>,
+    expr: Box<dyn AstNode>,
+    block: NodeBlock,
+    else_block: Option<Box<dyn AstNode>>,
 }
-impl<'a> NodeIfStatement<'a> {
+impl NodeIfStatement {
     pub fn new(
-        expr: &'a dyn AstNode<'a>,
-        block: &'a NodeBlock<'a>,
-        else_block: Option<&'a dyn AstNode<'a>>,
-        token: &'a LexerToken,
-    ) -> NodeIfStatement<'a> {
+        expr: Box<dyn AstNode>,
+        block: NodeBlock,
+        else_block: Option<Box<dyn AstNode>>,
+        token: LexerToken,
+    ) -> NodeIfStatement {
         return NodeIfStatement {
             ty: NodeType::IfStatement,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
 
             expr: expr,
@@ -530,34 +864,59 @@ impl<'a> NodeIfStatement<'a> {
         };
     }
 }
-impl_astnode!(NodeIfStatement);
+impl AstNode for NodeIfStatement {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeIfStatement);
 
-pub struct NodeTryCatch<'a> {
+#[derive(Clone)]
+pub struct NodeTryCatch {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    block: &'a NodeBlock<'a>,
-    catch_block: Vec<&'a NodeBlock<'a>>,
-    expr: Vec<&'a dyn AstNode<'a>>,
-    else_block: Option<&'a dyn AstNode<'a>>,
-    finally_block: Option<&'a dyn AstNode<'a>>,
-    variable: Option<&'a NodeDeclare<'a>>,
+    block: NodeBlock,
+    catch_block: Vec<NodeBlock>,
+    expr: Vec<NodeOrVec>,
+    else_block: Option<Box<dyn AstNode>>,
+    finally_block: Option<Box<dyn AstNode>>,
+    variable: Vec<Option<NodeDeclare>>,
 }
-impl<'a> NodeTryCatch<'a> {
+impl NodeTryCatch {
     pub fn new(
-        block: &'a NodeBlock<'a>,
-        catch_block: Vec<&'a NodeBlock<'a>>,
-        expr: Vec<&'a dyn AstNode<'a>>,
-        else_block: Option<&'a dyn AstNode<'a>>,
-        finally_block: Option<&'a dyn AstNode<'a>>,
-        token: &'a LexerToken,
-        variable: Option<&'a NodeDeclare<'a>>,
-    ) -> NodeTryCatch<'a> {
+        block: NodeBlock,
+        catch_block: Vec<NodeBlock>,
+        expr: Vec<NodeOrVec>,
+        else_block: Option<Box<dyn AstNode>>,
+        finally_block: Option<Box<dyn AstNode>>,
+        token: LexerToken,
+        variable: Vec<Option<NodeDeclare>>,
+    ) -> NodeTryCatch {
         return NodeTryCatch {
             ty: NodeType::Try,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
 
             block: block,
@@ -569,67 +928,148 @@ impl<'a> NodeTryCatch<'a> {
         };
     }
 }
-impl_astnode!(NodeTryCatch);
+impl AstNode for NodeTryCatch {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeTryCatch);
 
-pub struct NodeArgumentList<'a> {
+#[derive(Clone)]
+pub struct NodeArgumentList {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    arguments: Vec<NodeTokenType<'a>>,
+    pub arguments: Vec<NodeTokenType>,
 }
-impl<'a> NodeArgumentList<'a> {
-    pub fn new(token: &'a LexerToken) -> NodeArgumentList<'a> {
+impl NodeArgumentList {
+    pub fn new(arguments: Vec<NodeTokenType>, token: Option<NodeTokenType>) -> NodeArgumentList {
         return NodeArgumentList {
             ty: NodeType::ArgumentList,
-            tok: Some(NodeTokenType::Token(token)),
-            loc: token.location,
+            tok: token.clone(),
+            loc: match token {
+                Some(t) => match t {
+                    NodeTokenType::Token(tok) => tok.location,
+                    NodeTokenType::Node(node) => node.location(),
+                },
+                None => (0, 0),
+            },
 
-            arguments: vec![],
+            arguments: arguments,
         };
     }
 }
-impl_astnode!(NodeArgumentList);
+impl AstNode for NodeArgumentList {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeArgumentList);
 
-pub struct NodeSplatArgument<'a> {
+#[derive(Clone)]
+pub struct NodeSplatArgument {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    expr: &'a dyn AstNode<'a>,
+    expr: Box<dyn AstNode>,
 }
-impl<'a> NodeSplatArgument<'a> {
-    pub fn new(expr: &'a dyn AstNode<'a>, token: &'a LexerToken) -> NodeSplatArgument<'a> {
+impl NodeSplatArgument {
+    pub fn new(expr: Box<dyn AstNode>, token: LexerToken) -> NodeSplatArgument {
         return NodeSplatArgument {
             ty: NodeType::SplatArgument,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
 
             expr: expr,
         };
     }
 }
-impl_astnode!(NodeSplatArgument);
+impl AstNode for NodeSplatArgument {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return true;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeSplatArgument);
 
-pub struct NodeFunctionExpression<'a> {
+#[derive(Clone)]
+pub struct NodeFunctionExpression {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    block: &'a NodeBlock<'a>,
-    argument_list: &'a NodeArgumentList<'a>,
+    block: NodeBlock,
+    argument_list: NodeArgumentList,
 }
-impl<'a> NodeFunctionExpression<'a> {
+impl NodeFunctionExpression {
     pub fn new(
-        argument_list: &'a NodeArgumentList<'a>,
-        block: &'a NodeBlock<'a>,
-    ) -> NodeFunctionExpression<'a> {
+        argument_list: NodeArgumentList,
+        block: NodeBlock,
+    ) -> NodeFunctionExpression {
         return NodeFunctionExpression {
             ty: NodeType::FunctionExpression,
-            tok: Some(NodeTokenType::Node(block)),
+            tok: Some(NodeTokenType::Node(Box::new(block.clone()))),
             loc: block.location(),
 
             block: block,
@@ -637,89 +1077,195 @@ impl<'a> NodeFunctionExpression<'a> {
         };
     }
 }
-impl_astnode!(NodeFunctionExpression);
+impl AstNode for NodeFunctionExpression {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeFunctionExpression);
 
-pub struct NodeFunctionReturn<'a> {
+#[derive(Clone)]
+pub struct NodeFunctionReturn {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    value_node: &'a dyn AstNode<'a>,
+    value_node: Box<dyn AstNode>,
 }
-impl<'a> NodeFunctionReturn<'a> {
-    pub fn new(value_node: &'a dyn AstNode<'a>, token: &'a LexerToken) -> NodeFunctionReturn<'a> {
+impl NodeFunctionReturn {
+    pub fn new(value_node: Box<dyn AstNode>, token: Option<NodeTokenType>) -> NodeFunctionReturn {
         return NodeFunctionReturn {
             ty: NodeType::FunctionReturn,
-            tok: Some(NodeTokenType::Token(token)),
-            loc: token.location,
+            tok: token.clone(),
+            loc: match token {
+                Some(t) => match t {
+                    NodeTokenType::Token(tok) => tok.location,
+                    NodeTokenType::Node(node) => node.location(),
+                },
+                None => (0, 0),
+            },
 
             value_node: value_node,
         };
     }
 }
-impl_astnode!(NodeFunctionReturn);
+impl AstNode for NodeFunctionReturn {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeFunctionReturn);
 
-pub struct NodeMacro<'a> {
+#[derive(Clone)]
+pub struct NodeMacro {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    expr: &'a NodeCall<'a>,
+    expr: NodeCall,
 }
-impl<'a> NodeMacro<'a> {
-    pub fn new(expr: &'a NodeCall<'a>, token: &'a LexerToken) -> NodeMacro<'a> {
+impl NodeMacro {
+    pub fn new(expr: NodeCall, token: LexerToken) -> NodeMacro {
         return NodeMacro {
             ty: NodeType::Macro,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
 
             expr: expr,
         };
     }
 }
-impl_astnode!(NodeMacro);
+impl AstNode for NodeMacro {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeMacro);
 
-pub struct NodeMixin<'a> {
+#[derive(Clone)]
+pub struct NodeMixin {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    tokens: Vec<&'a LexerToken>,
+    tokens: Vec<LexerToken>,
 }
-impl<'a> NodeMixin<'a> {
-    pub fn new(tokens: Vec<&'a LexerToken>, token: &'a LexerToken) -> NodeMixin<'a> {
+impl NodeMixin {
+    pub fn new(tokens: Vec<LexerToken>, token: LexerToken) -> NodeMixin {
         return NodeMixin {
             ty: NodeType::Mixin,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
 
             tokens: tokens,
         };
     }
 }
-impl_astnode!(NodeMixin);
+impl AstNode for NodeMixin {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeMixin);
 
-pub struct NodeArrayExpression<'a> {
+#[derive(Clone)]
+pub struct NodeArrayExpression {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    members: Vec<&'a dyn AstNode<'a>>,
+    members: Vec<Box<dyn AstNode>>,
     is_dictionary: bool,
 }
-impl<'a> NodeArrayExpression<'a> {
+impl NodeArrayExpression {
     pub fn new(
-        members: Vec<&'a dyn AstNode<'a>>,
-        token: &'a LexerToken,
+        members: Vec<Box<dyn AstNode>>,
+        token: LexerToken,
         is_dictionary: bool,
-    ) -> NodeArrayExpression<'a> {
+    ) -> NodeArrayExpression {
         return NodeArrayExpression {
             ty: NodeType::ArrayExpression,
-            tok: Some(NodeTokenType::Token(token)),
+            tok: Some(NodeTokenType::Token(token.clone())),
             loc: token.location,
 
             members: members,
@@ -727,18 +1273,43 @@ impl<'a> NodeArrayExpression<'a> {
         };
     }
 }
-impl_astnode!(NodeArrayExpression);
+impl AstNode for NodeArrayExpression {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeArrayExpression);
 
-pub struct NodeObjectExpression<'a> {
+#[derive(Clone)]
+pub struct NodeObjectExpression {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    members: Vec<&'a NodeDeclare<'a>>,
+    members: Vec<NodeDeclare>,
 }
-impl<'a> NodeObjectExpression<'a> {
-    pub fn new(members: Vec<&'a NodeDeclare<'a>>) -> NodeObjectExpression<'a> {
+impl NodeObjectExpression {
+    pub fn new(members: Vec<NodeDeclare>) -> NodeObjectExpression {
         return NodeObjectExpression {
             // Members are var decls
             ty: NodeType::ObjectExpression,
@@ -749,50 +1320,106 @@ impl<'a> NodeObjectExpression<'a> {
         };
     }
 }
-impl_astnode!(NodeObjectExpression);
+impl AstNode for NodeObjectExpression {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeObjectExpression);
 
-pub struct NodeMemberExpression<'a> {
+#[derive(Clone)]
+pub struct NodeMemberExpression {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    lhs: &'a dyn AstNode<'a>,
-    identifier: &'a LexerToken,
+    lhs: Box<dyn AstNode>,
+    identifier: LexerToken,
 }
-impl<'a> NodeMemberExpression<'a> {
+impl NodeMemberExpression {
     pub fn new(
-        lhs: &'a dyn AstNode<'a>,
-        identifier: &'a LexerToken,
-        token: &'a LexerToken,
-    ) -> NodeMemberExpression<'a> {
+        lhs: Box<dyn AstNode>,
+        identifier: LexerToken,
+        token: Option<NodeTokenType>,
+    ) -> NodeMemberExpression {
         return NodeMemberExpression {
             ty: NodeType::MemberExpression,
-            tok: Some(NodeTokenType::Token(token)),
-            loc: token.location,
+            tok: token.clone(),
+            loc: match token {
+                Some(t) => match t {
+                    NodeTokenType::Token(tok) => tok.location,
+                    NodeTokenType::Node(node) => node.location(),
+                },
+                None => (0, 0),
+            },
 
             lhs: lhs,
             identifier: identifier,
         };
     }
 }
-impl_astnode!(NodeMemberExpression);
+impl AstNode for NodeMemberExpression {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeMemberExpression);
 
-pub struct NodeArrayAccessExpression<'a> {
+#[derive(Clone)]
+pub struct NodeArrayAccessExpression {
     ty: NodeType,
-    tok: Option<NodeTokenType<'a>>,
+    tok: Option<NodeTokenType>,
     loc: (i32, i32),
 
-    lhs: &'a dyn AstNode<'a>,
-    access_expr: &'a dyn AstNode<'a>,
+    lhs: Box<dyn AstNode>,
+    access_expr: Box<dyn AstNode>,
 }
-impl<'a> NodeArrayAccessExpression<'a> {
+impl NodeArrayAccessExpression {
     pub fn new(
-        lhs: &'a dyn AstNode<'a>,
-        access_expr: &'a dyn AstNode<'a>,
-        token: &'a LexerToken,
-    ) -> NodeArrayAccessExpression<'a> {
+        lhs: Box<dyn AstNode>,
+        access_expr: Box<dyn AstNode>,
+        token: LexerToken,
+    ) -> NodeArrayAccessExpression {
         return NodeArrayAccessExpression {
             ty: NodeType::ArrayAccessExpression,
             tok: Some(NodeTokenType::Token(token)),
@@ -803,5 +1430,29 @@ impl<'a> NodeArrayAccessExpression<'a> {
         };
     }
 }
-impl_astnode!(NodeArrayAccessExpression);
+impl AstNode for NodeArrayAccessExpression {
+    fn node_type(&self) -> NodeType {
+        return self.ty.clone();
+    }
+
+    fn token(&self) -> Option<NodeTokenType> {
+        return self.tok.clone();
+    }
+
+    fn location(&self) -> (i32, i32) {
+        return self.loc;
+    }
+
+    fn is_splat(&self) -> bool {
+        return false;
+    }
+
+    fn get_value(&self) -> Option<NodeValueType> {
+        return None;
+    }
+
+    fn as_dyn(&self) -> Box<dyn AstNode> {
+        Box::new(self.clone())
+    }
+}
 impl_astnode_displays!(NodeArrayAccessExpression);

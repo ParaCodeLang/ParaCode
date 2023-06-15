@@ -1,3 +1,4 @@
+#[derive(PartialEq, Debug, Clone)]
 pub struct SourceLocation {
     pub filename: String,
     pub col: i32,

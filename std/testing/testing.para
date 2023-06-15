@@ -1,4 +1,0 @@
-import "std/testing/test.para";
-
-func assert(condition, message) {
-}

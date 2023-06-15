@@ -6,8 +6,11 @@ use rustyline::Editor;
 
 use paracode::lexer::Lexer;
 use paracode::paracode::ParaCode;
+use paracode::parse::node::AstNode;
+use paracode::parse::parser::Parser;
 use paracode::parse::source_location::SourceLocation;
 use paracode::utils::LogColor;
+use paracode::error::ErrorList;
 
 pub struct Repl {
     paracode: ParaCode,
@@ -94,7 +97,7 @@ impl Repl {
 
     // load_walkthrough_messages
 
-    pub fn accept_input(&mut self) -> Result<(), String> {
+    pub fn accept_input(&mut self) -> Result<(), Option<String>> {
         let line = match self.rl.readline(">>> ") {
             Ok(line) => line,
             Err(ReadlineError::Interrupted) => {
@@ -172,15 +175,13 @@ impl Repl {
 
     // eval_line_ast
 
-    // Needs Parser
-    pub fn parse_line(&self, line: String) -> Result<((), ()), String> {
+    pub fn parse_line(&self, line: String) -> Result<(Vec<Box<dyn AstNode>>, ErrorList), Option<String>> {
         let mut lexer = Lexer::new(&line, SourceLocation::new(Repl::filename(), 1, 1));
         let tokens = lexer.lex()?;
 
-        // let parser = Parser::new(tokens, lexer.source_location);
+        let mut parser = Parser::new(tokens, lexer.source_location);
 
-        // return Ok(parser.parse(), parser.error_list);
-        return Ok(((), ()));
+        return Ok((parser.parse()?, parser.error_list));
     }
 
     pub fn count_continuation_tokens(&self, line: &String) -> (i32, i32, i32, String) {

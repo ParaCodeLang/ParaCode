@@ -5,7 +5,7 @@ let LangInfo = Type.extend({
         return "3.0.0";
     }
 
-    func get_extension_language() {
-        return "Rust";
+    func get_extensions_language() {
+        return "rust";
     }
 });

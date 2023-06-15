@@ -190,6 +190,9 @@ impl TokenType {
     }
 }
 
+lazy_static! {
+    static ref NONE_TOKEN: LexerToken = LexerToken::new(String::new(), Some(TokenType::NoneToken));
+}
 #[derive(Debug, Clone)]
 pub struct LexerToken {
     pub token_type: Option<TokenType>,
@@ -197,8 +200,8 @@ pub struct LexerToken {
     pub location: (i32, i32),
 }
 impl LexerToken {
-    pub fn none() -> LexerToken {
-        return LexerToken::new(String::new(), Some(TokenType::NoneToken));
+    pub fn none<'a>() -> &'a LexerToken {
+        return &*NONE_TOKEN;
     }
 
     pub fn new(value: String, token_type: Option<TokenType>) -> LexerToken {
@@ -209,6 +212,13 @@ impl LexerToken {
             },
             value: value,
             location: (0, 0),
+        };
+    }
+
+    pub fn is_none(&self) -> bool {
+        return match &self.token_type {
+            Some(t) => t == &TokenType::NoneToken,
+            None => true,
         };
     }
 }
@@ -238,7 +248,7 @@ impl PartialEq<LexerToken> for LexerToken {
 }
 
 pub struct Lexer<'a> {
-    pub tokens: Vec<LexerToken>,
+    pub tokens: Vec<Option<LexerToken>>,
     pub data: &'a String,
     pub token_data: String,
     pub index: i32,
@@ -290,13 +300,13 @@ impl<'a> Lexer<'a> {
         return self.data.chars().nth(idx as usize).unwrap().to_string();
     }
 
-    pub fn push_token(&mut self) -> Result<(), String> {
+    pub fn push_token(&mut self) -> Result<(), Option<String>> {
         let mut token = LexerToken::new(self.token_data.clone(), None);
         if self.token_data.is_empty() {
-            return Err("tokendata blank".to_string());
+            return Err(Some("tokendata blank".to_string()));
         }
         token.location = self.source_location.col_row();
-        self.tokens.push(token);
+        self.tokens.push(Some(token));
         self.token_data.clear();
 
         return Ok(());
@@ -314,7 +324,7 @@ impl<'a> Lexer<'a> {
         return false;
     }
 
-    pub fn lex(&mut self) -> Result<&Vec<LexerToken>, String> {
+    pub fn lex(&mut self) -> Result<Vec<Option<LexerToken>>, Option<String>> {
         let splitables = "(){}[];:+-*/=.,!?|&~<>^%".to_string();
         let multichar_splitables = vec![
             "**", "<=>", "<<=", ">>=", "|=", "&=", "^=", "==", "!=", "<=", ">=", "+=", "-=", "*=",
@@ -522,6 +532,6 @@ impl<'a> Lexer<'a> {
             self.push_token()?;
         }
 
-        return Ok(&self.tokens);
+        return Ok(self.tokens.clone());
     }
 }

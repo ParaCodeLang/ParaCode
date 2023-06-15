@@ -223,7 +223,7 @@ let Matrix4 = Iterable.extend({
     }
 
     func len(self) {
-        let _rval = 3;
+        let _rval = 4;
         return _rval;
     }
 

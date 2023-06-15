@@ -2,6 +2,9 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fmt::Debug;
 
+use crate::interpreter::scope::Scope;
+use crate::interpreter::basic_wrapper::BasicWrapper;
+
 use downcast_rs::Downcast;
 use dyn_clone::DynClone;
 
@@ -10,7 +13,32 @@ pub trait BasicValue: Debug + DynClone + Downcast {
         return self.get_detailed_string() == other.get_detailed_string();
     }
 
-    // lookup_type
+    fn lookup_type<'a>(&self, global_scope: Scope<'a>) -> Result<Option<&'a Box<BasicWrapper<'a>>>, String> {
+        /*if isinstance(self.value, BasicValue):#type(self.value) == BasicValue:
+            return self.value.lookup_type(global_scope)
+        elif isinstance(self.value, NodeFunctionExpression) or isinstance(self.value, BuiltinFunction):
+            return global_scope.find_variable_value('Func')
+        elif isinstance(self.value, NodeMacro):
+            return global_scope.find_variable_value('Macro')
+        elif type(self.value) is str:
+            return global_scope.find_variable_value('Str')
+        elif type(self.value) is int:
+            return global_scope.find_variable_value('Int')
+        elif type(self.value) is float:
+            return global_scope.find_variable_value('Float')
+        elif type(self.value) is list:
+            return global_scope.find_variable_value('Array')
+        elif type(self.value) is dict:
+            return global_scope.find_variable_value('Dict')
+        elif type(self.value) is bool:
+            return global_scope.find_variable_value('Bool')
+        elif self.value is None:
+            return global_scope.find_variable_value('Null')
+        else:
+            raise Exception('could not get type for {}'.format(self))*/
+    
+        todo!();
+    }
 
     fn is_null(&self) -> bool {
         return false;

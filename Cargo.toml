@@ -1,2 +1,9 @@
 [workspace]
-members = ["paracode", "paracode-macros", "paracode-repl"]
+members = [
+    "paracode",
+    "paracode-macros",
+    "paracode-repl"
+]
+
+# [profile.dev]
+# opt-level = "z"

@@ -5,7 +5,7 @@ use crate::parse::node::AstNode;
 use crate::utils::LogColor;
 
 pub struct InterpreterError<'a> {
-    node: &'a dyn AstNode<'a>,
+    node: Box<dyn AstNode>,
     ty: ErrorType,
     message: String,
     cont: bool,
@@ -15,7 +15,7 @@ pub struct InterpreterError<'a> {
 }
 impl<'a> InterpreterError<'a> {
     pub fn new(
-        node: &'a dyn AstNode<'a>,
+        node: Box<dyn AstNode>,
         ty: ErrorType,
         message: String,
         cont: bool,
@@ -40,7 +40,7 @@ impl<'a> fmt::Display for InterpreterError<'a> {
     }
 }
 
-#[derive(Eq, PartialEq, Debug, EnumString, strum_macros::Display, AsRefStr)]
+#[derive(Eq, PartialEq, Clone, Debug, EnumString, strum_macros::Display, AsRefStr)]
 pub enum ErrorType {
     #[strum(serialize = "Exception", serialize = "1")]
     Exception,
@@ -60,6 +60,7 @@ pub enum ErrorType {
     InterruptedError,
 }
 
+#[derive(Eq, PartialEq, Clone)]
 pub struct Error {
     ty: ErrorType,
     filename: String,
@@ -132,7 +133,7 @@ impl<'a> fmt::Debug for Error {
 }
 
 pub struct ErrorList {
-    errors: Vec<Error>,
+    pub errors: Vec<Error>,
 }
 impl ErrorList {
     pub fn new() -> ErrorList {
