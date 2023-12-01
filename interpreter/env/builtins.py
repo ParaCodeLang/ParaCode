@@ -1323,7 +1323,7 @@ def builtin_object_patch(arguments):
         interpreter.error(this_object, ErrorType.TypeError, 'Cannot patch non-BasicObject value: {}'.format(target))
         return None
 
-    if not isinstance(target, BasicObject):
+    if not isinstance(patch, BasicObject):
         interpreter.error(this_object, ErrorType.TypeError, 'Cannot patch object with non-BasicObject value: {}'.format(patch))
         return None
 
